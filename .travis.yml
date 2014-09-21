@@ -1,2 +1,2 @@
 language: cpp
-script : qmake && make
+script : qmake && make sub-src-src-cl-pro
