@@ -1,4 +1,5 @@
-This is FET version 5.23.2 [![Build Status](https://travis-ci.org/karandit/fet.png?branch=master)](https://travis-ci.org/karandit/fet)
+This is FET version 5.23.2
+[![Build Status] (https://travis-ci.org/karandit/fet.png?branch=master)](https://travis-ci.org/karandit/fet)
 
 
 Program description:
