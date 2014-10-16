@@ -2,5 +2,6 @@
 <qresource>
 	<file>images/locked.png</file>
 	<file>images/unlocked.png</file>
+	<file alias="images/appicon.png">../../icons/fet.png</file>
 </qresource>
 </RCC>

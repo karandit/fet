@@ -2,25 +2,22 @@
 File fet.cpp - this is where the program FET starts
 */
 
-/*
-Copyright 2002, 2003 Lalescu Liviu.
+/***************************************************************************
+                          fet.cpp  -  description
+                             -------------------
+    begin                : 2002
+    copyright            : (C) 2002 by Lalescu Liviu
+    email                : Please see http://lalescu.ro/liviu/ for details about contacting Liviu Lalescu (in particular, you can find here the e-mail address)
+ ***************************************************************************/
 
-This file is part of FET.
-
-FET is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-FET is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with timetable; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #include "fet.h"
 
@@ -38,6 +35,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <QTime>
 #include <QDate>
 #include <QDateTime>
+
+#include <QSet>
+
+static QSet<QString> languagesSet;
 
 #include <ctime>
 
@@ -241,9 +242,28 @@ void readSimulationParameters()
 		OUTPUT_DIR=predefDir;
 	}
 
+#ifndef USE_SYSTEM_LOCALE
 	FET_LANGUAGE=newSettings.value("language", "en_US").toString();
-	if(FET_LANGUAGE=="en_GB") //because older versions of FET used en_GB as the default language. I changed it to en_US
-		FET_LANGUAGE="en_US";
+#else
+	if(newSettings.contains("language")){
+		FET_LANGUAGE=newSettings.value("language").toString();
+	}
+	else{
+		FET_LANGUAGE=QLocale::system().name();
+
+		bool ok=false;
+		foreach(QString s, languagesSet){
+			if(FET_LANGUAGE.left(s.length())==s){
+				FET_LANGUAGE=s;
+				ok=true;
+				break;
+			}
+		}
+		if(!ok)
+			FET_LANGUAGE="en_US";
+	}
+#endif
+	
 	WORKING_DIRECTORY=newSettings.value("working-directory", "examples").toString();
 	IMPORT_DIRECTORY=newSettings.value("import-directory", OUTPUT_DIR).toString();
 	
@@ -346,6 +366,42 @@ void writeSimulationParameters()
 }
 #endif
 
+void initLanguagesSet()
+{
+	//This is one of the two places to insert a new language in the sources (the other one is in fetmainform.cpp).
+	languagesSet.clear();
+	languagesSet.insert("en_US");
+	languagesSet.insert("ar");
+	languagesSet.insert("ca");
+	languagesSet.insert("de");
+	languagesSet.insert("el");
+	languagesSet.insert("es");
+	languagesSet.insert("fr");
+	languagesSet.insert("hu");
+	languagesSet.insert("id");
+	languagesSet.insert("it");
+	languagesSet.insert("lt");
+	languagesSet.insert("mk");
+	languagesSet.insert("ms");
+	languagesSet.insert("nl");
+	languagesSet.insert("pl");
+	languagesSet.insert("ro");
+	languagesSet.insert("tr");
+	languagesSet.insert("ru");
+	languagesSet.insert("fa");
+	languagesSet.insert("uk");
+	languagesSet.insert("pt_BR");
+	languagesSet.insert("da");
+	languagesSet.insert("si");
+	languagesSet.insert("sk");
+	languagesSet.insert("he");
+	languagesSet.insert("sr");
+	languagesSet.insert("gl");
+	languagesSet.insert("vi");
+	languagesSet.insert("uz");
+	languagesSet.insert("sq");
+}
+
 #ifndef FET_COMMAND_LINE
 void setLanguage(QApplication& qapplication, QWidget* parent)
 #else
@@ -366,16 +422,16 @@ void setLanguage(QCoreApplication& qapplication, QWidget* parent)
 	
 	bool translation_loaded=false;
 	
-	//this is one place (out of 2) in which you need to add a new language
-	if(FET_LANGUAGE=="ar" || FET_LANGUAGE=="ca" || FET_LANGUAGE=="de" || FET_LANGUAGE=="es"
+	//this is one place (out of 2) in which you need to add a new language - DEPRECATED COMMENT
+/*	if(FET_LANGUAGE=="ar" || FET_LANGUAGE=="ca" || FET_LANGUAGE=="de" || FET_LANGUAGE=="es"
 	 || FET_LANGUAGE=="el" || FET_LANGUAGE=="fr" || FET_LANGUAGE=="hu" || FET_LANGUAGE=="mk"
 	 || FET_LANGUAGE=="ms" || FET_LANGUAGE=="nl" || FET_LANGUAGE=="pl" || FET_LANGUAGE=="ro"
 	 || FET_LANGUAGE=="tr" || FET_LANGUAGE=="id" || FET_LANGUAGE=="it" || FET_LANGUAGE=="lt"
 	 || FET_LANGUAGE=="ru" || FET_LANGUAGE=="fa" || FET_LANGUAGE=="uk" || FET_LANGUAGE=="pt_BR"
 	 || FET_LANGUAGE=="da" || FET_LANGUAGE=="si" || FET_LANGUAGE=="sk" || FET_LANGUAGE=="he"
 	 || FET_LANGUAGE=="sr" || FET_LANGUAGE=="gl" || FET_LANGUAGE=="vi" || FET_LANGUAGE=="uz"
-	 || FET_LANGUAGE=="sq"){
-
+	 || FET_LANGUAGE=="sq"){*/
+	if(FET_LANGUAGE!="en_US" && languagesSet.contains(FET_LANGUAGE)){
 		translation_loaded=translator.load("fet_"+FET_LANGUAGE, qapplication.applicationDirPath());
 		if(!translation_loaded){
 			translation_loaded=translator.load("fet_"+FET_LANGUAGE, qapplication.applicationDirPath()+"/translations");
@@ -548,6 +604,8 @@ int main(int argc, char **argv)
 #else
 	QCoreApplication qCoreApplication(argc, argv);
 #endif
+
+	initLanguagesSet();
 
 	VERBOSE=false;
 

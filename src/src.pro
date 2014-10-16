@@ -1308,6 +1308,13 @@ greaterThan(QT_MAJOR_VERSION, 4){
 DESTDIR = ..
 TARGET = fet
 
+win32 {
+	RC_FILE += interface/fet.rc
+}
+else: macx {
+	ICON = ../icons/fet.icns
+}
+
 OBJECTS_DIR = ../tmp/gui
 UI_DIR = ../tmp/gui
 MOC_DIR = ../tmp/gui
@@ -1316,4 +1323,10 @@ RCC_DIR = ../tmp/gui
 INCLUDEPATH += engine interface
 DEPENDPATH += engine interface
 
-RESOURCES+=interface/interface_images.qrc
+RESOURCES += interface/interface_images.qrc
+
+unix {
+	target.path = /usr/bin
+
+	INSTALLS += target
+}

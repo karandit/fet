@@ -34,9 +34,12 @@
 #include <QResizeEvent>
 #include <QCloseEvent>
 
+#include <QString>
 #include <QStringList>
 
 #include <QAction>
+
+#include <QMap>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -103,6 +106,8 @@ private:
 	QString strippedName(const QString& fullFileName);
 	void updateRecentFileActions();
 
+	void populateLanguagesMap(QMap<QString, QString>& languagesMap);
+	
 public:
 	FetMainForm();
 	~FetMainForm();

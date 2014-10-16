@@ -452,6 +452,7 @@ For multiple generation:
 Maybe add a checkbox "shutdown after job is done".
 
 26---------------------------------------------------------
+(see also entry #194)
 From Volker Dirr:
 
 long time goal: code cover planning.
@@ -1170,7 +1171,7 @@ Since there are two dialogs, one for activities and one for subactivities the (n
 By the way, is it really necessary to have two dialogs? I could imagine a check box "subactivity only" in a common dialog for both, activities and subactivities. This would make this comment obsolete.
 
 66---------------------------------------------------------
-From Chafik Graiguer:
+From Chafik Graiguer and Pietro:
 
 -Min hours daily with an activity tag (to count real activities only leaving pseudo activities out of count)
 -Min hours continuously with an activity tag 
@@ -2988,3 +2989,115 @@ space and maybe also improve speed.
 the problem is:
 how to implement both features ("year-group-subgroup" fet and enable only
 a "year-group" one.) at the same time without confusing a user?
+
+191---------------------------------------------------------
+From Boubker (on forum):
+
+Je tente de générer un emploi  du temps pour mon collège  et je  bute sur un petit problème est le suivant :
+Pour un enseignant  donné  « T »  j’ai affecté des classes répartis sur 3 niveaux (N1, N2 et N3) et je désire que cet enseignant  se voie attribuer  des classes de deux niveaux max par jour :
+C’est-à-dire que  cet enseignant  aura dans un jour de travail des classes des niveaux (N1 et N2) ou bien (N1 et N3)  ou bien (N2 et  N3).
+Es ce que vous pouvez me dire comment faire ?
+
+192---------------------------------------------------------
+From mbarsan (on forum):
+
+We have a school with 8 periods per day, with a short break every 2 hours. 
+There are 3 buildings.
+Teacher may change building during those short breaks.
+So we  haven't to say to FET any duration to change buildings. This may be done at beginning of hours nn. 3, 5 and 7.
+If a teacher works in a building at first and second periods, he may change building and work at third period.
+
+We may chose to insert breaks times (students and teachers not available) between periods 2 and 3, 4 and 5, 6 and 7 to allow building change in a period. But now we can handle 3 hours lessons only with the constraint "two activities are grouped", using the same teacher and same class with (sub)activities of 1 and 2 hours. We have also problems with subactivities with duration 2 that FET may not put with a break inside (so we have to use the same trick as above).
+
+Do you think that we may define a grid of hours to allow building changes only at specific periods?
+
+193---------------------------------------------------------
+From _indianajones (on forum):
+
+I think it would be useful, in case of difficult generation, to save the incomplete timetable in a .fet file without stopping the process,
+so I could convert this file with "Excel FET file import 2010 Marco Albano ver 2.0" and try to solve it manually.
+
+---
+
+Liviu Lalescu: Generate, stop, advanced lock -> lock all activities of current timetable -> save file.
+
+---
+
+_indianajones: ...but in this way the generation is definitively stopped.... am I wrong?
+
+After hours of elaboration I wish to save the best timetable found and let FET goes ahead...
+is it possible?
+
+---
+
+Liviu Lalescu: Oh, sorry, I did not see that you wanted generation to continue.
+
+I'll add your suggestion in the TODO, but it is not very nice, because I prefer FET to save .fet timetable files only when they are complete.
+
+Meanwhile, you can do this, for only one interruption (if you have a multiple core computer): start two generations on the same timetable, with the same FET version, with the same initial random seed state, then interrupt one of them after a few hours, and leave the other one running.
+
+194---------------------------------------------------------
+(see also entry #26)
+From russell (on forum):
+
+I hope FET could plan courses soon.
+
+195---------------------------------------------------------
+From russell (on forum):
+
+I have a teacher come to school in Monday and Wednesday OR in Tuesday and Friday. How to implement this constraint in FET? (I have some other constraint related to that teacher and his activities)
+
+---
+
+Liviu Lalescu:
+
+It would be easy to make a change in the code for this. But I don't know how to make it a general constraint with FET-style-name.
+
+These tricks might work:
+
+- Teacher not available on Thursday;
+
+- Max days per week for this teacher = 4;
+
+- Add two dummy activities for this teacher, duration = number of hours per day. Not allowed on Thursday (not really needed, because the teacher is not available). Then min+max 3 days between them;
+
+I hope I got all the details. Please correct me if I am wrong.
+
+---
+
+russell:
+
+Thanks for your reply.
+
+Can you please explain to me about "min+max 3"?  Dose it mean exactly 3 days distance (Tuesday to Friday)?
+
+Dose your solution work for days with different hours (Monday has 8 hours and others 6)?
+
+---
+
+Liviu Lalescu:
+
+The constraint min, then max days between activities.
+
+If the teacher cannot have more than 6 working hours on Monday, use a constraint activities occupy max time slots from selection for his activities, so he has no more than 6 working hours on Monday (less work for you).
+
+If he can have 7 or 8 real working hours on Monday, a lot of work for you: constrain each pair dummy - real activity pair for this teacher to not be on the same day (min 1 days between activities).
+
+Please think of other solutions, if you want.
+
+---
+
+russell:
+
+Most of the “select a day’s group from a set of the day’s group for a teacher” constraints can implement by other FET constraints. But if FET has a specific constraint for that it would be better.
+
+---
+
+Liviu Lalescu:
+
+Maybe better "Teacher works in a days group from a set of days groups".
+
+196---------------------------------------------------------
+From russell:
+
+Maybe adding a Pause/Resume to "Generate new timetable" window (changing Start button after press to Pause).

@@ -1995,7 +1995,7 @@ void Import::importCSVActivities(QWidget* parent){
 	if(!ok)	return;
 
 	if(fieldNumber[FIELD_SPLIT_DURATION]==DO_NOT_IMPORT&&fieldNumber[FIELD_TOTAL_DURATION]==DO_NOT_IMPORT){
-		QMessageBox::warning(newParent, tr("FET warning"), Import::tr("FET need to know %1 or %2 if you import %3.").arg(fieldName[FIELD_SPLIT_DURATION]).arg(fieldName[FIELD_TOTAL_DURATION]).arg(importThing));
+		QMessageBox::warning(newParent, tr("FET warning"), Import::tr("FET needs to know %1 or %2 if you import %3.").arg(fieldName[FIELD_SPLIT_DURATION]).arg(fieldName[FIELD_TOTAL_DURATION]).arg(importThing));
 		return;
 	}
 

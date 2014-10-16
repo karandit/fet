@@ -1,5 +1,4 @@
-This is FET version 5.23.2
-[![Build Status] (https://travis-ci.org/karandit/fet.png?branch=master)](https://travis-ci.org/karandit/fet)
+This is FET version 5.23.3
 
 
 Program description:
@@ -16,7 +15,7 @@ Program description:
 Requirements:
 
 	FET is created in the following environment: openSUSE 13.1 GNU/Linux distribution, Linux 3.11.10, Xfce 4.10,
-	Midnight Commander 4.8.10, KDiff3 0.9.97, Qt 5.3.1, gcc 4.8.1, g++ 4.8.1, make 3.82, Valgrind 3.8.1, other great free tools.
+	Midnight Commander 4.8.10, KDiff3 0.9.97, Qt 5.3.2, gcc 4.8.1, g++ 4.8.1, make 3.82, Valgrind 3.8.1, other great free tools.
 	FET can be run on any platform supported by the free software Qt (GNU/Linux, Windows, Mac OS X).
 
 	GNU/Linux, Mac OS X:
@@ -24,7 +23,7 @@ Requirements:
 		make 3.82 or similar (GNU Make)
 		gcc 4.8.1 or similar
 		g++ 4.8.1 or similar (or gcc-g++, or gcc-c++, the name may vary. This program may be included in the gcc package)
-		Qt 5.3.1 or compatible (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
+		Qt 5.3.2 or compatible (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
 
 	Windows:
 	For running, you need only the archive of FET compiled for Windows (which contains the MinGW and Qt dlls).
@@ -53,7 +52,7 @@ Getting - compiling - installing Qt:
 
 	Qt homepage: http://qt-project.org/
 
-	You will need Qt 5.3.1 or compatible to compile FET (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
+	You will need Qt 5.3.2 or compatible to compile FET (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
 	You can get the corresponding version of Qt with your package manager or from the Qt homepage.
 	Qt can be used with the LGPL, GPL or commercial license.
 
@@ -70,7 +69,7 @@ Getting - compiling - installing Qt:
 	Note about the Qt "QMAKESPEC" variable: advanced topic, read this if you get Qt errors about the environment not being set, or environment
 	variable QMAKESPEC not being set, or if the Qt environment is not set correctly: Qt needs to know the environment you are using. It is usually
 	something like: linux-g++, macx-g++ or win32-g++ (platform-compiler). You can find all the supported platforms in the directory "mkspecs" of Qt
-	(some usual locations are /usr/share/qt5/mkspecs or /usr/lib/qt5/mkspecs on GNU/Linux or C:\Qt\5.3.1\mkspecs on Windows).
+	(some usual locations are /usr/share/qt5/mkspecs or /usr/lib/qt5/mkspecs on GNU/Linux or C:\Qt\5.3.2\mkspecs on Windows).
 	It seems that Qt automatically finds the platform (there is a default configuration in the "default" subdirectory of the "mkspecs" directory,
 	which is created automatically when you install Qt). If the default configuration is not working or is wrong, you may need to set the
 	correct QMAKESPEC variable for your platform. Under Windows, you can create an environment variable QMAKESPEC equal to win32-g++
@@ -112,13 +111,19 @@ Compiling FET:
 	to keep a core free for other tasks, write "make -j 3"). This is proven to work under GNU/Linux and Mac OS X. Under Windows it depends on the C++ compiler (you
 	may try it to see if it works).
 
-	Currently FET can be compiled with a C++ compiler, using Qt version 5.3.1 or compatible.
+	Currently FET can be compiled with a C++ compiler, using Qt version 5.3.2 or compatible.
+
+	Note NUseSystemLocale: If you want FET to autodetect the system locale language, type <<qmake fet.pro "DEFINES+=USE_SYSTEM_LOCALE">>
+	or simply <<qmake "DEFINES+=USE_SYSTEM_LOCALE">>. This will work if you recompile from the beginning all the FET package (remove
+	all the intermediary files and recompile), and also if you did not use FET on this machine or if you remove the settings file/registry entry for FET
+	(otherwise FET will retain the language which was already saved in its settings).
 
 
 	GNU/Linux:
-	- You will need Qt 5.3.1 or compatible to compile this program.
+	- You will need Qt 5.3.2 or compatible to compile this program.
 	- type "qmake fet.pro" or simply "qmake". You have to use qmake from Qt 5 series, which on some systems
 	might be named qmake-qt5 (this command is executed very fast, so don't worry if you get immediate return from it)
+	See also note NUseSystemLocale above.
 	- type "make" (this takes a long time, maybe even 1 hour). See also note NMkJobs above.
 	To remove the compiled objects/executable: "make clean" and/or "make distclean".
 
@@ -127,12 +132,13 @@ Compiling FET:
 	2 Variants:
 
 	1. First variant, if you use gcc compiler:
-	- You will need Qt 5.3.1 or compatible to compile this program.
+	- You will need Qt 5.3.2 or compatible to compile this program.
 	- type "qmake fet.pro" or simply "qmake". You have to use qmake from Qt 5 series.
 	(this command is executed very fast, so don't worry if you get immediate return from it)
-	- IMPORTANT: you might need to write: "qmake -spec macx-g++ fet.pro", if "qmake fet.pro" 
+	- IMPORTANT: you might need to write: "qmake -spec macx-g++ fet.pro", if "qmake fet.pro"
 	does not produce a correct makefile. Please see 
 	http://lists.trolltech.com/qt-interest/2007-04/thread01126-0.html for details.
+	See also note NUseSystemLocale above.
 	- type "make" (this takes a long time, maybe even 1 hour). See also note NMkJobs above.
 	To remove the compiled objects/executable: "make clean" and/or "make distclean".
 
@@ -143,12 +149,14 @@ Compiling FET:
 	http://lists.trolltech.com/qt-interest/2007-04/thread01126-0.html
 
 
-	Windows: MinGW C++ compiler: you need Qt 5.3.1 or compatible, and MinGW.
+	Windows: MinGW C++ compiler: you need Qt 5.3.2 or compatible, and MinGW.
 	You might use other compilers if you want, please see the Qt homepage.
 	for other variants. Any C++ compiler that supports Qt should be good.
 	You need to run "qmake fet.pro" or "qmake" (this command is executed very fast, so don't worry if you get
-	immediate return from it) and then, if you are using MinGW, "mingw32-make" (this takes a long time, maybe even 1 hour) 
-	in a command line in the FET directory. See also note NMkJobs above.
+	immediate return from it) and then, if you are using MinGW, "mingw32-make" (this takes a long time, maybe even 1 hour)
+	in a command line in the FET directory.
+	See also note NUseSystemLocale above.
+	See also note NMkJobs above.
 	(You can use the command line prompt of Windows or the Qt command line prompt shortcut in the Qt shortcuts menu.)
 	Then, you can remove the directories "src" and "tmp", to save up space, if you want.
 	You will need to copy the dll's in the same directories as in the official FET archive for Windows.
@@ -157,11 +165,10 @@ Compiling FET:
 Installing FET:
 
 	GNU/Linux, and maybe Mac OS X:
-	Please move the whole directory "fet-v.v.v" into the place where you like,
-	for instance to the directory "/usr/local/".
+	Type "make install" with root permissions.
 
 	Windows:
-	Move the FET directory in a place of your choice.
+	Move the FET directory to a place of your choice.
 
 
 Running FET:
@@ -286,7 +293,7 @@ Languages (translations):
 
 Documentation:
 
-	Some hints in the directory "fet-v.v.v/doc/".
+	Some hints in the directory "fet-v.v.v/doc/" (under GNU/Linux or Mac OS X, they may be found in usr/share/doc/fet/ directory).
 	Some other hints in the program Help menu.
 	You may find more documentation on the FET homepage.
 
@@ -294,11 +301,14 @@ Documentation:
 Input files:
 
 	You can open a few sample input files in "fet-v.v.v/examples/" directory
-	(under GNU/Linux or Mac OS X, they may be found in /usr/share/doc/fet/, or /usr/share/fet/)
+	(under GNU/Linux or Mac OS X, they may be found in /usr/share/fet/examples/)
 
 
 Uninstalling FET:
 
+	GNU/Linux, and maybe Mac OS X: type "make uninstall" with root permissions. Then,
+
+	GNU/Linux and Windows:
 	Remove the directory fet-v.v.v. Also, you may want to remove the directory with the fet results (default: $HOME/fet-results).
 	This will leave the settings of FET on your system. FET stores its settings in your operating system's dedicated section.
 	If you really want to get rid of everything FET created, read below.

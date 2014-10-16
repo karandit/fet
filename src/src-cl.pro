@@ -69,3 +69,9 @@ RCC_DIR = ../tmp/commandline
 
 INCLUDEPATH += engine interface
 DEPENDPATH += engine interface
+
+unix {
+	target.path = /usr/bin
+
+	INSTALLS += target
+}

@@ -414,6 +414,9 @@ void RandomSeedDialog::ok()
 FetMainForm::FetMainForm()
 {
 	setupUi(this);
+	
+	QIcon appIcon(":/images/appicon.png");
+	pqapplication->setWindowIcon(appIcon);
 
 	QSettings settings(COMPANY, PROGRAM);
 	int nRec=settings.value(QString("FetMainForm/number-of-recent-files"), 0).toInt();
@@ -637,6 +640,42 @@ void FetMainForm::setEnabledIcon(QAction* action, bool enabled)
 		action->setIcon(unlocked);
 	else
 		action->setIcon(locked);
+}
+
+//this is another place (out of two) in which you need to add a new language. The other one is in the file fet.cpp
+void FetMainForm::populateLanguagesMap(QMap<QString, QString>& languagesMap)
+{
+	languagesMap.clear();
+	languagesMap.insert("en_US", tr("US English"));
+	languagesMap.insert("ar", tr("Arabic"));
+	languagesMap.insert("ca", tr("Catalan"));
+	languagesMap.insert("de", tr("German"));
+	languagesMap.insert("el", tr("Greek"));
+	languagesMap.insert("es", tr("Spanish"));
+	languagesMap.insert("fr", tr("French"));
+	languagesMap.insert("hu", tr("Hungarian"));
+	languagesMap.insert("id", tr("Indonesian"));
+	languagesMap.insert("it", tr("Italian"));
+	languagesMap.insert("lt", tr("Lithuanian"));
+	languagesMap.insert("mk", tr("Macedonian"));
+	languagesMap.insert("ms", tr("Malay"));
+	languagesMap.insert("nl", tr("Dutch"));
+	languagesMap.insert("pl", tr("Polish"));
+	languagesMap.insert("ro", tr("Romanian"));
+	languagesMap.insert("tr", tr("Turkish"));
+	languagesMap.insert("ru", tr("Russian"));
+	languagesMap.insert("fa", tr("Persian"));
+	languagesMap.insert("uk", tr("Ukrainian"));
+	languagesMap.insert("pt_BR", tr("Brazilian Portuguese"));
+	languagesMap.insert("da", tr("Danish"));
+	languagesMap.insert("si", tr("Sinhala"));
+	languagesMap.insert("sk", tr("Slovak"));
+	languagesMap.insert("he", tr("Hebrew"));
+	languagesMap.insert("sr", tr("Serbian"));
+	languagesMap.insert("gl", tr("Galician"));
+	languagesMap.insert("vi", tr("Vietnamese"));
+	languagesMap.insert("uz", tr("Uzbek"));
+	languagesMap.insert("sq", tr("Albanian"));
 }
 
 
@@ -3480,38 +3519,8 @@ void FetMainForm::on_languageAction_triggered()
 	QSize tmp=languagesComboBox->minimumSizeHint();
 	Q_UNUSED(tmp);
 	
-	//this is the other place (out of 2) in which you need to add a new language
 	QMap<QString, QString> languagesMap;
-	languagesMap.insert("en_US", tr("US English"));
-	languagesMap.insert("ar", tr("Arabic"));
-	languagesMap.insert("ca", tr("Catalan"));
-	languagesMap.insert("de", tr("German"));
-	languagesMap.insert("el", tr("Greek"));
-	languagesMap.insert("es", tr("Spanish"));
-	languagesMap.insert("fr", tr("French"));
-	languagesMap.insert("hu", tr("Hungarian"));
-	languagesMap.insert("id", tr("Indonesian"));
-	languagesMap.insert("it", tr("Italian"));
-	languagesMap.insert("lt", tr("Lithuanian"));
-	languagesMap.insert("mk", tr("Macedonian"));
-	languagesMap.insert("ms", tr("Malay"));
-	languagesMap.insert("nl", tr("Dutch"));
-	languagesMap.insert("pl", tr("Polish"));
-	languagesMap.insert("ro", tr("Romanian"));
-	languagesMap.insert("tr", tr("Turkish"));
-	languagesMap.insert("ru", tr("Russian"));
-	languagesMap.insert("fa", tr("Persian"));
-	languagesMap.insert("uk", tr("Ukrainian"));
-	languagesMap.insert("pt_BR", tr("Brazilian Portuguese"));
-	languagesMap.insert("da", tr("Danish"));
-	languagesMap.insert("si", tr("Sinhala"));
-	languagesMap.insert("sk", tr("Slovak"));
-	languagesMap.insert("he", tr("Hebrew"));
-	languagesMap.insert("sr", tr("Serbian"));
-	languagesMap.insert("gl", tr("Galician"));
-	languagesMap.insert("vi", tr("Vietnamese"));
-	languagesMap.insert("uz", tr("Uzbek"));
-	languagesMap.insert("sq", tr("Albanian"));
+	populateLanguagesMap(languagesMap);
 	
 	//assert(languagesMap.count()==N_LANGUAGES);
 	
@@ -3629,7 +3638,30 @@ void FetMainForm::on_settingsRestoreDefaultsAction_triggered()
 	s+=QString("5. ")+tr("Use colors in FET graphical user interface will be %1", "%1 is true or false").arg(tr("false"));
 	s+="\n";
 
+#ifndef USE_SYSTEM_LOCALE
 	s+=QString("6. ")+tr("Language will be %1", "%1 is the default language").arg(QString("en_US")+QString(" (")+tr("US English")+QString(")"));
+#else
+	QMap<QString, QString> languagesMap;
+	populateLanguagesMap(languagesMap);
+
+	QString NEW_FET_LANGUAGE=QLocale::system().name();
+	
+	bool ok=false;
+	QMapIterator<QString, QString> i(languagesMap);
+	while(i.hasNext()){
+		i.next();
+		if(NEW_FET_LANGUAGE.left(i.key().length())==i.key()){
+			NEW_FET_LANGUAGE=i.key();
+			ok=true;
+			break;
+		}
+	}
+	if(!ok)
+		NEW_FET_LANGUAGE="en_US";
+		
+	assert(languagesMap.contains(NEW_FET_LANGUAGE));
+	s+=QString("6. ")+tr("Language will be %1", "%1 is the default language").arg(NEW_FET_LANGUAGE+QString(" (")+languagesMap.value(NEW_FET_LANGUAGE)+QString(")"));
+#endif
 	s+="\n";
 
 	s+=QString("7. ")+tr("The list of recently used files will be cleared");
@@ -3716,7 +3748,11 @@ void FetMainForm::on_settingsRestoreDefaultsAction_triggered()
 	//move(ORIGINAL_X, ORIGINAL_Y);
 	forceCenterWidgetOnScreen(this);
 	
-	FET_LANGUAGE="en_US";
+#ifndef USE_SYSTEM_LOCALE
+	FET_LANGUAGE=QString("en_US");
+#else
+	FET_LANGUAGE=NEW_FET_LANGUAGE;
+#endif
 	
 	checkForUpdatesAction->setChecked(false);
 	checkForUpdates=0;
