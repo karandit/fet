@@ -8151,13 +8151,13 @@ void sortActivities(QWidget* parent, const QHash<int, int> & reprSameStartingTim
 		bool report=true;
 		int j=0;
 		
-		foreach(const GroupActivitiesInInitialOrderItem& item, gt.rules.groupActivitiesInInitialOrderList){
+		foreach(GroupActivitiesInInitialOrderItem* item, gt.rules.groupActivitiesInInitialOrderList){
 			j++;
 			
-			if(!item.active)
+			if(!item->active)
 				continue;
 			
-			if(item.indices.count()<2){
+			if(item->indices.count()<2){
 				if(report){
 					QString s=GeneratePreTranslate::tr("Group activities in initial order item number %1 is ignored, because it contains less than"
 					 " two active activities").arg(j);
@@ -8171,7 +8171,7 @@ void sortActivities(QWidget* parent, const QHash<int, int> & reprSameStartingTim
 				}
 			}
 			else{
-				int index0=item.indices.at(0);
+				int index0=item->indices.at(0);
 				int xx=nIncompatible[index0];
 				/*if(fixedTimeActivity[index0] && fixedSpaceActivity[index0]){
 					assert(xx>=INF2);
@@ -8183,8 +8183,8 @@ void sortActivities(QWidget* parent, const QHash<int, int> & reprSameStartingTim
 				int MM=xx;
 				int father=0;
 				
-				for(int i=1; i<item.indices.count(); i++){
-					int indexi=item.indices.at(i);
+				for(int i=1; i<item->indices.count(); i++){
+					int indexi=item->indices.at(i);
 
 					int yy=nIncompatible[indexi];
 					/*if(fixedTimeActivity[indexi] && fixedSpaceActivity[indexi]){
@@ -8203,10 +8203,10 @@ void sortActivities(QWidget* parent, const QHash<int, int> & reprSameStartingTim
 				//if(MM>=INF)
 				//	MM=INF-1;
 
-				for(int i=0; i<item.indices.count(); i++)
+				for(int i=0; i<item->indices.count(); i++)
 					if(i!=father){
-						assert(fatherActivityInInitialOrder[item.indices.at(i)]==-1);
-						fatherActivityInInitialOrder[item.indices.at(i)]=item.indices.at(father);
+						assert(fatherActivityInInitialOrder[item->indices.at(i)]==-1);
+						fatherActivityInInitialOrder[item->indices.at(i)]=item->indices.at(father);
 					}
 					
 				/*for(int i=0; i<item.indices.count(); i++){

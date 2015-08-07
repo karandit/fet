@@ -473,7 +473,7 @@ bool Export::exportCSVActivityTags(QWidget* parent, QString& lastWarnings, const
 
 	lastWarnings+=Export::tr("%1 activity tags exported.").arg(gt.rules.activityTagsList.size())+"\n";
 	if(fileExport.error()>0){
-		lastWarnings+=Export::tr("FET critical. Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(file).arg(fileExport.error()+"\n");
+		lastWarnings+=Export::tr("FET critical. Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(file).arg(fileExport.error())+QString("\n");
 		return false;
 	}
 	fileExport.close();
@@ -527,7 +527,7 @@ bool Export::exportCSVRoomsAndBuildings(QWidget* parent, QString& lastWarnings, 
 	}
 	
 	if(fileExport.error()>0){
-		lastWarnings+=Export::tr("FET critical. Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(file).arg(fileExport.error()+"\n");
+		lastWarnings+=Export::tr("FET critical. Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(file).arg(fileExport.error())+QString("\n");
 		return false;
 	}
 	fileExport.close();
@@ -570,7 +570,7 @@ bool Export::exportCSVSubjects(QWidget* parent, QString& lastWarnings, const QSt
 
 	lastWarnings+=Export::tr("%1 subjects exported.").arg(gt.rules.subjectsList.size())+"\n";	
 	if(fileExport.error()>0){
-		lastWarnings+=Export::tr("FET critical. Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(file).arg(fileExport.error()+"\n");
+		lastWarnings+=Export::tr("FET critical. Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(file).arg(fileExport.error())+QString("\n");
 		return false;
 	}
 	fileExport.close();
@@ -615,7 +615,7 @@ bool Export::exportCSVTeachers(QWidget* parent, QString& lastWarnings, const QSt
 
 	lastWarnings+=Export::tr("%1 teachers exported.").arg(gt.rules.teachersList.size())+"\n";
 	if(fileExport.error()>0){
-		lastWarnings+=Export::tr("FET critical. Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(file).arg(fileExport.error()+"\n");
+		lastWarnings+=Export::tr("FET critical. Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(file).arg(fileExport.error())+QString("\n");
 		return false;
 	}
 	fileExport.close();
@@ -690,7 +690,7 @@ bool Export::exportCSVStudents(QWidget* parent, QString& lastWarnings, const QSt
 	lastWarnings+=Export::tr("%1 groups exported.").arg(ig)+"\n";
 	lastWarnings+=Export::tr("%1 subgroups exported.").arg(is)+"\n";
 	if(fileExport.error()>0){
-		lastWarnings+=Export::tr("FET critical. Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(file).arg(fileExport.error()+"\n");
+		lastWarnings+=Export::tr("FET critical. Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(file).arg(fileExport.error())+QString("\n");
 		return false;
 	}
 	fileExport.close();

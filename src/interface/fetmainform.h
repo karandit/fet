@@ -155,7 +155,28 @@ public slots:
 	
 	void on_helpSettingsAction_triggered();
 	void on_settingsUseColorsAction_toggled();
+	void showSubgroupsInComboBoxesToggled(bool checked);
+	void showSubgroupsInActivityPlanningToggled(bool checked);
 	void on_settingsShowShortcutsOnMainWindowAction_toggled();
+	
+	///write timetables options
+	void on_enableConflictsTimetableAction_toggled();
+
+	void on_enableXmlTimetablesAction_toggled();
+	void on_enableDaysHorizontalTimetablesAction_toggled();
+	void on_enableDaysVerticalTimetablesAction_toggled();
+	void on_enableTimeHorizontalTimetablesAction_toggled();
+	void on_enableTimeVerticalTimetablesAction_toggled();
+
+	void on_enableSubgroupsTimetablesAction_toggled();
+	void on_enableGroupsTimetablesAction_toggled();
+	void on_enableYearsTimetablesAction_toggled();
+	void on_enableTeachersTimetablesAction_toggled();
+	void on_enableTeachersFreePeriodsTimetablesAction_toggled();
+	void on_enableRoomsTimetablesAction_toggled();
+	void on_enableSubjectsTimetablesAction_toggled();
+	void on_enableActivitiesTimetablesAction_toggled();
+	///
 
 	//////confirmations
 	void on_settingsConfirmActivityPlanningAction_toggled();

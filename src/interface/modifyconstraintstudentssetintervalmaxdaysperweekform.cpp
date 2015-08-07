@@ -45,7 +45,7 @@ ModifyConstraintStudentsSetIntervalMaxDaysPerWeekForm::ModifyConstraintStudentsS
 	weightLineEdit->setText(CustomFETString::number(ctr->weightPercentage));
 	
 	updateMaxDaysSpinBox();
-	updateStudentsComboBox();
+	updateStudentsComboBox(parent);
 	
 	maxDaysSpinBox->setValue(ctr->maxDaysPerWeek);
 	
@@ -68,7 +68,7 @@ ModifyConstraintStudentsSetIntervalMaxDaysPerWeekForm::~ModifyConstraintStudents
 	saveFETDialogGeometry(this);
 }
 
-void ModifyConstraintStudentsSetIntervalMaxDaysPerWeekForm::updateStudentsComboBox(){
+void ModifyConstraintStudentsSetIntervalMaxDaysPerWeekForm::updateStudentsComboBox(QWidget* parent){
 	studentsComboBox->clear();
 	int i=0, j=-1;
 	for(int m=0; m<gt.rules.yearsList.size(); m++){
@@ -83,7 +83,7 @@ void ModifyConstraintStudentsSetIntervalMaxDaysPerWeekForm::updateStudentsComboB
 			if(stg->name==this->_ctr->students)
 				j=i;
 			i++;
-			for(int p=0; p<stg->subgroupsList.size(); p++){
+			if(SHOW_SUBGROUPS_IN_COMBO_BOXES) for(int p=0; p<stg->subgroupsList.size(); p++){
 				StudentsSubgroup* sts=stg->subgroupsList[p];
 				studentsComboBox->addItem(sts->name);
 				if(sts->name==this->_ctr->students)
@@ -92,15 +92,18 @@ void ModifyConstraintStudentsSetIntervalMaxDaysPerWeekForm::updateStudentsComboB
 			}
 		}
 	}
-	assert(j>=0);
-	studentsComboBox->setCurrentIndex(j);																
+	if(j<0)
+		showWarningForInvisibleSubgroupConstraint(parent, this->_ctr->students);
+	else
+		assert(j>=0);
+	studentsComboBox->setCurrentIndex(j);
 
 	constraintChanged();
 }
 
 void ModifyConstraintStudentsSetIntervalMaxDaysPerWeekForm::updateMaxDaysSpinBox(){
 	maxDaysSpinBox->setMinimum(0);
-	maxDaysSpinBox->setMaximum(gt.rules.nDaysPerWeek);	
+	maxDaysSpinBox->setMaximum(gt.rules.nDaysPerWeek);
 }
 
 void ModifyConstraintStudentsSetIntervalMaxDaysPerWeekForm::constraintChanged()
@@ -109,6 +112,11 @@ void ModifyConstraintStudentsSetIntervalMaxDaysPerWeekForm::constraintChanged()
 
 void ModifyConstraintStudentsSetIntervalMaxDaysPerWeekForm::ok()
 {
+	if(studentsComboBox->currentIndex()<0){
+		showWarningCannotModifyConstraintInvisibleSubgroupConstraint(this, this->_ctr->students);
+		return;
+	}
+
 	double weight;
 	QString tmp=weightLineEdit->text();
 	weight_sscanf(tmp, "%lf", &weight);

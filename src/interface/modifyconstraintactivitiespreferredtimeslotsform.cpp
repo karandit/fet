@@ -59,7 +59,7 @@ ModifyConstraintActivitiesPreferredTimeSlotsForm::ModifyConstraintActivitiesPref
 	this->_ctr=ctr;
 
 	updateTeachersComboBox();
-	updateStudentsComboBox();
+	updateStudentsComboBox(parent);
 	updateSubjectsComboBox();
 	updateActivityTagsComboBox();
 
@@ -226,7 +226,7 @@ void ModifyConstraintActivitiesPreferredTimeSlotsForm::updateTeachersComboBox(){
 	teachersComboBox->setCurrentIndex(j);
 }
 
-void ModifyConstraintActivitiesPreferredTimeSlotsForm::updateStudentsComboBox(){
+void ModifyConstraintActivitiesPreferredTimeSlotsForm::updateStudentsComboBox(QWidget* parent){
 	int i=0, j=-1;
 	studentsComboBox->clear();
 	studentsComboBox->addItem("");
@@ -245,7 +245,7 @@ void ModifyConstraintActivitiesPreferredTimeSlotsForm::updateStudentsComboBox(){
 			if(stg->name==this->_ctr->p_studentsName)
 				j=i;
 			i++;
-			for(int p=0; p<stg->subgroupsList.size(); p++){
+			if(SHOW_SUBGROUPS_IN_COMBO_BOXES) for(int p=0; p<stg->subgroupsList.size(); p++){
 				StudentsSubgroup* sts=stg->subgroupsList[p];
 				studentsComboBox->addItem(sts->name);
 				if(sts->name==this->_ctr->p_studentsName)
@@ -254,7 +254,10 @@ void ModifyConstraintActivitiesPreferredTimeSlotsForm::updateStudentsComboBox(){
 			}
 		}
 	}
-	assert(j>=0);
+	if(j<0)
+		showWarningForInvisibleSubgroupConstraint(parent, this->_ctr->p_studentsName);
+	else
+		assert(j>=0);
 	studentsComboBox->setCurrentIndex(j);
 }
 
@@ -296,6 +299,11 @@ void ModifyConstraintActivitiesPreferredTimeSlotsForm::updateActivityTagsComboBo
 
 void ModifyConstraintActivitiesPreferredTimeSlotsForm::ok()
 {
+	if(studentsComboBox->currentIndex()<0){
+		showWarningCannotModifyConstraintInvisibleSubgroupConstraint(this, this->_ctr->p_studentsName);
+		return;
+	}
+	
 	double weight;
 	QString tmp=weightLineEdit->text();
 	weight_sscanf(tmp, "%lf", &weight);

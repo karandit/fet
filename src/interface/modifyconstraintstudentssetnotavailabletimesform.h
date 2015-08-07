@@ -31,7 +31,7 @@ public:
 	ModifyConstraintStudentsSetNotAvailableTimesForm(QWidget* parent, ConstraintStudentsSetNotAvailableTimes* ctr);
 	~ModifyConstraintStudentsSetNotAvailableTimesForm();
 
-	void updateStudentsComboBox();
+	void updateStudentsComboBox(QWidget* parent);
 
 	void colorItem(QTableWidgetItem* item);
 

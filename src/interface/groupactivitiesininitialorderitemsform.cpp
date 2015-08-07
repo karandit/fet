@@ -98,7 +98,7 @@ GroupActivitiesInInitialOrderItemsForm::GroupActivitiesInInitialOrderItemsForm(Q
 		for(int j=0; j<sty->groupsList.size(); j++){
 			StudentsGroup* stg=sty->groupsList[j];
 			studentsComboBox->addItem(stg->name);
-			for(int k=0; k<stg->subgroupsList.size(); k++){
+			if(SHOW_SUBGROUPS_IN_COMBO_BOXES) for(int k=0; k<stg->subgroupsList.size(); k++){
 				StudentsSubgroup* sts=stg->subgroupsList[k];
 				studentsComboBox->addItem(sts->name);
 			}
@@ -189,7 +189,7 @@ void GroupActivitiesInInitialOrderItemsForm::filterChanged()
 	itemsListWidget->clear();
 	int n_active=0;
 	for(int i=0; i<gt.rules.groupActivitiesInInitialOrderList.count(); i++){
-		GroupActivitiesInInitialOrderItem* item=&gt.rules.groupActivitiesInInitialOrderList[i];
+		GroupActivitiesInInitialOrderItem* item=gt.rules.groupActivitiesInInitialOrderList[i];
 		if(filterOk(*item)){
 			visibleItemsList.append(item);
 			itemsListWidget->addItem(item->getDescription(gt.rules));
@@ -283,7 +283,7 @@ void GroupActivitiesInInitialOrderItemsForm::removeItem()
 		s, tr("Yes"), tr("No"), 0, 0, 1 ) ){
 	case 0: // The user clicked the OK button or pressed Enter
 		for(int j=0; j<gt.rules.groupActivitiesInInitialOrderList.count(); j++)
-			if(visibleItemsList.at(i) == &gt.rules.groupActivitiesInInitialOrderList[j]){
+			if(visibleItemsList.at(i) == gt.rules.groupActivitiesInInitialOrderList[j]){
 				gt.rules.groupActivitiesInInitialOrderList.removeAt(j);
 				
 				gt.rules.internalStructureComputed=false;
@@ -295,6 +295,7 @@ void GroupActivitiesInInitialOrderItemsForm::removeItem()
 		visibleItemsList.removeAt(i);
 		itemsListWidget->setCurrentRow(-1);
 		itemsListWidget->takeItem(i);
+		delete item;
 
 		break;
 	case 1: // The user clicked the Cancel button or pressed Escape
@@ -351,9 +352,9 @@ void GroupActivitiesInInitialOrderItemsForm::activateItem()
 		itemChanged(itemsListWidget->currentRow());
 	
 		int n_active=0;
-		foreach(const GroupActivitiesInInitialOrderItem& item2, gt.rules.groupActivitiesInInitialOrderList)
-			if(filterOk(item2)){
-				if(item2.active)
+		foreach(GroupActivitiesInInitialOrderItem* item2, gt.rules.groupActivitiesInInitialOrderList)
+			if(filterOk(*item2)){
+				if(item2->active)
 					n_active++;
 			}
 	
@@ -386,9 +387,9 @@ void GroupActivitiesInInitialOrderItemsForm::deactivateItem()
 		itemChanged(itemsListWidget->currentRow());
 
 		int n_active=0;
-		foreach(const GroupActivitiesInInitialOrderItem& item2, gt.rules.groupActivitiesInInitialOrderList)
-			if(filterOk(item2)){
-				if(item2.active)
+		foreach(GroupActivitiesInInitialOrderItem* item2, gt.rules.groupActivitiesInInitialOrderList)
+			if(filterOk(*item2)){
+				if(item2->active)
 					n_active++;
 			}
 	
@@ -398,9 +399,9 @@ void GroupActivitiesInInitialOrderItemsForm::deactivateItem()
 	}
 }
 
-static int itemsAscendingByComments(const GroupActivitiesInInitialOrderItem& item1, const GroupActivitiesInInitialOrderItem& item2)
+static int itemsAscendingByComments(const GroupActivitiesInInitialOrderItem* item1, const GroupActivitiesInInitialOrderItem* item2)
 {
-	return item1.comments < item2.comments;
+	return item1->comments < item2->comments;
 }
 
 void GroupActivitiesInInitialOrderItemsForm::sortItemsByComments()

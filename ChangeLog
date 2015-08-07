@@ -1701,7 +1701,7 @@ Version 5.22.0
 	- Increased the maximum number of divisions in the first and second categories when dividing a year (suggested by Bobby Wise).
 	- Added a new Morocco example file, by Mohamed Bahaj.
 ---------------------------------------------------------------------------------
-Versions 5.23.0 - 5.23.v
+Versions 5.23.0 - 5.23.4
 - Version 5.23.0
 	- Updated to Qt 5.3.1.
 	- Added a new timetabling generation option, to group selected activities in the initial order, next to the activity which is
@@ -1725,3 +1725,24 @@ Versions 5.23.0 - 5.23.v
 - Version 5.23.4
 	- Added a partial Chinese Simplified (zh_CN) translation, by orange.
 	- Added two example files from Vietnam, by Nguyen Huu Tuyen.
+---------------------------------------------------------------------------------
+Versions 5.24.0 - 5.24.x
+- Version 5.24.0
+	- Updated to Qt 5.4.0.
+	- Significant speed improvements when using many students sets (suggested by Volker Dirr).
+	- Speed improvements in the statistics menu.
+	- Other speed improvements for larger data.
+	- Added an option to hide students subgroups in combo boxes/activity planning (useful if you have too many students subgroups
+	and you don't use them in the interface).
+	- Added options to select the categories of timetables to write on the hard disk.
+	- Automatic division of years by categories is improved (suggested by alxgudea, Bobby Wise and Volker Dirr).
+	- Code improvement in reading the .fet XML files: converted from the obsolete Qt classes QDom* to QXmlStreamReader. It brings
+	speed and memory improvements when reading the input files, and ensures FET source compatibility with future Qt versions.
+	Also error reporting when reading a corrupt file is improved. The structure of the .fet XML files is slightly changed,
+	but of course older files are opened correctly.
+	- Several bug fixes, when trying to open corrupt files.
+	- Other bug fixes, reported by Vanyo Georgiev.
+	- It is now allowed to have constraints preferred/home rooms with a single room (suggested by liquid and Volker Dirr).
+	- Added a new example file from Vietnam, by nguyenhuuduyet.
+	- Added a new example file from Namibia, by Bobby Wise.
+	- Added two anonymous example files.

@@ -52,9 +52,11 @@ public:
 	QString getXmlDescription(Rules& r);
 	QString getDescription(Rules& r);
 	QString getDetailedDescription(Rules& r);
+	
+	void removeUseless(Rules& r);
 };
 
-typedef QList<GroupActivitiesInInitialOrderItem> GroupActivitiesInInitialOrderList;
+typedef QList<GroupActivitiesInInitialOrderItem*> GroupActivitiesInInitialOrderList;
 
 /**
 This class represents an activity.

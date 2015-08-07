@@ -31,7 +31,7 @@ public:
 	ModifyConstraintStudentsSetMaxHoursContinuouslyForm(QWidget* parent, ConstraintStudentsSetMaxHoursContinuously* ctr);
 	~ModifyConstraintStudentsSetMaxHoursContinuouslyForm();
 
-	void updateStudentsComboBox();
+	void updateStudentsComboBox(QWidget* parent);
 
 public slots:
 	void constraintChanged();

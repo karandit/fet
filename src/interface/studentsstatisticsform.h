@@ -22,10 +22,17 @@
 
 #include <QDialog>
 
+#include <QString>
+#include <QHash>
+
 #include "studentsset.h"
 
 class StudentsStatisticsForm : public QDialog, Ui::StudentsStatisticsForm_template  {
 	Q_OBJECT
+	
+private:
+	QHash<QString, int> allHours;
+	QHash<QString, int> allActivities;
 
 public:
 	StudentsStatisticsForm(QWidget* parent);

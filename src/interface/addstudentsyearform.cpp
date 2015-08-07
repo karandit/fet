@@ -56,16 +56,28 @@ void AddStudentsYearForm::addStudentsYear()
 		if(ss->type==STUDENTS_SUBGROUP){
 			QMessageBox::information( this, tr("Year insertion dialog"),
 				tr("This name is taken for a subgroup - please consider another name"));
+
+			nameLineEdit->selectAll();
+			nameLineEdit->setFocus();
+
 			return;
 		}
 		else if(ss->type==STUDENTS_GROUP){
 			QMessageBox::information( this, tr("Year insertion dialog"),
 				tr("This name is taken for a group - please consider another name"));
+
+			nameLineEdit->selectAll();
+			nameLineEdit->setFocus();
+
 			return;
 		}
 		else if(ss->type==STUDENTS_YEAR){
 			QMessageBox::information( this, tr("Year insertion dialog"),
 				tr("This name is taken for a year - please consider another name"));
+
+			nameLineEdit->selectAll();
+			nameLineEdit->setFocus();
+
 			return;
 		}
 		else

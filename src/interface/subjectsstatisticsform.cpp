@@ -1,5 +1,5 @@
 /***************************************************************************
-                          subjectsstatisticform.cpp  -  description
+                          subjectsstatisticsform.cpp  -  description
                              -------------------
     begin                : March 25, 2006
     copyright            : (C) 2006 by Lalescu Liviu
@@ -28,6 +28,9 @@
 #include <QTableWidget>
 #include <QHeaderView>
 
+#include <QSet>
+#include <QHash>
+
 SubjectsStatisticsForm::SubjectsStatisticsForm(QWidget* parent): QDialog(parent)
 {
 	setupUi(this);
@@ -53,6 +56,15 @@ SubjectsStatisticsForm::SubjectsStatisticsForm(QWidget* parent): QDialog(parent)
 	
 	tableWidget->setHorizontalHeaderLabels(columns);
 	
+	QHash<QString, QSet<Activity*> > activitiesForSubject;
+	
+	foreach(Activity* act, gt.rules.activitiesList)
+		if(act->active){
+			QSet<Activity*> acts=activitiesForSubject.value(act->subjectName, QSet<Activity*>());
+			acts.insert(act);
+			activitiesForSubject.insert(act->subjectName, acts);
+		}
+	
 	for(int i=0; i<gt.rules.subjectsList.size(); i++){
 		Subject* s=gt.rules.subjectsList[i];
 		
@@ -63,12 +75,17 @@ SubjectsStatisticsForm::SubjectsStatisticsForm(QWidget* parent): QDialog(parent)
 		int	nSubActivities=0;
 		int nHours=0;
 		
-		foreach(Activity* act, gt.rules.activitiesList)
-			if(act->active)
-				if(act->subjectName==s->name){
-					nSubActivities++;
-					nHours+=act->duration;
-				}
+		QSet<Activity*> acts=activitiesForSubject.value(s->name, QSet<Activity*>());
+		
+		foreach(Activity* act, acts){
+			if(act->active){
+				nSubActivities++;
+				nHours+=act->duration;
+			}
+			else{
+				assert(0);
+			}
+		}
 
 		newItem=new QTableWidgetItem(CustomFETString::number(nSubActivities));
 		newItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);

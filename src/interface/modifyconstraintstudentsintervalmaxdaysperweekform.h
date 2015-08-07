@@ -32,7 +32,6 @@ public:
 	~ModifyConstraintStudentsIntervalMaxDaysPerWeekForm();
 
 	void updateMaxDaysSpinBox();
-	//void updateStudentsComboBox();
 
 public slots:
 	void constraintChanged();

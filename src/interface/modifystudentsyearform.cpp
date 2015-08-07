@@ -61,9 +61,13 @@ void ModifyStudentsYearForm::ok()
 	}
 	if(this->_initialYearName!=nameLineEdit->text() && gt.rules.searchStudentsSet(nameLineEdit->text())!=NULL){
 		QMessageBox::information(this, tr("FET information"), tr("Name existing - please choose another"));
+
+		nameLineEdit->selectAll();
+		nameLineEdit->setFocus();
+
 		return;
 	}
-	bool t=gt.rules.modifyYear(this->_initialYearName, nameLineEdit->text(), numberSpinBox->value());
+	bool t=gt.rules.modifyStudentsSet(this->_initialYearName, nameLineEdit->text(), numberSpinBox->value());
 	assert(t);
 
 	this->close();

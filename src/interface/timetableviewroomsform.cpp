@@ -275,14 +275,15 @@ void TimetableViewRoomsForm::updateRoomsTimetableTable(){
 	s = roomName;
 	roomNameTextLabel->setText(s);
 	
-	if(gt.rules.searchRoom(roomName)<0){
+	int roomIndex=gt.rules.searchRoom(roomName);
+
+	if(roomIndex<0){
 		QMessageBox::warning(this, tr("FET warning"), tr("You have an old timetable view rooms dialog opened - please close it"));
 		return;
 	}
 
 	assert(gt.rules.initialized);
 
-	int roomIndex=gt.rules.searchRoom(roomName);
 	assert(roomIndex>=0);
 	for(int j=0; j<gt.rules.nHoursPerDay && j<roomsTimetableTable->rowCount(); j++){
 		for(int k=0; k<gt.rules.nDaysPerWeek && k<roomsTimetableTable->columnCount(); k++){

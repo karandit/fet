@@ -1,4 +1,4 @@
-This is FET version 5.23.4
+This is FET version 5.24.0
 
 
 Program description:
@@ -14,8 +14,9 @@ Program description:
 
 Requirements:
 
-	FET is created in the following environment: openSUSE 13.2 GNU/Linux distribution, Linux 3.16.6, Xfce 4.10,
-	Midnight Commander 4.8.13, KDiff3 0.9.97, Qt 5.3.2, gcc 4.8.3, g++ 4.8.3, make 4.0, Valgrind 3.10.0, other great free tools.
+	FET is created in the following environment: openSUSE 13.2 GNU/Linux distribution, Linux 3.16.7, Xfce 4.10,
+	Midnight Commander 4.8.13, KDiff3 0.9.97, Qt 5.4.0, gcc 4.8.3, g++ 4.8.3, make 4.0, sed 4.2.2,
+	Valgrind 3.10.0, Coverity Scan 7.5.0, Cppcheck 1.67, other great free tools.
 	FET can be run on any platform supported by the free software Qt (GNU/Linux, Windows, Mac OS X).
 
 	GNU/Linux, Mac OS X:
@@ -23,7 +24,7 @@ Requirements:
 		make 4.0 or similar (GNU Make)
 		gcc 4.8.3 or similar
 		g++ 4.8.3 or similar (or gcc-g++, or gcc-c++, the name may vary. This program may be included in the gcc package)
-		Qt 5.3.2 or compatible (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
+		Qt 5.4.0 or compatible (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
 
 	Windows:
 	For running, you need only the archive of FET compiled for Windows (which contains the MinGW and Qt dlls).
@@ -50,9 +51,9 @@ Getting - compiling - installing GNU tools: make, gcc and g++ (or gcc-g++, or gc
 
 Getting - compiling - installing Qt:
 
-	Qt homepage: http://qt-project.org/
+	Qt homepage: http://www.qt.io/
 
-	You will need Qt 5.3.2 or compatible to compile FET (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
+	You will need Qt 5.4.0 or compatible to compile FET (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
 	You can get the corresponding version of Qt with your package manager or from the Qt homepage.
 	Qt can be used with the LGPL, GPL or commercial license.
 
@@ -69,7 +70,7 @@ Getting - compiling - installing Qt:
 	Note about the Qt "QMAKESPEC" variable: advanced topic, read this if you get Qt errors about the environment not being set, or environment
 	variable QMAKESPEC not being set, or if the Qt environment is not set correctly: Qt needs to know the environment you are using. It is usually
 	something like: linux-g++, macx-g++ or win32-g++ (platform-compiler). You can find all the supported platforms in the directory "mkspecs" of Qt
-	(some usual locations are /usr/share/qt5/mkspecs or /usr/lib/qt5/mkspecs on GNU/Linux or C:\Qt\5.3.2\mkspecs on Windows).
+	(some usual locations are /usr/share/qt5/mkspecs or /usr/lib/qt5/mkspecs on GNU/Linux or C:\Qt\5.4.0\mkspecs on Windows).
 	It seems that Qt automatically finds the platform (there is a default configuration in the "default" subdirectory of the "mkspecs" directory,
 	which is created automatically when you install Qt). If the default configuration is not working or is wrong, you may need to set the
 	correct QMAKESPEC variable for your platform. Under Windows, you can create an environment variable QMAKESPEC equal to win32-g++
@@ -79,10 +80,21 @@ Getting - compiling - installing Qt:
 
 Compiling FET:
 
-	Note: compilation takes long (maybe even 1 hour, if you are using an older computer). The file
+	Note: if after unpacking the tar.bz2 sources archive you obtain some files with incomplete/truncated file names in the sources directories,
+	you might need to use a better (un)packer (probably a recent version of the official tar and bzip2 should be fine).
+	For GNU/Linux and maybe Mac OS X, "tar -jxvf fet-v.v.v.tar.bz2" should work correctly.
+	For Windows, either use a modern good (un)packer, or, advice from a user:
+		1. download mingw-get-setup.exe from http://sourceforge.net/projects/mingw/files
+		2. run mingw-get-setup.exe
+		3. check msys-base to be installed, Apply Changes from Installation menu and close MinGW Installation Manager
+		4. run C:\MinGW\msys\1.0\msys.bat
+		5. $ cd to the directory where the .tar.bz2 file is
+		6. $ tar -jxvf fet-v.v.v.bz2
+
+	Note2: compilation takes long (maybe even 1 hour, if you are using an older computer). The file
 	rules.cpp takes the longest time to compile, maybe even 1 minute or more.
 
-	Note2: the following situation may appear under GNU/Linux, but it could be met also on other platforms.
+	Note3: the following situation may appear under GNU/Linux, but it could be met also on other platforms.
 	Depending on your Qt installation, it may happen that the FET intermediary files and executables are very large (~100 MB for the fet executable
 	instead of ~10 MB). It is not sure if this affects the FET speed and performance, but anyway it is unpleasant. In this case, you may want to
 	modify some files in your system (Qt files) to improve this. You need to change some Qt configuration files and recompile FET from the beginning
@@ -111,14 +123,14 @@ Compiling FET:
 	to keep a core free for other tasks, write "make -j 3"). This is proven to work under GNU/Linux and Mac OS X. Under Windows it depends on the C++ compiler (you
 	may try it to see if it works).
 
-	Currently FET can be compiled with a C++ compiler, using Qt version 5.3.2 or compatible.
+	Currently FET can be compiled with a C++ compiler, using Qt version 5.4.0 or compatible.
 
 	Note NUseSystemLocale: If you want FET to autodetect the system locale language, type <<qmake fet.pro "DEFINES+=USE_SYSTEM_LOCALE">>
 	or simply <<qmake "DEFINES+=USE_SYSTEM_LOCALE">>. This will work if you recompile from the beginning all the FET package (remove
 	all the intermediary files and recompile), and also if you did not use FET on this machine or if you remove the settings file/registry entry for FET
 	(otherwise FET will retain the language which was already saved in its settings).
 	
-	Note3: If you get the error:
+	Note4: If you get an error like this:
 	In file included from ../../Qt5.3.2/5.3/gcc_64/include/QtGui/qopenglcontext.h:62:0,
 		from ../../Qt5.3.2/5.3/gcc_64/include/QtGui/QtGui:32,
 		from ../../Qt5.3.2/5.3/gcc_64/include/QtWidgets/QtWidgetsDepends:3,
@@ -132,10 +144,10 @@ Compiling FET:
 
 
 	GNU/Linux:
-	- You will need Qt 5.3.2 or compatible to compile this program.
+	- You will need Qt 5.4.0 or compatible to compile this program.
 	- type "qmake fet.pro" or simply "qmake". You have to use qmake from Qt 5 series, which on some systems
 	might be named qmake-qt5 (this command is executed very fast, so don't worry if you get immediate return from it)
-	See also notes NUseSystemLocale and Note3 above.
+	See also notes NUseSystemLocale and Note4 above.
 	- type "make" (this takes a long time, maybe even 1 hour). See also note NMkJobs above.
 	To remove the compiled objects/executable: "make clean" and/or "make distclean".
 
@@ -144,13 +156,13 @@ Compiling FET:
 	2 Variants:
 
 	1. First variant, if you use gcc compiler:
-	- You will need Qt 5.3.2 or compatible to compile this program.
+	- You will need Qt 5.4.0 or compatible to compile this program.
 	- type "qmake fet.pro" or simply "qmake". You have to use qmake from Qt 5 series.
 	(this command is executed very fast, so don't worry if you get immediate return from it)
 	- IMPORTANT: you might need to write: "qmake -spec macx-g++ fet.pro", if "qmake fet.pro"
 	does not produce a correct makefile. Please see 
 	http://lists.trolltech.com/qt-interest/2007-04/thread01126-0.html for details.
-	See also notes NUseSystemLocale and Note3 above.
+	See also notes NUseSystemLocale and Note4 above.
 	- type "make" (this takes a long time, maybe even 1 hour). See also note NMkJobs above.
 	To remove the compiled objects/executable: "make clean" and/or "make distclean".
 
@@ -161,14 +173,14 @@ Compiling FET:
 	http://lists.trolltech.com/qt-interest/2007-04/thread01126-0.html
 
 
-	Windows: MinGW C++ compiler: you need Qt 5.3.2 or compatible, and MinGW.
+	Windows: MinGW C++ compiler: you need Qt 5.4.0 or compatible, and MinGW.
 	You might use other compilers if you want, please see the Qt homepage.
 	for other variants. Any C++ compiler that supports Qt should be good.
 	You need to run "qmake fet.pro" or "qmake" (this command is executed very fast, so don't worry if you get
 	immediate return from it) and then, if you are using MinGW, "mingw32-make" (this takes a long time, maybe even 1 hour)
 	in a command line in the FET directory.
 	See also note NUseSystemLocale above.
-	See also Note3 above.
+	See also Note4 above.
 	See also note NMkJobs above.
 	(You can use the command line prompt of Windows or the Qt command line prompt shortcut in the Qt shortcuts menu.)
 	Then, you can remove the directories "src" and "tmp", to save up space, if you want.
@@ -207,6 +219,10 @@ Running FET:
 	Run the executable fet.exe (its location is inside the fet-v.v.v directory, you can find it there if you have FET precompiled for Windows or after you compiled it).
 
 	COMMAND LINE: no GUI, just run "fet-cl --inputfile=x [--outputdir=d] [--timelimitseconds=y] [--htmllevel=z] [--language=t]
+	 [--writetimetableconflicts=wt1] [--writetimetablesxml=wt2] [--writetimetablesdayshorizontal=wt3] [--writetimetablesdaysvertical=wt4]
+	 [--writetimetablestimehorizontal=wt5] [--writetimetablestimevertical=wt6] [--writetimetablessubgroups=wt7] [--writetimetablesgroups=wt8]
+	 [--writetimetablesyears=wt9] [--writetimetablesteachers=wt10] [--writetimetablesteachersfreeperiods=wt11] [--writetimetablesrooms=wt12]
+	 [--writetimetablessubjects=wt13] [--writetimetablesactivities=wt14]
 	 [--printactivitytags=a] [--printnotavailable=u] [--printbreak=b] [--dividetimeaxisbydays=v] [--duplicateverticalheaders=e]
 	 [--printsimultaneousactivities=w] [--randomseedx=rx --randomseedy=ry] [--warnifusingnotperfectconstraints=s]
 	 [--warnifusingstudentsminhoursdailywithallowemptydays=p] [--verbose=r]",
@@ -217,6 +233,7 @@ Running FET:
 			z is integer from 0 to 6 and represents the detail level for the generated HTML timetables
 				(default 2, larger values have more details/facilities and larger file sizes).
 			t is one of en_US, ar, ca, da, de, el, es, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk, uz, vi, zh_CN (default en_US).
+			wt1 to wt14 are either true or false and represent whether you want the corresponding timetables to be written on the disk (default true).
 			a is either true or false and represets if you want activity tags to be present in the final HTML timetables (default true).
 			u is either "true" or "false" and represents if you want -x- (for true) or --- (for false) in the generated timetables for the
 				not available slots (default true).
@@ -328,9 +345,11 @@ Uninstalling FET:
 
 	To completely remove stored FET settings from your operating system:
 
-	GNU/Linux, and maybe Mac OS X:
+	GNU/Linux:
 	Usually, in your $HOME/.config directory you will find a directory "fet" containing the file "fettimetabling.conf".
 	Remove the directory "fet" and its contents.
+
+	Mac OS X: It seems that the configuration file might be: $HOME/Library/Preferences/com.fet.fettimetabling.plist
 
 	Windows:
 	Run regedit.exe (Registry Editor), search for the key "fet". You will find a section "fet" with the subsection "fettimetabling".

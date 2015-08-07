@@ -758,7 +758,7 @@ void TimetableExport::writeRandomSeedFile(QWidget* parent, const QString& filena
 void TimetableExport::writeTimetableDataFile(QWidget* parent, const QString& filename){
 	if(!students_schedule_ready || !teachers_schedule_ready || !rooms_schedule_ready){
 		IrreconcilableCriticalMessage::critical(parent, tr("FET - Critical"), tr("Timetable not generated - cannot save it - this should not happen (please report bug)"));
-		return;	
+		return;
 	}
 
 	Solution* tc=&best_solution;
@@ -768,13 +768,13 @@ void TimetableExport::writeTimetableDataFile(QWidget* parent, const QString& fil
 		int time=tc->times[ai];
 		if(time==UNALLOCATED_TIME){
 			IrreconcilableCriticalMessage::critical(parent, tr("FET - Critical"), tr("Incomplete timetable - this should not happen - please report bug"));
-			return;	
+			return;
 		}
 		
 		int ri=tc->rooms[ai];
 		if(ri==UNALLOCATED_SPACE){
 			IrreconcilableCriticalMessage::critical(parent, tr("FET - Critical"), tr("Incomplete timetable - this should not happen - please report bug"));
-			return;	
+			return;
 		}
 	}
 	
@@ -909,7 +909,7 @@ void TimetableExport::writeTimetableDataFile(QWidget* parent, const QString& fil
 	while(!lockSpaceConstraintsList.isEmpty())
 		delete lockSpaceConstraintsList.takeFirst();
 
-	//if(result)	
+	//if(result)
 	//	QMessageBox::information(parent, tr("FET information"),
 	//		tr("File saved successfully. You can see it on the hard disk. Current data file remained untouched (of locking constraints),"
 	//		" so you can save it also, or generate different timetables."));
@@ -1510,6 +1510,13 @@ void TimetableExport::writeConflictsTxt(QWidget* parent, const QString& filename
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLE_CONFLICTS){
+		if(QFile::exists(filename))
+			QFile::remove(filename);
+	
+		return;
+	}
+
 	QFile file(filename);
 	if(!file.open(QIODevice::WriteOnly)){
 		IrreconcilableCriticalMessage::critical(parent, tr("FET critical"),
@@ -1560,6 +1567,13 @@ void TimetableExport::writeConflictsTxt(QWidget* parent, const QString& filename
 void TimetableExport::writeSubgroupsTimetableXml(QWidget* parent, const QString& xmlfilename){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_XML || !WRITE_TIMETABLES_SUBGROUPS){
+		if(QFile::exists(xmlfilename))
+			QFile::remove(xmlfilename);
+	
+		return;
+	}
 
 	//Now we print the results to an XML file
 	QFile file(xmlfilename);
@@ -1620,6 +1634,13 @@ void TimetableExport::writeTeachersTimetableXml(QWidget* parent, const QString& 
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_XML || !WRITE_TIMETABLES_TEACHERS){
+		if(QFile::exists(xmlfilename))
+			QFile::remove(xmlfilename);
+	
+		return;
+	}
+
 	//Writing the timetable in xml format
 	QFile file(xmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -1677,6 +1698,13 @@ void TimetableExport::writeActivitiesTimetableXml(QWidget* parent, const QString
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_XML || !WRITE_TIMETABLES_ACTIVITIES){
+		if(QFile::exists(xmlfilename))
+			QFile::remove(xmlfilename);
+
+		return;
+	}
+
 	//Writing the timetable in xml format
 	QFile file(xmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -1733,6 +1761,26 @@ void TimetableExport::writeIndexHtml(QWidget* parent, const QString& htmlfilenam
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	bool writeAtLeastATimetable = WRITE_TIMETABLE_CONFLICTS ||
+	 (WRITE_TIMETABLES_XML &&
+	 (WRITE_TIMETABLES_SUBGROUPS ||
+	 WRITE_TIMETABLES_TEACHERS ||
+	 WRITE_TIMETABLES_ACTIVITIES)) ||
+	 ((WRITE_TIMETABLES_DAYS_HORIZONTAL ||
+	 WRITE_TIMETABLES_DAYS_VERTICAL ||
+	 WRITE_TIMETABLES_TIME_HORIZONTAL ||
+	 WRITE_TIMETABLES_TIME_VERTICAL) &&
+	 (WRITE_TIMETABLES_SUBGROUPS ||
+	 WRITE_TIMETABLES_GROUPS ||
+	 WRITE_TIMETABLES_YEARS ||
+	 WRITE_TIMETABLES_TEACHERS ||
+	 WRITE_TIMETABLES_ROOMS ||
+	 WRITE_TIMETABLES_SUBJECTS ||
+	 WRITE_TIMETABLES_ACTIVITIES)) ||
+	 ((WRITE_TIMETABLES_DAYS_HORIZONTAL ||
+	 WRITE_TIMETABLES_DAYS_VERTICAL) &&
+	 WRITE_TIMETABLES_TEACHERS_FREE_PERIODS);
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -1760,95 +1808,263 @@ void TimetableExport::writeIndexHtml(QWidget* parent, const QString& htmlfilenam
 		//	cout<<"Minor problem - input file does not end in .fet extension - might be a problem when saving the timetables"<<" (file:"<<__FILE__<<", line:"<<__LINE__<<")"<<endl;
 	}
 	tos<<"    <p>\n";
-
-	tos<<"      <a href=\""<<s2+bar+CONFLICTS_FILENAME<<"\">"<<tr("View the soft conflicts list.")<<"</a><br />\n";
-	//	tos<<"    </p>\n";
-	//	tos<<"    <p>\n";
-
-	QString tmp1="<a href=\""+s2+bar+SUBGROUPS_TIMETABLE_FILENAME_XML+"\">"+tr("subgroups")+"</a>";
-	QString tmp2="<a href=\""+s2+bar+TEACHERS_TIMETABLE_FILENAME_XML+"\">"+tr("teachers")+"</a>";
-	QString tmp3="<a href=\""+s2+bar+ACTIVITIES_TIMETABLE_FILENAME_XML+"\">"+tr("activities")+"</a>";
-	QString tmp4=TimetableExport::tr("View XML: %1, %2, %3.", "%1, %2 and %3 are three files in XML format, subgroups, teachers and activities timetables. The user can click on one file to view it").arg(tmp1).arg(tmp2).arg(tmp3);
-	tos<<"      "<<tmp4<<"\n";
-
-	tos<<"    </p>\n\n";
-
-	tos<<"    <table border=\"1\">\n";
-
-	tos<<"      <caption>"<<protect2(gt.rules.institutionName)<<"</caption>\n";
-
-	tos<<"      <thead>\n        <tr><td rowspan=\"2\"></td><th colspan=\"4\">"+tr("Timetables")+"</th></tr>\n";
-	tos<<"        <tr>\n          <!-- span -->\n";
-	tos<<"          <th>"+tr("Days Horizontal")+"</th><th>"+tr("Days Vertical")+"</th><th>"+tr("Time Horizontal")+"</th><th>"+tr("Time Vertical")+"</th>";
-	tos<<"        </tr>\n";
-	tos<<"      </thead>\n";
-	tos<<"      <tbody>\n";
 	
-	/* workaround
-	tos<<"      <tfoot><tr><td></td><td colspan=\"4\">"<<TimetableExport::tr("Timetable generated with FET %1 on %2", "%1 is FET version, %2 is the date and time of generation").arg(FET_VERSION).arg(saveTime)<<"</td></tr></tfoot>\n";
-	*/
+	if(!writeAtLeastATimetable){
+		tos<<"      "<<TimetableExport::tr("No timetable was written, because from the settings you disabled writing any timetable.")<<"\n";
+		tos<<"      "<<TimetableExport::tr("The exception is that after each successful (complete) timetable generation the %1 file"
+		 " will be written.").arg("data_and_timetable.fet")<<"\n";
+		tos<<"    </p>\n";
+		tos<<"    <p>\n";
+		tos<<"      "<<TimetableExport::tr("File generated with FET %1 on %2", "%1 is FET version, %2 is the date and time of generation").arg(FET_VERSION).arg(saveTime)<<"\n";
+		tos<<"    </p>\n";
+	}
+	else{
+		if(WRITE_TIMETABLE_CONFLICTS)
+			tos<<"      <a href=\""<<s2+bar+CONFLICTS_FILENAME<<"\">"<<tr("View the soft conflicts list.")<<"</a><br />\n";
+		else
+			tos<<"      "<<tr("Soft conflicts list - disabled.")<<"<br />\n";
+		//	tos<<"    </p>\n";
+		//	tos<<"    <p>\n";
 
-	tos<<"        <tr>\n";
-	tos<<"          <th>"+tr("Subgroups")+"</th>\n";
-	tos<<"          <td><a href=\""<<s2+bar+SUBGROUPS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+SUBGROUPS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+SUBGROUPS_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+SUBGROUPS_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"        </tr>\n";
-	tos<<"        <tr>\n";
-	tos<<"          <th>"+tr("Groups")+"</th>\n";
-	tos<<"          <td><a href=\""<<s2+bar+GROUPS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+GROUPS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+GROUPS_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+GROUPS_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"        </tr>\n";
-	tos<<"        <tr>\n";
-	tos<<"          <th>"+tr("Years")+"</th>\n";
-	tos<<"          <td><a href=\""<<s2+bar+YEARS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+YEARS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+YEARS_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+YEARS_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"        </tr>\n";
-	tos<<"        <tr>\n";
-	tos<<"          <th>"+tr("Teachers")+"</th>\n";
-	tos<<"          <td><a href=\""<<s2+bar+TEACHERS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+TEACHERS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+TEACHERS_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+TEACHERS_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"        </tr>\n";
-	tos<<"        <tr>\n";
-	tos<<"          <th>"+tr("Teachers Free Periods")+"</th>\n";
-	tos<<"          <td><a href=\""<<s2+bar+TEACHERS_FREE_PERIODS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+TEACHERS_FREE_PERIODS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td>"<<protect2(STRING_EMPTY_SLOT)<<"</td>\n";
-	tos<<"          <td>"<<protect2(STRING_EMPTY_SLOT)<<"</td>\n";
-	tos<<"        </tr>\n";
-	tos<<"        <tr>\n";
-	tos<<"          <th>"+tr("Rooms")+"</th>\n";
-	tos<<"          <td><a href=\""<<s2+bar+ROOMS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+ROOMS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+ROOMS_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+ROOMS_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"        </tr>\n";
-	tos<<"        <tr>\n";
-	tos<<"          <th>"+tr("Subjects")+"</th>\n";
-	tos<<"          <td><a href=\""<<s2+bar+SUBJECTS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+SUBJECTS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+SUBJECTS_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+SUBJECTS_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"        </tr>\n";
-	tos<<"        <tr>\n";
-	tos<<"          <th>"+tr("Activities")+"</th>\n";
-	tos<<"          <td><a href=\""<<s2+bar+ALL_ACTIVITIES_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+ALL_ACTIVITIES_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+ALL_ACTIVITIES_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"          <td><a href=\""<<s2+bar+ALL_ACTIVITIES_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
-	tos<<"        </tr>\n";
-	//workaround begin.
-	tos<<"      <tr class=\"foot\"><td></td><td colspan=\"4\">"<<TimetableExport::tr("Timetable generated with FET %1 on %2", "%1 is FET version, %2 is the date and time of generation").arg(FET_VERSION).arg(saveTime)<<"</td></tr>\n";
-	//workaround end.
-	tos<<"      </tbody>\n";
-	tos<<"    </table>\n";
+		QString tmp1, tmp2, tmp3;
+		if(WRITE_TIMETABLES_XML && WRITE_TIMETABLES_SUBGROUPS)
+			tmp1="<a href=\""+s2+bar+SUBGROUPS_TIMETABLE_FILENAME_XML+"\">"+tr("subgroups")+"</a>";
+		else
+			tmp1=tr("subgroups - disabled", "It means the subgroups XML timetables are disabled");
+		if(WRITE_TIMETABLES_XML && WRITE_TIMETABLES_TEACHERS)
+			tmp2="<a href=\""+s2+bar+TEACHERS_TIMETABLE_FILENAME_XML+"\">"+tr("teachers")+"</a>";
+		else
+			tmp2=tr("teachers - disabled", "It means the teachers XML timetables are disabled");
+		if(WRITE_TIMETABLES_XML && WRITE_TIMETABLES_ACTIVITIES)
+			tmp3="<a href=\""+s2+bar+ACTIVITIES_TIMETABLE_FILENAME_XML+"\">"+tr("activities")+"</a>";
+		else
+			tmp3=tr("activities - disabled", "It means the activities XML timetables are disabled");
+		QString tmp4=TimetableExport::tr("View XML: %1, %2, %3.", "%1, %2 and %3 are three files in XML format, subgroups, teachers and activities timetables. The user can click on one file to view it").arg(tmp1).arg(tmp2).arg(tmp3);
+		tos<<"      "<<tmp4<<"\n";
+
+		tos<<"    </p>\n\n";
+
+		tos<<"    <table border=\"1\">\n";
+
+		tos<<"      <caption>"<<protect2(gt.rules.institutionName)<<"</caption>\n";
+
+		tos<<"      <thead>\n        <tr><td rowspan=\"2\"></td><th colspan=\"4\">"+tr("Timetables")+"</th></tr>\n";
+		tos<<"        <tr>\n          <!-- span -->\n";
+		tos<<"          <th>"+tr("Days Horizontal")+"</th><th>"+tr("Days Vertical")+"</th><th>"+tr("Time Horizontal")+"</th><th>"+tr("Time Vertical")+"</th>";
+		tos<<"        </tr>\n";
+		tos<<"      </thead>\n";
+		tos<<"      <tbody>\n";
+		
+		/* workaround
+		tos<<"      <tfoot><tr><td></td><td colspan=\"4\">"<<TimetableExport::tr("Timetable generated with FET %1 on %2", "%1 is FET version, %2 is the date and time of generation").arg(FET_VERSION).arg(saveTime)<<"</td></tr></tfoot>\n";
+		*/
+
+		tos<<"        <tr>\n";
+		tos<<"          <th>"+tr("Subgroups")+"</th>\n";
+		if(WRITE_TIMETABLES_SUBGROUPS){
+			if(WRITE_TIMETABLES_DAYS_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+SUBGROUPS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_DAYS_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+SUBGROUPS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+SUBGROUPS_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+SUBGROUPS_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+		} else {
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+		}
+		tos<<"        </tr>\n";
+		tos<<"        <tr>\n";
+		tos<<"          <th>"+tr("Groups")+"</th>\n";
+		if(WRITE_TIMETABLES_GROUPS){
+			if(WRITE_TIMETABLES_DAYS_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+GROUPS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_DAYS_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+GROUPS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+GROUPS_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+GROUPS_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+		} else {
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+		}
+		tos<<"        </tr>\n";
+		tos<<"        <tr>\n";
+		tos<<"          <th>"+tr("Years")+"</th>\n";
+		if(WRITE_TIMETABLES_YEARS){
+			if(WRITE_TIMETABLES_DAYS_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+YEARS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_DAYS_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+YEARS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+YEARS_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+YEARS_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+		} else {
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+		}
+		tos<<"        </tr>\n";
+		tos<<"        <tr>\n";
+		tos<<"          <th>"+tr("Teachers")+"</th>\n";
+		if(WRITE_TIMETABLES_TEACHERS){
+			if(WRITE_TIMETABLES_DAYS_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+TEACHERS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_DAYS_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+TEACHERS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+TEACHERS_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+TEACHERS_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+		} else {
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+		}
+		tos<<"        </tr>\n";
+		tos<<"        <tr>\n";
+		tos<<"          <th>"+tr("Teachers Free Periods")+"</th>\n";
+		if(WRITE_TIMETABLES_TEACHERS_FREE_PERIODS){
+			if(WRITE_TIMETABLES_DAYS_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+TEACHERS_FREE_PERIODS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_DAYS_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+TEACHERS_FREE_PERIODS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+		} else {
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+		}
+		tos<<"          <td>"<<protect2(STRING_EMPTY_SLOT)<<"</td>\n";
+		tos<<"          <td>"<<protect2(STRING_EMPTY_SLOT)<<"</td>\n";
+		tos<<"        </tr>\n";
+		tos<<"        <tr>\n";
+		tos<<"          <th>"+tr("Rooms")+"</th>\n";
+		if(WRITE_TIMETABLES_ROOMS){
+			if(WRITE_TIMETABLES_DAYS_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+ROOMS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_DAYS_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+ROOMS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+ROOMS_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+ROOMS_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+		} else {
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+		}
+		tos<<"        </tr>\n";
+		tos<<"        <tr>\n";
+		tos<<"          <th>"+tr("Subjects")+"</th>\n";
+		if(WRITE_TIMETABLES_SUBJECTS){
+			if(WRITE_TIMETABLES_DAYS_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+SUBJECTS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_DAYS_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+SUBJECTS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+SUBJECTS_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+SUBJECTS_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+		} else {
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+		}
+		tos<<"        </tr>\n";
+		tos<<"        <tr>\n";
+		tos<<"          <th>"+tr("Activities")+"</th>\n";
+		if(WRITE_TIMETABLES_ACTIVITIES){
+			if(WRITE_TIMETABLES_DAYS_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+ALL_ACTIVITIES_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_DAYS_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+ALL_ACTIVITIES_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_HORIZONTAL)
+				tos<<"          <td><a href=\""<<s2+bar+ALL_ACTIVITIES_TIMETABLE_TIME_HORIZONTAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+			if(WRITE_TIMETABLES_TIME_VERTICAL)
+				tos<<"          <td><a href=\""<<s2+bar+ALL_ACTIVITIES_TIMETABLE_TIME_VERTICAL_FILENAME_HTML<<"\">"+tr("view")+"</a></td>\n";
+			else
+				tos<<"          <td>"+tr("disabled")+"</td>\n";
+		} else {
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+			tos<<"          <td>"+tr("disabled")+"</td>\n";
+		}
+		tos<<"        </tr>\n";
+		//workaround begin.
+		tos<<"      <tr class=\"foot\"><td></td><td colspan=\"4\">"<<TimetableExport::tr("Timetable generated with FET %1 on %2", "%1 is FET version, %2 is the date and time of generation").arg(FET_VERSION).arg(saveTime)<<"</td></tr>\n";
+		//workaround end.
+		tos<<"      </tbody>\n";
+		tos<<"    </table>\n";
+	}
 
 	tos<<"  </body>\n</html>\n";
 
@@ -1860,9 +2076,36 @@ void TimetableExport::writeIndexHtml(QWidget* parent, const QString& htmlfilenam
 }
 
 // writing the stylesheet in css format to a file by Volker Dirr.
-void TimetableExport::writeStylesheetCss(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
+void TimetableExport::writeStylesheetCss(QWidget* parent, const QString& cssfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+	
+	bool writeAtLeastATimetable = WRITE_TIMETABLE_CONFLICTS ||
+	 (WRITE_TIMETABLES_XML &&
+	 (WRITE_TIMETABLES_SUBGROUPS ||
+	 WRITE_TIMETABLES_TEACHERS ||
+	 WRITE_TIMETABLES_ACTIVITIES)) ||
+	 ((WRITE_TIMETABLES_DAYS_HORIZONTAL ||
+	 WRITE_TIMETABLES_DAYS_VERTICAL ||
+	 WRITE_TIMETABLES_TIME_HORIZONTAL ||
+	 WRITE_TIMETABLES_TIME_VERTICAL) &&
+	 (WRITE_TIMETABLES_SUBGROUPS ||
+	 WRITE_TIMETABLES_GROUPS ||
+	 WRITE_TIMETABLES_YEARS ||
+	 WRITE_TIMETABLES_TEACHERS ||
+	 WRITE_TIMETABLES_ROOMS ||
+	 WRITE_TIMETABLES_SUBJECTS ||
+	 WRITE_TIMETABLES_ACTIVITIES)) ||
+	 ((WRITE_TIMETABLES_DAYS_HORIZONTAL ||
+	 WRITE_TIMETABLES_DAYS_VERTICAL) &&
+	 WRITE_TIMETABLES_TEACHERS_FREE_PERIODS);
+	
+	if(!writeAtLeastATimetable){
+		if(QFile::exists(cssfilename))
+			QFile::remove(cssfilename);
+
+		return;
+	}
 
 	//get used students	//TODO: do it the same way in statistics.cpp
 	QSet<QString> usedStudents;
@@ -1874,10 +2117,10 @@ void TimetableExport::writeStylesheetCss(QWidget* parent, const QString& htmlfil
 	}
 
 	//Now we print the results to an CSS file
-	QFile file(htmlfilename);
+	QFile file(cssfilename);
 	if(!file.open(QIODevice::WriteOnly)){
 		IrreconcilableCriticalMessage::critical(parent, tr("FET critical"),
-		 TimetableExport::tr("Cannot open file %1 for writing. Please check your disk's free space. Saving of %1 aborted.").arg(htmlfilename));
+		 TimetableExport::tr("Cannot open file %1 for writing. Please check your disk's free space. Saving of %1 aborted.").arg(cssfilename));
 		return;
 	}
 	QTextStream tos(&file);
@@ -2023,7 +2266,7 @@ void TimetableExport::writeStylesheetCss(QWidget* parent, const QString& htmlfil
 
 	if(file.error()>0){
 		IrreconcilableCriticalMessage::critical(parent, tr("FET critical"),
-		 TimetableExport::tr("Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(htmlfilename).arg(file.error()));
+		 TimetableExport::tr("Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(cssfilename).arg(file.error()));
 	}
 	file.close();
 }
@@ -2032,6 +2275,13 @@ void TimetableExport::writeStylesheetCss(QWidget* parent, const QString& htmlfil
 void TimetableExport::writeSubgroupsTimetableDaysHorizontalHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_DAYS_HORIZONTAL || !WRITE_TIMETABLES_SUBGROUPS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2081,6 +2331,13 @@ void TimetableExport::writeSubgroupsTimetableDaysHorizontalHtml(QWidget* parent,
 void TimetableExport::writeSubgroupsTimetableDaysVerticalHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_DAYS_VERTICAL || !WRITE_TIMETABLES_SUBGROUPS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2132,6 +2389,13 @@ void TimetableExport::writeSubgroupsTimetableTimeVerticalHtml(QWidget* parent, c
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_SUBGROUPS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -2162,6 +2426,13 @@ void TimetableExport::writeSubgroupsTimetableTimeHorizontalHtml(QWidget* parent,
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_SUBGROUPS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -2191,6 +2462,13 @@ void TimetableExport::writeSubgroupsTimetableTimeHorizontalHtml(QWidget* parent,
 void TimetableExport::writeSubgroupsTimetableTimeVerticalDailyHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_SUBGROUPS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2226,6 +2504,13 @@ void TimetableExport::writeSubgroupsTimetableTimeHorizontalDailyHtml(QWidget* pa
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_SUBGROUPS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -2259,6 +2544,13 @@ void TimetableExport::writeSubgroupsTimetableTimeHorizontalDailyHtml(QWidget* pa
 void TimetableExport::writeGroupsTimetableDaysHorizontalHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_DAYS_HORIZONTAL || !WRITE_TIMETABLES_GROUPS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2312,6 +2604,13 @@ void TimetableExport::writeGroupsTimetableDaysVerticalHtml(QWidget* parent, cons
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_DAYS_VERTICAL || !WRITE_TIMETABLES_GROUPS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -2364,6 +2663,13 @@ void TimetableExport::writeGroupsTimetableTimeVerticalHtml(QWidget* parent, cons
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_GROUPS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -2400,6 +2706,13 @@ void TimetableExport::writeGroupsTimetableTimeHorizontalHtml(QWidget* parent, co
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_GROUPS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -2434,6 +2747,13 @@ void TimetableExport::writeGroupsTimetableTimeHorizontalHtml(QWidget* parent, co
 void TimetableExport::writeGroupsTimetableTimeVerticalDailyHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_GROUPS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2473,6 +2793,13 @@ void TimetableExport::writeGroupsTimetableTimeVerticalDailyHtml(QWidget* parent,
 void TimetableExport::writeGroupsTimetableTimeHorizontalDailyHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_GROUPS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2514,6 +2841,13 @@ void TimetableExport::writeGroupsTimetableTimeHorizontalDailyHtml(QWidget* paren
 void TimetableExport::writeYearsTimetableDaysHorizontalHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_DAYS_HORIZONTAL || !WRITE_TIMETABLES_YEARS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2562,6 +2896,13 @@ void TimetableExport::writeYearsTimetableDaysVerticalHtml(QWidget* parent, const
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_DAYS_VERTICAL || !WRITE_TIMETABLES_YEARS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -2609,6 +2950,13 @@ void TimetableExport::writeYearsTimetableTimeVerticalHtml(QWidget* parent, const
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_YEARS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -2645,6 +2993,13 @@ void TimetableExport::writeYearsTimetableTimeHorizontalHtml(QWidget* parent, con
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_YEARS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -2680,6 +3035,13 @@ void TimetableExport::writeYearsTimetableTimeHorizontalHtml(QWidget* parent, con
 void TimetableExport::writeYearsTimetableTimeVerticalDailyHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_YEARS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2719,6 +3081,13 @@ void TimetableExport::writeYearsTimetableTimeVerticalDailyHtml(QWidget* parent, 
 void TimetableExport::writeYearsTimetableTimeHorizontalDailyHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_YEARS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2761,6 +3130,13 @@ void TimetableExport::writeAllActivitiesTimetableDaysHorizontalHtml(QWidget* par
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_DAYS_HORIZONTAL || !WRITE_TIMETABLES_ACTIVITIES){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -2788,6 +3164,13 @@ void TimetableExport::writeAllActivitiesTimetableDaysVerticalHtml(QWidget* paren
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_DAYS_VERTICAL || !WRITE_TIMETABLES_ACTIVITIES){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -2814,6 +3197,13 @@ void TimetableExport::writeAllActivitiesTimetableDaysVerticalHtml(QWidget* paren
 void TimetableExport::writeAllActivitiesTimetableTimeVerticalHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_ACTIVITIES){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2844,6 +3234,13 @@ void TimetableExport::writeAllActivitiesTimetableTimeHorizontalHtml(QWidget* par
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_ACTIVITIES){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -2872,6 +3269,13 @@ void TimetableExport::writeAllActivitiesTimetableTimeHorizontalHtml(QWidget* par
 void TimetableExport::writeAllActivitiesTimetableTimeVerticalDailyHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_ACTIVITIES){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2904,6 +3308,13 @@ void TimetableExport::writeAllActivitiesTimetableTimeVerticalDailyHtml(QWidget* 
 void TimetableExport::writeAllActivitiesTimetableTimeHorizontalDailyHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_ACTIVITIES){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2940,6 +3351,13 @@ void TimetableExport::writeAllActivitiesTimetableTimeHorizontalDailyHtml(QWidget
 void TimetableExport::writeTeachersTimetableDaysHorizontalHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_DAYS_HORIZONTAL || !WRITE_TIMETABLES_TEACHERS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -2981,6 +3399,13 @@ void TimetableExport::writeTeachersTimetableDaysVerticalHtml(QWidget* parent, co
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_DAYS_VERTICAL || !WRITE_TIMETABLES_TEACHERS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -3020,6 +3445,13 @@ void TimetableExport::writeTeachersTimetableTimeVerticalHtml(QWidget* parent, co
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_TEACHERS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -3048,6 +3480,13 @@ void TimetableExport::writeTeachersTimetableTimeHorizontalHtml(QWidget* parent, 
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_TEACHERS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -3075,6 +3514,13 @@ void TimetableExport::writeTeachersTimetableTimeHorizontalHtml(QWidget* parent, 
 void TimetableExport::writeTeachersTimetableTimeVerticalDailyHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_TEACHERS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -3109,6 +3555,13 @@ void TimetableExport::writeTeachersTimetableTimeHorizontalDailyHtml(QWidget* par
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_TEACHERS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -3142,6 +3595,13 @@ void TimetableExport::writeTeachersTimetableTimeHorizontalDailyHtml(QWidget* par
 void TimetableExport::writeRoomsTimetableDaysHorizontalHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_DAYS_HORIZONTAL || !WRITE_TIMETABLES_ROOMS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -3185,6 +3645,13 @@ void TimetableExport::writeRoomsTimetableDaysHorizontalHtml(QWidget* parent, con
 void TimetableExport::writeRoomsTimetableDaysVerticalHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_DAYS_VERTICAL || !WRITE_TIMETABLES_ROOMS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -3231,6 +3698,13 @@ void TimetableExport::writeRoomsTimetableTimeVerticalHtml(QWidget* parent, const
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_ROOMS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -3263,6 +3737,13 @@ void TimetableExport::writeRoomsTimetableTimeVerticalHtml(QWidget* parent, const
 void TimetableExport::writeRoomsTimetableTimeHorizontalHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_ROOMS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -3297,6 +3778,13 @@ void TimetableExport::writeRoomsTimetableTimeHorizontalHtml(QWidget* parent, con
 void TimetableExport::writeRoomsTimetableTimeVerticalDailyHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_ROOMS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -3335,6 +3823,13 @@ void TimetableExport::writeRoomsTimetableTimeVerticalDailyHtml(QWidget* parent, 
 void TimetableExport::writeRoomsTimetableTimeHorizontalDailyHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_ROOMS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -3377,6 +3872,13 @@ void TimetableExport::writeSubjectsTimetableDaysHorizontalHtml(QWidget* parent, 
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_DAYS_HORIZONTAL || !WRITE_TIMETABLES_SUBJECTS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -3418,6 +3920,13 @@ void TimetableExport::writeSubjectsTimetableDaysVerticalHtml(QWidget* parent, co
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_DAYS_VERTICAL || !WRITE_TIMETABLES_SUBJECTS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -3458,6 +3967,13 @@ void TimetableExport::writeSubjectsTimetableTimeVerticalHtml(QWidget* parent, co
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_SUBJECTS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -3486,6 +4002,13 @@ void TimetableExport::writeSubjectsTimetableTimeVerticalHtml(QWidget* parent, co
 void TimetableExport::writeSubjectsTimetableTimeHorizontalHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_SUBJECTS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -3516,6 +4039,13 @@ void TimetableExport::writeSubjectsTimetableTimeHorizontalHtml(QWidget* parent, 
 void TimetableExport::writeSubjectsTimetableTimeVerticalDailyHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_TIME_VERTICAL || !WRITE_TIMETABLES_SUBJECTS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -3552,6 +4082,13 @@ void TimetableExport::writeSubjectsTimetableTimeHorizontalDailyHtml(QWidget* par
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
+	if(!WRITE_TIMETABLES_TIME_HORIZONTAL || !WRITE_TIMETABLES_SUBJECTS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
 	if(!file.open(QIODevice::WriteOnly)){
@@ -3585,6 +4122,13 @@ void TimetableExport::writeSubjectsTimetableTimeHorizontalDailyHtml(QWidget* par
 void TimetableExport::writeTeachersFreePeriodsTimetableDaysHorizontalHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_DAYS_HORIZONTAL || !WRITE_TIMETABLES_TEACHERS_FREE_PERIODS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -3636,6 +4180,13 @@ void TimetableExport::writeTeachersFreePeriodsTimetableDaysHorizontalHtml(QWidge
 void TimetableExport::writeTeachersFreePeriodsTimetableDaysVerticalHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_DAYS_VERTICAL || !WRITE_TIMETABLES_TEACHERS_FREE_PERIODS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);

@@ -31,7 +31,7 @@ public:
 	ModifyConstraintStudentsSetMaxBuildingChangesPerWeekForm(QWidget* parent, ConstraintStudentsSetMaxBuildingChangesPerWeek* ctr);
 	~ModifyConstraintStudentsSetMaxBuildingChangesPerWeekForm();
 
-	void updateStudentsComboBox();
+	void updateStudentsComboBox(QWidget* parent);
 
 public slots:
 	void constraintChanged();

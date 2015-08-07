@@ -24,6 +24,8 @@
 #include "subactivitiesform.h"
 #include "modifysubactivityform.h"
 
+#include "centerwidgetonscreen.h"
+
 #include <QString>
 #include <QMessageBox>
 
@@ -128,7 +130,7 @@ SubactivitiesForm::SubactivitiesForm(QWidget* parent, const QString& teacherName
 			currentID++;
 			if(stg->name==studentsSetName)
 				cist=currentID;
-			for(int k=0; k<stg->subgroupsList.size(); k++){
+			if(SHOW_SUBGROUPS_IN_COMBO_BOXES) for(int k=0; k<stg->subgroupsList.size(); k++){
 				StudentsSubgroup* sts=stg->subgroupsList[k];
 				studentsComboBox->addItem(sts->name);
 				currentID++;
@@ -140,7 +142,17 @@ SubactivitiesForm::SubactivitiesForm(QWidget* parent, const QString& teacherName
 	studentsComboBox->setCurrentIndex(cist);
 	
 	if(studentsSetName!=""){
-		this->studentsFilterChanged();
+		if(cist==0){
+			showWarningForInvisibleSubgroupActivity(parent, studentsSetName);
+
+			showedStudents.clear();
+			showedStudents.insert("");
+
+			this->filterChanged();
+		}
+		else{
+			this->studentsFilterChanged();
+		}
 	}
 	else{
 		showedStudents.clear();

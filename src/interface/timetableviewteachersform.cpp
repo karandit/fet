@@ -253,7 +253,8 @@ void TimetableViewTeachersForm::updateTeachersTimetableTable(){
 
 	teachername = teachersListWidget->currentItem()->text();
 	
-	if(gt.rules.searchTeacher(teachername)<0){
+	int teacher=gt.rules.searchTeacher(teachername);
+	if(teacher<0){
 		QMessageBox::warning(this, tr("FET warning"), tr("You have an old timetable view teachers dialog opened - please close it"));
 		return;
 	}
@@ -262,19 +263,6 @@ void TimetableViewTeachersForm::updateTeachersTimetableTable(){
 	teacherNameTextLabel->setText(s);
 
 	assert(gt.rules.initialized);
-/*	teachersTimetableTable->setNumRows(gt.rules.nHoursPerDay);
-	teachersTimetableTable->setNumCols(gt.rules.nDaysPerWeek);
-	for(int j=0; j<gt.rules.nDaysPerWeek; j++)
-		teachersTimetableTable->horizontalHeader()->setLabel(j, gt.rules.daysOfTheWeek[j]);
-	for(int i=0; i<gt.rules.nHoursPerDay; i++)
-		teachersTimetableTable->verticalHeader()->setLabel(i, gt.rules.hoursOfTheDay[i]);*/
-
-	int teacher=gt.rules.searchTeacher(teachername);
-	if(teacher<0){
-		QMessageBox::warning(this, tr("FET information"),
-			tr("The teacher's timetable cannot be printed, because the teacher is invalid"));
-		return;
-	}
 
 	for(int j=0; j<gt.rules.nHoursPerDay && j<teachersTimetableTable->rowCount(); j++){
 		for(int k=0; k<gt.rules.nDaysPerWeek && k<teachersTimetableTable->columnCount(); k++){

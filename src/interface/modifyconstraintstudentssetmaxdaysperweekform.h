@@ -32,7 +32,7 @@ public:
 	~ModifyConstraintStudentsSetMaxDaysPerWeekForm();
 
 	void updateMaxDaysSpinBox();
-	void updateStudentsComboBox();
+	void updateStudentsComboBox(QWidget* parent);
 
 public slots:
 	void constraintChanged();

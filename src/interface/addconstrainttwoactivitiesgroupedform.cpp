@@ -83,7 +83,7 @@ AddConstraintTwoActivitiesGroupedForm::AddConstraintTwoActivitiesGroupedForm(QWi
 		for(int j=0; j<sty->groupsList.size(); j++){
 			StudentsGroup* stg=sty->groupsList[j];
 			studentsComboBox->addItem(stg->name);
-			for(int k=0; k<stg->subgroupsList.size(); k++){
+			if(SHOW_SUBGROUPS_IN_COMBO_BOXES) for(int k=0; k<stg->subgroupsList.size(); k++){
 				StudentsSubgroup* sts=stg->subgroupsList[k];
 				studentsComboBox->addItem(sts->name);
 			}

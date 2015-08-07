@@ -88,11 +88,11 @@ void AddConstraintTeacherHomeRoomsForm::addConstraint()
 			tr("Empty list of selected rooms"));
 		return;
 	}
-	if(selectedRoomsListWidget->count()==1){
+	/*if(selectedRoomsListWidget->count()==1){
 		QMessageBox::warning(this, tr("FET information"),
 			tr("Only one selected room - please use constraint teacher home room if you want a single room"));
 		return;
-	}
+	}*/
 
 	QString teacher=teachersComboBox->currentText();
 	assert(gt.rules.searchTeacher(teacher)>=0);

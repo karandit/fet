@@ -57,7 +57,6 @@ win32 {
 	CONFIG += console
 }
 QT -= gui
-QT += xml
 
 DESTDIR = ..
 TARGET = fet-cl

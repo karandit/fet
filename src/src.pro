@@ -1299,7 +1299,7 @@ TRANSLATIONS += \
 TEMPLATE = app
 
 CONFIG += release warn_on thread
-QT += xml network
+QT += network
 
 greaterThan(QT_MAJOR_VERSION, 4){
 	QT += widgets

@@ -86,7 +86,7 @@ AddGroupActivitiesInInitialOrderItemForm::AddGroupActivitiesInInitialOrderItemFo
 		for(int j=0; j<sty->groupsList.size(); j++){
 			StudentsGroup* stg=sty->groupsList[j];
 			studentsComboBox->addItem(stg->name);
-			for(int k=0; k<stg->subgroupsList.size(); k++){
+			if(SHOW_SUBGROUPS_IN_COMBO_BOXES) for(int k=0; k<stg->subgroupsList.size(); k++){
 				StudentsSubgroup* sts=stg->subgroupsList[k];
 				studentsComboBox->addItem(sts->name);
 			}
@@ -210,8 +210,8 @@ void AddGroupActivitiesInInitialOrderItemForm::addItem()
 		}
 	*/
 	
-	GroupActivitiesInInitialOrderItem item;
-	item.ids=ids;
+	GroupActivitiesInInitialOrderItem* item=new GroupActivitiesInInitialOrderItem();
+	item->ids=ids;
 	gt.rules.groupActivitiesInInitialOrderList.append(item);
 	
 	gt.rules.internalStructureComputed=false;
@@ -219,7 +219,7 @@ void AddGroupActivitiesInInitialOrderItemForm::addItem()
 
 	QString s=tr("Added group activities in initial order item");
 	s+="\n\n";
-	s+=item.getDetailedDescription(gt.rules);
+	s+=item->getDetailedDescription(gt.rules);
 	LongTextMessageBox::information(this, tr("FET information"), s);
 }
 

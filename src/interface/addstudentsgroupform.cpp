@@ -60,17 +60,29 @@ void AddStudentsGroupForm::addStudentsGroup()
 	if(gt.rules.searchGroup(yearName, groupName)>=0){
 		QMessageBox::information( this, tr("Group insertion dialog"),
 			tr("Could not insert item. Duplicate"));
+
+		nameLineEdit->selectAll();
+		nameLineEdit->setFocus();
+
 		return;
 	}
 	StudentsSet* ss=gt.rules.searchStudentsSet(groupName);
 	if(ss!=NULL && ss->type==STUDENTS_YEAR){
 		QMessageBox::information( this, tr("Group insertion dialog"),
 			tr("This name is taken for a year - please consider another name"));
+
+		nameLineEdit->selectAll();
+		nameLineEdit->setFocus();
+
 		return;
 	}
 	if(ss!=NULL && ss->type==STUDENTS_SUBGROUP){
 		QMessageBox::information( this, tr("Group insertion dialog"),
 			tr("This name is taken for a subgroup - please consider another name"));
+
+		nameLineEdit->selectAll();
+		nameLineEdit->setFocus();
+
 		return;
 	}
 	if(ss!=NULL){ //already existing group, but in other year. It is the same group.
@@ -82,8 +94,13 @@ void AddStudentsGroupForm::addStudentsGroup()
 			"If you want to make a new group, independent, "
 			"please abort now and give it another name.")+"\n\n"+tr("Note: the number of students for the added group will be the number of students of the already existing group"
 			" (you can modify the number of students in the modify group dialog)."),
-			tr("Add"),tr("Abort"), 0, 0, 1 ) == 1)
+			tr("Add"),tr("Abort"), 0, 0, 1 ) == 1){
+
+			nameLineEdit->selectAll();
+			nameLineEdit->setFocus();
+
 			return;
+		}
 
 		numberSpinBox->setValue(ss->numberOfStudents);
 		sg=(StudentsGroup*)ss;

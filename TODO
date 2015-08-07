@@ -3196,8 +3196,10 @@ Liviu:
 
 Unfortunately, I cannot think of how to adapt the FET algorithm to multiple cores.
 
-201---------------------------------------------------------
+201-------------------------DONE----------------------------
 From liquid (on forum):
+
+DONE since FET-5.24.0 on 23 November 2014, constraints preferred/home rooms allow a single room -->
 
 Generally, constraints have the two forms:
 item has preferred other item
@@ -3225,3 +3227,124 @@ That's what I meant starting this thread. I'm sorry if the first post was misund
 Liviu:
 
 Variant 1 is wrong. You should use 2. Yes, I'll add this in the TODO.
+
+<-- DONE
+
+202---------------------------------------------------------
+From Vanyo Georgiev (on forum):
+
+The last opened FET XML file is opened again at start up.
+
+(Vanyo Georgiev provided the necessary code changes to do this.)
+
+203---------------------------------------------------------
+From Vanyo Georgiev (on forum):
+
+One more place to check for a language .qm file - the work path.
+
+(Vanyo Georgiev provided the necessary code changes to do this:
+	translation_loaded=translator.load("fet_"+FET_LANGUAGE, QDir::currentPath());
+in fet.cpp.)
+
+This change makes possible by setting the Working directory of the exe file in QtCreator to test the current translation without copying the .qm file to another directory.
+
+204---------------------------------------------------------
+From Vanyo Georgiev (on forum):
+
+Save and restore tabWidget current page at start up.
+
+(Vanyo Georgiev provided the necessary code changes to do this.)
+
+Liviu: See the ChangeLog for FET-5.19.0: "- When starting FET, the first shortcuts tab section (File) is selected (suggested by a user)." Previously, I saved the main tab widget position (as you do), but a user suggested that it is better to start always with the File tab selected.
+
+Anyway, I'll add this in the TODO, as your suggestion.
+
+Vanyo Georgiev: May be there must be a setting: 'Remember current page' and each user to choose his own preference. I'll try to do so.
+
+(Vanyo Georgiev provided the necessary code changes to do this.)
+
+205---------------------------------------------------------
+From bharatstank (on forum): ( http://lalescu.ro/liviu/fet/forum/index.php?topic=1826 )
+
+bharatstank:
+
+I have below created a Student structure (having 60 students):-
+
+(Student) Year - Group - Sub Group
+
+Year                    Group                    Sub Group
+MBACPM (60)       MBA CPM L (60)     MBACPM G1 (30)
+                                                       MBACPM G2 (30)
+Activity Tags:
+Lecture
+Tutorial
+Practical
+
+Activities created are as follows:-
+1. MBA CPM L (Lecture) of a SUBJECT1 for 2 hours duration is conducted by a FACULTY1 for all the 60 students
+2. MBA CPM G1 (Tutorial) of a SAME SUBJECT1 for 2 hours is conducted by SAME FACULTY1 for 30 students
+3. MBA CPM G2 (Tutorial) of a SAME SUBJECT1 for 2 hours is conducted by SAME FACULTY1 for 30 students
+4. MBA CPM G1 (Practical) of a SAME SUBJECT1 for 2 hours is conducted by SAME FACULTY1 for 30 students
+5. MBA CPM G2 (Practical) of a SAME SUBJECT1 for 2 hours is conducted by SAME FACULTY1 for 30 students
+
+6. MBA CPM L (Lecture) of a SUBJECT2 for 2 hours duration is conducted by a FACULTY2 for all the 60 students
+7. MBA CPM G1 (Tutorial) of a SAME SUBJECT2 for 2 hours is conducted by SAME FACULTY2 for 30 students
+8. MBA CPM G2 (Tutorial) of a SAME SUBJECT2 for 2 hours is conducted by SAME FACULTY2 for 30 students
+9. MBA CPM G1 (Practical) of a SAME SUBJECT2 for 2 hours is conducted by SAME FACULTY2 for 30 students
+10. MBA CPM G2 (Practical) of a SAME SUBJECT2 for 2 hours is conducted by SAME FACULTY2 for 30 students
+
+and so on...
+
+How to place the activities - so that:-
+1. For Subject1 - Lecture followed by Tutorial followed by Practical is conducted in sequence in a day and FET do NOT place tutorial or practical before Lecture
+
+I want to use this process as a template for every subject (Lecture -> Tutorial -> Practical). So that FET places all the possible activities according to this template.  and constraints are only applied in case of specific activities or exceptions.
+
+How to achieve this scenario.
+
+---
+
+Liviu:
+
+I am not sure I understand well, but I think you can use a constraint three activities grouped and two constraints two activities ordered.
+
+---
+
+bharatstank:
+
+using "constraint three activities grouped and two constraints two activities ordered." - here I need to create manual constraints for all the approx. 200 activities.
+
+is there a way - where I can create a Standardised constraints using Activity Tag.
+I have defined 3 activity tag (which needs to follow the below sequence):-
+1. Lecture
+2. Tutorial
+3. Practical
+
+As per the guideline - for subject1 - First lecture is conducted, Then its Tutorial is conducted and then its Practical is conducted.
+
+In my case FET does not places activity like (Subject1 lecture -> Subject1 Tutorial -> Subject1 Practical) in sequence but most of the time it places the activity like (Subject1 Lecture -> Subject2 Tutorial -> Subject3 Practical or vice versa)
+
+how to resolve this issue.
+I have also attached the timetable screenshot:-
+
+1. Correctly placed activity shown in Green circle
+2. Wrongly placed activity shown in Red Circle
+
+Here it is not important that Subject1 (lecture, Tutorial, Practical) should be consecutive but has to follow activity tag order (for a particular subject). otherwise timetable starts with Tutorial or Practical without Lecture - which is not feasible.
+
+---
+
+Liviu:
+
+I do not understand the picture in your attachment.
+
+If it is not important that the three kinds of activities are grouped, you might need to add only two constraints two activities ordered. You might want to add also a constraint activities same starting day.
+
+About making this automatic for activity tags - I have added this in the TODO list.
+
+206---------------------------------------------------------
+From Vanyo Georgiev (on forum):
+
+There are translations of the FET User manual in several languages http://lalescu.ro/liviu/fet/doc/
+
+I think it would be nice, when there is an User manual in the currently set language of the FET interface, by clicking on the Help -> Online -> Help contents the User manual in the  language of the FET interface is opened.

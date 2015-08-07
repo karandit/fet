@@ -16,7 +16,7 @@
  ***************************************************************************/
 
 #ifndef CONSTRAINTSTUDENTSACTIVITYTAGMAXHOURSDAILYFORM_H
-#define CONSTRAINTSTUDENTSCTIVITYTAGMAXHOURSDAILYFORM_H
+#define CONSTRAINTSTUDENTSACTIVITYTAGMAXHOURSDAILYFORM_H
 
 #include "ui_constraintstudentsactivitytagmaxhoursdailyform_template.h"
 #include "timetable_defs.h"

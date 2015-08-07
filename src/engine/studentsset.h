@@ -56,7 +56,7 @@ public:
 	int type;
 
 	StudentsSet();
-	~StudentsSet();
+	virtual ~StudentsSet();
 };
 
 class StudentsYear: public StudentsSet

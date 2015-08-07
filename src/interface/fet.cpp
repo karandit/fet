@@ -173,6 +173,20 @@ void usage(QTextStream* out, const QString& error)
 	
 	s+=QString(
 		"Command line usage: \"fet-cl --inputfile=x [--outputdir=d] [--timelimitseconds=y] [--htmllevel=z] [--language=t] "
+		"[--writetimetableconflicts=wt1] "
+		"[--writetimetablesxml=wt2] "
+		"[--writetimetablesdayshorizontal=wt3] "
+		"[--writetimetablesdaysvertical=wt4] "
+		"[--writetimetablestimehorizontal=wt5] "
+		"[--writetimetablestimevertical=wt6] "
+		"[--writetimetablessubgroups=wt7] "
+		"[--writetimetablesgroups=wt8] "
+		"[--writetimetablesyears=wt9] "
+		"[--writetimetablesteachers=wt10] "
+		"[--writetimetablesteachersfreeperiods=wt11] "
+		"[--writetimetablesrooms=wt12] "
+		"[--writetimetablessubjects=wt13] "
+		"[--writetimetablesactivities=wt14] "
 		"[--printactivitytags=a] [--printnotavailable=u] [--printbreak=b] [--dividetimeaxisbydays=v] [--duplicateverticalheaders=e] "
 		"[--printsimultaneousactivities=w] [--randomseedx=rx --randomseedy=ry] [--warnifusingnotperfectconstraints=s] "
 		"[--warnifusingstudentsminhoursdailywithallowemptydays=p] [--warnifusinggroupactivitiesininitialorder=g] [--verbose=r]\",\n"
@@ -183,6 +197,7 @@ void usage(QTextStream* out, const QString& error)
 		"z is integer from 0 to 6 and represents the detail level for the generated HTML timetables "
 		"(default 2, larger values have more details/facilities and larger file sizes).\n"
 		"t is one of en_US, ar, ca, da, de, el, es, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk, uz, vi, zh_CN (default en_US).\n"
+		"wt1 to wt14 are either true or false and represent whether you want the corresponding timetables to be written on the disk (default true).\n"
 		"a is either true or false and represets if you want activity tags to be present in the final HTML timetables (default true).\n"
 		"u is either true or false and represents if you want -x- (for true) or --- (for false) in the generated timetables for the "
 		"not available slots (default true).\n"
@@ -294,6 +309,26 @@ void readSimulationParameters()
 	
 	USE_GUI_COLORS=newSettings.value("use-gui-colors", "false").toBool();
 
+	SHOW_SUBGROUPS_IN_COMBO_BOXES=newSettings.value("show-subgroups-in-combo-boxes", "true").toBool();
+	SHOW_SUBGROUPS_IN_ACTIVITY_PLANNING=newSettings.value("show-subgroups-in-activity-planning", "true").toBool();
+	
+	WRITE_TIMETABLE_CONFLICTS=newSettings.value("write-timetable-conflicts", "true").toBool();
+
+	WRITE_TIMETABLES_XML=newSettings.value("write-timetables-xml", "true").toBool();
+	WRITE_TIMETABLES_DAYS_HORIZONTAL=newSettings.value("write-timetables-days-horizontal", "true").toBool();
+	WRITE_TIMETABLES_DAYS_VERTICAL=newSettings.value("write-timetables-days-vertical", "true").toBool();
+	WRITE_TIMETABLES_TIME_HORIZONTAL=newSettings.value("write-timetables-time-horizontal", "true").toBool();
+	WRITE_TIMETABLES_TIME_VERTICAL=newSettings.value("write-timetables-time-vertical", "true").toBool();
+
+	WRITE_TIMETABLES_SUBGROUPS=newSettings.value("write-timetables-subgroups", "true").toBool();
+	WRITE_TIMETABLES_GROUPS=newSettings.value("write-timetables-groups", "true").toBool();
+	WRITE_TIMETABLES_YEARS=newSettings.value("write-timetables-years", "true").toBool();
+	WRITE_TIMETABLES_TEACHERS=newSettings.value("write-timetables-teachers", "true").toBool();
+	WRITE_TIMETABLES_TEACHERS_FREE_PERIODS=newSettings.value("write-timetables-teachers-free-periods", "true").toBool();
+	WRITE_TIMETABLES_ROOMS=newSettings.value("write-timetables-rooms", "true").toBool();
+	WRITE_TIMETABLES_SUBJECTS=newSettings.value("write-timetables-subjects", "true").toBool();
+	WRITE_TIMETABLES_ACTIVITIES=newSettings.value("write-timetables-activities", "true").toBool();
+
 /////////confirmations
 	CONFIRM_ACTIVITY_PLANNING=newSettings.value("confirm-activity-planning", "true").toBool();
 	CONFIRM_SPREAD_ACTIVITIES=newSettings.value("confirm-spread-activities", "true").toBool();
@@ -341,7 +376,27 @@ void writeSimulationParameters()
 	settings.setValue("print-break", PRINT_BREAK_TIME_SLOTS);
 	
 	settings.setValue("use-gui-colors", USE_GUI_COLORS);
+
+	settings.setValue("show-subgroups-in-combo-boxes", SHOW_SUBGROUPS_IN_COMBO_BOXES);
+	settings.setValue("show-subgroups-in-activity-planning", SHOW_SUBGROUPS_IN_ACTIVITY_PLANNING);
 	
+	settings.setValue("write-timetable-conflicts", WRITE_TIMETABLE_CONFLICTS);
+
+	settings.setValue("write-timetables-xml", WRITE_TIMETABLES_XML);
+	settings.setValue("write-timetables-days-horizontal", WRITE_TIMETABLES_DAYS_HORIZONTAL);
+	settings.setValue("write-timetables-days-vertical", WRITE_TIMETABLES_DAYS_VERTICAL);
+	settings.setValue("write-timetables-time-horizontal", WRITE_TIMETABLES_TIME_HORIZONTAL);
+	settings.setValue("write-timetables-time-vertical", WRITE_TIMETABLES_TIME_VERTICAL);
+
+	settings.setValue("write-timetables-subgroups", WRITE_TIMETABLES_SUBGROUPS);
+	settings.setValue("write-timetables-groups", WRITE_TIMETABLES_GROUPS);
+	settings.setValue("write-timetables-years", WRITE_TIMETABLES_YEARS);
+	settings.setValue("write-timetables-teachers", WRITE_TIMETABLES_TEACHERS);
+	settings.setValue("write-timetables-teachers-free-periods", WRITE_TIMETABLES_TEACHERS_FREE_PERIODS);
+	settings.setValue("write-timetables-rooms", WRITE_TIMETABLES_ROOMS);
+	settings.setValue("write-timetables-subjects", WRITE_TIMETABLES_SUBJECTS);
+	settings.setValue("write-timetables-activities", WRITE_TIMETABLES_ACTIVITIES);
+
 ///////////confirmations
 	settings.setValue("confirm-activity-planning", CONFIRM_ACTIVITY_PLANNING);
 	settings.setValue("confirm-spread-activities", CONFIRM_SPREAD_ACTIVITIES);
@@ -703,6 +758,23 @@ int main(int argc, char **argv)
 		
 		PRINT_BREAK_TIME_SLOTS=true;
 		
+		WRITE_TIMETABLE_CONFLICTS=true;
+	
+		WRITE_TIMETABLES_XML=true;
+		WRITE_TIMETABLES_DAYS_HORIZONTAL=true;
+		WRITE_TIMETABLES_DAYS_VERTICAL=true;
+		WRITE_TIMETABLES_TIME_HORIZONTAL=true;
+		WRITE_TIMETABLES_TIME_VERTICAL=true;
+
+		WRITE_TIMETABLES_SUBGROUPS=true;
+		WRITE_TIMETABLES_GROUPS=true;
+		WRITE_TIMETABLES_YEARS=true;
+		WRITE_TIMETABLES_TEACHERS=true;
+		WRITE_TIMETABLES_TEACHERS_FREE_PERIODS=true;
+		WRITE_TIMETABLES_ROOMS=true;
+		WRITE_TIMETABLES_SUBJECTS=true;
+		WRITE_TIMETABLES_ACTIVITIES=true;
+
 		DIVIDE_HTML_TIMETABLES_WITH_TIME_AXIS_BY_DAYS=false;
 		
 		TIMETABLE_HTML_REPEAT_NAMES=false;
@@ -775,10 +847,6 @@ int main(int argc, char **argv)
 				if(s.right(5)=="false")
 					SHOW_WARNING_FOR_STUDENTS_MIN_HOURS_DAILY_WITH_ALLOW_EMPTY_DAYS=false;
 			}
-			else if(s.left(43)=="--warnifusinggroupactivitiesininitialorder="){
-				if(s.right(5)=="false")
-					SHOW_WARNING_FOR_GROUP_ACTIVITIES_IN_INITIAL_ORDER=false;
-			}
 			else if(s.left(10)=="--verbose="){
 				if(s.right(4)=="true")
 					VERBOSE=true;
@@ -786,6 +854,66 @@ int main(int argc, char **argv)
 			else if(s=="--version"){
 				showVersion=true;
 			}
+			///
+			else if(s.left(26)=="--writetimetableconflicts="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLE_CONFLICTS=false;
+			}
+			//
+			else if(s.left(21)=="--writetimetablesxml="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_XML=false;
+			}
+			else if(s.left(32)=="--writetimetablesdayshorizontal="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_DAYS_HORIZONTAL=false;
+			}
+			else if(s.left(30)=="--writetimetablesdaysvertical="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_DAYS_VERTICAL=false;
+			}
+			else if(s.left(32)=="--writetimetablestimehorizontal="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_TIME_HORIZONTAL=false;
+			}
+			else if(s.left(30)=="--writetimetablestimevertical="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_TIME_VERTICAL=false;
+			}
+			//
+			else if(s.left(27)=="--writetimetablessubgroups="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_SUBGROUPS=false;
+			}
+			else if(s.left(24)=="--writetimetablesgroups="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_GROUPS=false;
+			}
+			else if(s.left(23)=="--writetimetablesyears="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_YEARS=false;
+			}
+			else if(s.left(26)=="--writetimetablesteachers="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_TEACHERS=false;
+			}
+			else if(s.left(37)=="--writetimetablesteachersfreeperiods="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_TEACHERS_FREE_PERIODS=false;
+			}
+			else if(s.left(23)=="--writetimetablesrooms="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_ROOMS=false;
+			}
+			else if(s.left(26)=="--writetimetablessubjects="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_SUBJECTS=false;
+			}
+			else if(s.left(28)=="--writetimetablesactivities="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_ACTIVITIES=false;
+			}
+			///
 			else
 				unrecognizedOptions.append(s);
 		}

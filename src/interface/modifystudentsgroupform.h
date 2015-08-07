@@ -27,9 +27,9 @@
 class ModifyStudentsGroupForm : public QDialog, Ui::ModifyStudentsGroupForm_template {
 	Q_OBJECT
 public:
-	QString _yearName;
+//	QString _yearName;
 	QString _initialGroupName;
-	int _initialNumberOfStudents;
+//	int _initialNumberOfStudents;
 
 	ModifyStudentsGroupForm(QWidget* parent, const QString& yearName, const QString& initialGroupName, int initialNumberOfStudents);
 	~ModifyStudentsGroupForm();

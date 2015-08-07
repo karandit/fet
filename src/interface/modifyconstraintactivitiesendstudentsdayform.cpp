@@ -17,8 +17,6 @@
 
 #include <QMessageBox>
 
-
-
 #include "modifyconstraintactivitiesendstudentsdayform.h"
 #include "timeconstraint.h"
 
@@ -46,7 +44,7 @@ ModifyConstraintActivitiesEndStudentsDayForm::ModifyConstraintActivitiesEndStude
 	this->_ctr=ctr;
 
 	updateTeachersComboBox();
-	updateStudentsComboBox();
+	updateStudentsComboBox(parent);
 	updateSubjectsComboBox();
 	updateActivityTagsComboBox();
 
@@ -76,7 +74,7 @@ void ModifyConstraintActivitiesEndStudentsDayForm::updateTeachersComboBox(){
 	teachersComboBox->setCurrentIndex(j);
 }
 
-void ModifyConstraintActivitiesEndStudentsDayForm::updateStudentsComboBox(){
+void ModifyConstraintActivitiesEndStudentsDayForm::updateStudentsComboBox(QWidget* parent){
 	int i=0, j=-1;
 	studentsComboBox->clear();
 	studentsComboBox->addItem("");
@@ -95,7 +93,7 @@ void ModifyConstraintActivitiesEndStudentsDayForm::updateStudentsComboBox(){
 			if(stg->name==this->_ctr->studentsName)
 				j=i;
 			i++;
-			for(int p=0; p<stg->subgroupsList.size(); p++){
+			if(SHOW_SUBGROUPS_IN_COMBO_BOXES) for(int p=0; p<stg->subgroupsList.size(); p++){
 				StudentsSubgroup* sts=stg->subgroupsList[p];
 				studentsComboBox->addItem(sts->name);
 				if(sts->name==this->_ctr->studentsName)
@@ -104,7 +102,10 @@ void ModifyConstraintActivitiesEndStudentsDayForm::updateStudentsComboBox(){
 			}
 		}
 	}
-	assert(j>=0);
+	if(j<0)
+		showWarningForInvisibleSubgroupConstraint(parent, this->_ctr->studentsName);
+	else
+		assert(j>=0);
 	studentsComboBox->setCurrentIndex(j);
 }
 
@@ -146,6 +147,11 @@ void ModifyConstraintActivitiesEndStudentsDayForm::updateActivityTagsComboBox(){
 
 void ModifyConstraintActivitiesEndStudentsDayForm::ok()
 {
+	if(studentsComboBox->currentIndex()<0){
+		showWarningCannotModifyConstraintInvisibleSubgroupConstraint(this, this->_ctr->studentsName);
+		return;
+	}
+
 	double weight;
 	QString tmp=weightLineEdit->text();
 	weight_sscanf(tmp, "%lf", &weight);

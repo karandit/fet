@@ -331,25 +331,19 @@ void TimetableViewStudentsForm::updateStudentsTimetableTable(){
 	groupname = groupsListWidget->currentItem()->text();
 	subgroupname = subgroupsListWidget->currentItem()->text();
 
-	if( ! ((StudentsSubgroup*)gt.rules.searchAugmentedStudentsSet(subgroupname)) ){
+	StudentsSubgroup* sts=(StudentsSubgroup*)gt.rules.searchAugmentedStudentsSet(subgroupname);
+	if(sts==NULL){
 		QMessageBox::information(this, tr("FET warning"), tr("You have an old timetable view students dialog opened - please close it"));
 		return;
 	}
 
 	s="";
-/*	s = tr("Students");
-	s += ": ";*/
-	//s += yearname;
-	//s += ", ";
-	//s += groupname;
-	//s += ", ";
 	s += subgroupname;
 
 	classNameTextLabel->setText(s);
 
 	assert(gt.rules.initialized);
 
-	StudentsSubgroup* sts=(StudentsSubgroup*)gt.rules.searchAugmentedStudentsSet(subgroupname);
 	assert(sts);
 	int i;
 	for(i=0; i<gt.rules.nInternalSubgroups; i++)

@@ -31,7 +31,7 @@ public:
 	ModifyConstraintStudentsSetHomeRoomForm(QWidget* parent, ConstraintStudentsSetHomeRoom* ctr);
 	~ModifyConstraintStudentsSetHomeRoomForm();
 
-	void updateStudentsComboBox();
+	void updateStudentsComboBox(QWidget* parent);
 	void updateRoomsComboBox();
 
 public slots:

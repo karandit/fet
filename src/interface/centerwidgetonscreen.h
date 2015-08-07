@@ -47,4 +47,8 @@ void setStretchAvailabilityTableNicely(QTableWidget* notAllowedTimesTable);
 void setRulesModifiedAndOtherThings(Rules* rules);
 void setRulesUnmodifiedAndOtherThings(Rules* rules);
 
+void showWarningForInvisibleSubgroupConstraint(QWidget* parent, const QString& initialSubgroupName);
+void showWarningCannotModifyConstraintInvisibleSubgroupConstraint(QWidget* parent, const QString& initialSubgroupName);
+void showWarningForInvisibleSubgroupActivity(QWidget* parent, const QString& initialSubgroupName);
+
 #endif

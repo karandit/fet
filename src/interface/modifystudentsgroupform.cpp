@@ -35,9 +35,9 @@ ModifyStudentsGroupForm::ModifyStudentsGroupForm(QWidget* parent, const QString&
 	numberSpinBox->setMinimum(0);
 	numberSpinBox->setValue(0);
 				
-	this->_yearName=yearName;
+//	this->_yearName=yearName;
 	this->_initialGroupName=initialGroupName;
-	this->_initialNumberOfStudents=initialNumberOfStudents;
+//	this->_initialNumberOfStudents=initialNumberOfStudents;
 	numberSpinBox->setValue(initialNumberOfStudents);
 	yearNameLineEdit->setText(yearName);
 	nameLineEdit->setText(initialGroupName);
@@ -61,19 +61,23 @@ void ModifyStudentsGroupForm::ok()
 		QMessageBox::information(this, tr("FET information"), tr("Incorrect name"));
 		return;
 	}
-	QString yearName=yearNameLineEdit->text();
+	//QString yearName=yearNameLineEdit->text();
 	QString groupName=nameLineEdit->text();
 	
 	if(this->_initialGroupName!=groupName && gt.rules.searchStudentsSet(groupName)!=NULL){
-		QMessageBox::information(this, tr("FET information"), 
+		QMessageBox::information(this, tr("FET information"),
 		 tr("Name exists. If you would like to make more years to contain a group (overlapping years),"
 		 " please remove current group (FET will unfortunately remove all related activities and constraints)"
 		 " and add a new group with desired name in current year."
 		 " I know this is a not an elegant procedure, I'll try to fix that in the future."));
+
+		nameLineEdit->selectAll();
+		nameLineEdit->setFocus();
+		
 		return;
 	}
 	
-	bool t=gt.rules.modifyGroup(this->_yearName, this->_initialGroupName, groupName, numberSpinBox->value());	
+	bool t=gt.rules.modifyStudentsSet(this->_initialGroupName, groupName, numberSpinBox->value());
 	assert(t);
 	
 	this->close();

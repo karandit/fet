@@ -1235,14 +1235,40 @@
      <property name="title">
       <string>Interface</string>
      </property>
+     <addaction name="settingsShowShortcutsOnMainWindowAction"/>
+     <addaction name="separator"/>
      <addaction name="settingsUseColorsAction"/>
      <addaction name="separator"/>
-     <addaction name="settingsShowShortcutsOnMainWindowAction"/>
+     <addaction name="settingsShowSubgroupsInComboBoxesAction"/>
+     <addaction name="settingsShowSubgroupsInActivityPlanningAction"/>
     </widget>
     <widget class="QMenu" name="menuTimetables">
      <property name="title">
       <string>Timetables</string>
      </property>
+     <widget class="QMenu" name="menuWrite_on_disk">
+      <property name="title">
+       <string>Enable writing on disk</string>
+      </property>
+      <addaction name="enableConflictsTimetableAction"/>
+      <addaction name="separator"/>
+      <addaction name="enableXmlTimetablesAction"/>
+      <addaction name="enableDaysHorizontalTimetablesAction"/>
+      <addaction name="enableDaysVerticalTimetablesAction"/>
+      <addaction name="enableTimeHorizontalTimetablesAction"/>
+      <addaction name="enableTimeVerticalTimetablesAction"/>
+      <addaction name="separator"/>
+      <addaction name="enableSubgroupsTimetablesAction"/>
+      <addaction name="enableGroupsTimetablesAction"/>
+      <addaction name="enableYearsTimetablesAction"/>
+      <addaction name="enableTeachersTimetablesAction"/>
+      <addaction name="enableTeachersFreePeriodsTimetablesAction"/>
+      <addaction name="enableRoomsTimetablesAction"/>
+      <addaction name="enableSubjectsTimetablesAction"/>
+      <addaction name="enableActivitiesTimetablesAction"/>
+     </widget>
+     <addaction name="menuWrite_on_disk"/>
+     <addaction name="separator"/>
      <addaction name="settingsTimetableHtmlLevelAction"/>
      <addaction name="separator"/>
      <addaction name="settingsPrintActivityTagsAction"/>
@@ -1674,7 +1700,7 @@
   </action>
   <action name="settingsTimetableHtmlLevelAction">
    <property name="text">
-    <string>Html level for generated timetables</string>
+    <string>HTML level for generated timetables</string>
    </property>
   </action>
   <action name="dataTimeConstraintsTeachersMinHoursDailyAction">
@@ -2026,7 +2052,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Divide html timetables with time-axis by days</string>
+    <string>Divide HTML timetables with time-axis by days</string>
    </property>
   </action>
   <action name="helpSettingsAction">
@@ -2382,6 +2408,182 @@
    </property>
    <property name="text">
     <string>Warn if using group activities in initial order</string>
+   </property>
+  </action>
+  <action name="settingsShowSubgroupsInComboBoxesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show subgroups in combo boxes</string>
+   </property>
+  </action>
+  <action name="settingsShowSubgroupsInActivityPlanningAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show subgroups in activity planning</string>
+   </property>
+  </action>
+  <action name="enableXmlTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>XML</string>
+   </property>
+  </action>
+  <action name="enableDaysHorizontalTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Days horizontal</string>
+   </property>
+  </action>
+  <action name="enableDaysVerticalTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Days vertical</string>
+   </property>
+  </action>
+  <action name="enableTimeHorizontalTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Time horizontal</string>
+   </property>
+  </action>
+  <action name="enableTimeVerticalTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Time vertical</string>
+   </property>
+  </action>
+  <action name="enableSubgroupsTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Subgroups</string>
+   </property>
+  </action>
+  <action name="enableGroupsTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Groups</string>
+   </property>
+  </action>
+  <action name="enableYearsTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Years</string>
+   </property>
+  </action>
+  <action name="enableTeachersTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Teachers</string>
+   </property>
+  </action>
+  <action name="enableTeachersFreePeriodsTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Teachers free periods</string>
+   </property>
+  </action>
+  <action name="enableRoomsTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Rooms</string>
+   </property>
+  </action>
+  <action name="enableSubjectsTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Subjects</string>
+   </property>
+  </action>
+  <action name="enableActivitiesTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Activities</string>
+   </property>
+  </action>
+  <action name="enableConflictsTimetableAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Soft conflicts</string>
    </property>
   </action>
  </widget>

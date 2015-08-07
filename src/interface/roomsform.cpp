@@ -127,7 +127,7 @@ void RoomsForm::removeRoom()
 		tr("Yes"), tr("No"), 0, 0, 1 ) == 1)
 		return;
 
-	bool tmp=gt.rules.removeRoom(this, rm->name);
+	bool tmp=gt.rules.removeRoom(rm->name);
 	assert(tmp);
 
 	visibleRoomsList.removeAt(ind);

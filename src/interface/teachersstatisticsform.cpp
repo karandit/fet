@@ -28,6 +28,9 @@
 #include <QTableWidget>
 #include <QHeaderView>
 
+#include <QSet>
+#include <QHash>
+
 TeachersStatisticsForm::TeachersStatisticsForm(QWidget* parent): QDialog(parent)
 {
 	setupUi(this);
@@ -41,7 +44,7 @@ TeachersStatisticsForm::TeachersStatisticsForm(QWidget* parent): QDialog(parent)
 
 	centerWidgetOnScreen(this);
 	restoreFETDialogGeometry(this);
-		
+	
 	tableWidget->clear();
 	tableWidget->setColumnCount(3);
 	tableWidget->setRowCount(gt.rules.teachersList.size());
@@ -53,6 +56,16 @@ TeachersStatisticsForm::TeachersStatisticsForm(QWidget* parent): QDialog(parent)
 	
 	tableWidget->setHorizontalHeaderLabels(columns);
 	
+	QHash<QString, QSet<Activity*> > activitiesForTeacher;
+	
+	foreach(Activity* act, gt.rules.activitiesList)
+		if(act->active)
+			foreach(QString teacherName, act->teachersNames){
+				QSet<Activity*> acts=activitiesForTeacher.value(teacherName, QSet<Activity*>());
+				acts.insert(act);
+				activitiesForTeacher.insert(teacherName, acts);
+			}
+	
 	for(int i=0; i<gt.rules.teachersList.size(); i++){
 		Teacher* t=gt.rules.teachersList[i];
 		
@@ -63,12 +76,17 @@ TeachersStatisticsForm::TeachersStatisticsForm(QWidget* parent): QDialog(parent)
 		int	nSubActivities=0;
 		int nHours=0;
 		
-		foreach(Activity* act, gt.rules.activitiesList)
-			if(act->active)
-				if(act->teachersNames.contains(t->name)){
-					nSubActivities++;
-					nHours+=act->duration;
-				}
+		QSet<Activity*> acts=activitiesForTeacher.value(t->name, QSet<Activity*>());
+		
+		foreach(Activity* act, acts){
+			if(act->active){
+				nSubActivities++;
+				nHours+=act->duration;
+			}
+			else{
+				assert(0);
+			}
+		}
 
 		newItem=new QTableWidgetItem(CustomFETString::number(nSubActivities));
 		newItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);

@@ -17,8 +17,6 @@
 
 #include <QMessageBox>
 
-
-
 #include "longtextmessagebox.h"
 
 #include "addconstraintactivitypreferredroomsform.h"
@@ -91,7 +89,7 @@ AddConstraintActivityPreferredRoomsForm::AddConstraintActivityPreferredRoomsForm
 		for(int j=0; j<sty->groupsList.size(); j++){
 			StudentsGroup* stg=sty->groupsList[j];
 			studentsComboBox->addItem(stg->name);
-			for(int k=0; k<stg->subgroupsList.size(); k++){
+			if(SHOW_SUBGROUPS_IN_COMBO_BOXES) for(int k=0; k<stg->subgroupsList.size(); k++){
 				StudentsSubgroup* sts=stg->subgroupsList[k];
 				studentsComboBox->addItem(sts->name);
 			}
@@ -200,11 +198,11 @@ void AddConstraintActivityPreferredRoomsForm::addConstraint()
 			tr("Empty list of selected rooms"));
 		return;
 	}
-	if(selectedRoomsListWidget->count()==1){
+	/*if(selectedRoomsListWidget->count()==1){
 		QMessageBox::warning(this, tr("FET information"),
 			tr("Only one selected room - please use constraint activity preferred room if you want a single room"));
 		return;
-	}
+	}*/
 
 	int id;
 	int tmp2=activitiesComboBox->currentIndex();

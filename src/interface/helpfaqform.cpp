@@ -46,7 +46,7 @@ void HelpFaqForm::setText()
 	
 	s+=tr("Frequently asked questions.");
 	s+="\n\n";
-	s+=tr("Last modified on %1.").arg(tr("28 September 2013"));
+	s+=tr("Last modified on %1.").arg(tr("21 December 2014"));
 	
 	s+="\n\n";
 	s+="--------------------";
@@ -154,16 +154,9 @@ void HelpFaqForm::setText()
 	s+="\n\n";
 
 	s+=tr("Q: How to define the students into sections?\n\n"
-		"A: FET can automatically divide years by at most 4 categories of options. If you need to divide "
-		"a year into 5 categories, you can use a small trick (see below)."
+		"A: FET can automatically divide years by categories of options."
 		"\n\n"
-		"Add years and the option 'Divide ...' in the years dialog is the easiest way. You can also add manually years, groups and subgroups."
-		"\n\n"
-		"If each year (for instance 9) is divided by at most 4 categories, you can add year 9 and divide it in 4 categories. "
-		"If a year is divided by 5 categories (for instance, year 9 is divided by: section (a, b, c, d), first language (en, fr), "
-		"religion, boys/girls and second language (de, it)), you might consider years: 9a, 9b, 9c, 9d, each divided "
-		"into 4 categories, and divide each year in the dialog. For more than 5 categories, very unlikely case, you will need to "
-		"manually adjust groups/subgroups.");
+		"Add years and the option 'Divide ...' in the years dialog is the easiest way. You can also add manually years, groups and subgroups.");
 	s+="\n\n";
 	s+=tr("Important: you must consider that each year contains groups which contain independent subgroups. Subgroups should have "
 		"all the activities of the year and group plus additional optional activities. Please check menu statistics/students for "
@@ -930,6 +923,71 @@ void HelpFaqForm::setText()
 	 " students set to take place in the same room, be it Lab-1 or Lab-2");
 	s+="\n\n";
 	s+=tr("A: You can use the constraint activities occupy max different rooms, with max different rooms = 1.");
+
+	s+="\n\n";
+	s+="--------------------";
+	s+="\n\n";
+
+	s+=tr("Q: How can I backup/restore the FET settings on a computer, or share them between different computers?");
+	s+="\n\n";
+	s+=tr("A: GNU/Linux: Usually, in your %1 directory you will find a directory \"%2\""
+	 " containing the file \"%3\". If you copy this file to another computer, the FET settings will be copied. You can also make"
+	 " a backup of this file and copy it on the same computer, later, to restore the previous settings."
+	 " If you remove this file, all FET settings on this computer will be reset to defaults."
+	 ).arg("$HOME/.config").arg("fet").arg("fettimetabling.conf");
+	s+="\n\n";
+	s+=tr("Mac OS X: It seems that the configuration file might be %1").arg("$HOME/Library/Preferences/com.fet.fettimetabling.plist");
+	s+="\n\n";
+	s+=tr("Windows: Run regedit.exe (Registry Editor) and search for the key \"%1\". You will find a section with this name,"
+	 " with the subsection \"%2\". You can export this section to a file, and import it from this file on the same or another computer."
+	 " If you remove this section, all FET settings will be reset to defaults.").arg("fet").arg("fettimetabling.conf");
+
+	s+="\n\n";
+	s+="--------------------";
+	s+="\n\n";
+
+	s+=tr("Q: I have many subgroups and I don't explicitely use them. Can I hide them in the combo boxes, to add easier the constraints?"
+	 " Also, can I make the FET interface work faster?");
+	s+="\n\n";
+	s+=tr("A:", "Answer");
+	s+=" ";
+	s+=tr("If you have many subgroups and you don't explicitely use them, it is recommended to use the three global settings: hide subgroups"
+		" in combo boxes, hide subgroups in activity planning, and do not write subgroups timetables on hard disk.");
+	s+="\n";
+	s+=tr("Note that using the global menu setting to hide subgroups in activity planning is a different thing from the check box in the activity"
+		" planning dialog, and the global setting works better and faster.");
+	s+="\n";
+	s+=tr("If you hide subgroups in combo boxes, the affected dialogs (like the activities dialog or the add constraint students set not available times dialog)"
+		" will load much faster if you have many subgroups.");
+		
+	s+="\n\n";
+		
+	s+=tr("If you are only working on a timetable, and you do not need to publish it, you may want to disable writing some categories of timetables"
+		" on the hard disk, for operativity (the generation speed is not affected, only the overhead to write the partial/complete timetables"
+		" when stopping/finishing the simulation). The timetables taking the longest time are the subgroups, groups AND years ones.");
+	s+=" ";
+	s+=tr("(Also the conflicts timetable might take long to write, if the file is large.)");
+	s+=" ";
+	s+=tr("After that, you can re-enable writing of the timetables and re-generate.");
+
+	s+="\n\n";
+	s+="--------------------";
+	s+="\n\n";
+	
+	s+=tr("Q: How about dividing a students year automatically into many subgroups?");
+	s+="\n\n";
+	s+=tr("A:", "Answer");
+	s+=" ";
+	s+=tr("About using a large number of categories, divisions per category and subgroups: it is highly recommended to"
+		" keep these to a minimum, especially the number of categories, by using any kind of tricks. Otherwise the timetable"
+		" might become impossible (taking too much time to generate).");
+	s+=" ";
+	s+=tr("Maybe a reasonable number of categories could be 2, 3 or maximum 4. The divide year dialog allows much higher values, but"
+		" these are not at all recommended.");
+	s+="\n\n";
+	s+=tr("Maybe an alternative to dividing a year into many categories/subgroups would be to enter individual students as FET subgroups and add into"
+		" each group the corresponding subgroups. But this is hard to do from the FET interface - maybe a solution would be to use an automatic"
+		" tool to convert your instition data into a file in .fet format.");
 
 	plainTextEdit->setPlainText(s);
 }

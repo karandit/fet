@@ -40,7 +40,6 @@ AddConstraintStudentsIntervalMaxDaysPerWeekForm::AddConstraintStudentsIntervalMa
 	Q_UNUSED(tmp2);
 
 	updateMaxDaysSpinBox();
-	//updateStudentsComboBox();
 	updateStartHoursComboBox();
 	updateEndHoursComboBox();
 }

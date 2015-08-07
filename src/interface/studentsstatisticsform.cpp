@@ -22,6 +22,8 @@
 
 #include "fet.h"
 
+#include "messageboxes.h"
+
 #include <QString>
 #include <QStringList>
 
@@ -38,25 +40,6 @@
 #include <QTableWidget>
 
 extern QApplication* pqapplication;
-
-//QHash<QString, int> onlyExactHours; //for each students set, only the hours from each activity which has exactly the same set
-//does not include related sets.
-
-//QHash<QString, int> onlyExactActivities;
-
-//QHash<QString, int> allStudentsSets; //int is type
-QSet<QString> allStudentsSets;
-
-QHash<QString, int> allHours; //for each students set, only the hours from each activity which has exactly the same set
-//does not include related sets.
-
-QHash<QString, int> allActivities;
-
-QSet<QString> related; //related to current set
-
-QSet<QString> relatedSubgroups;
-QSet<QString> relatedGroups;
-QSet<QString> relatedYears;
 
 StudentsStatisticsForm::StudentsStatisticsForm(QWidget* parent): QDialog(parent)
 {
@@ -77,6 +60,155 @@ StudentsStatisticsForm::StudentsStatisticsForm(QWidget* parent): QDialog(parent)
 	connect(showSubgroupsCheckBox, SIGNAL(toggled(bool)), this, SLOT(checkBoxesModified()));
 
 	connect(showCompleteStructureCheckBox, SIGNAL(toggled(bool)), this, SLOT(checkBoxesModified()));
+	
+	//2014-12-18
+	QSet<StudentsYear*> allYears;
+	QSet<StudentsGroup*> allGroups;
+	QSet<StudentsSubgroup*> allSubgroups;
+	
+	QHash<QString, StudentsYear*> yearsHash;
+	QHash<QString, StudentsGroup*> groupsHash;
+	QHash<QString, StudentsSubgroup*> subgroupsHash;
+	
+	QHash<StudentsYear*, QSet<Activity*> > activitiesForYear;
+	QHash<StudentsGroup*, QSet<Activity*> > activitiesForGroup;
+	QHash<StudentsSubgroup*, QSet<Activity*> > activitiesForSubgroup;
+	
+	foreach(StudentsYear* year, gt.rules.yearsList){
+		yearsHash.insert(year->name, year);
+		
+		allYears.insert(year);
+		
+		foreach(StudentsGroup* group, year->groupsList){
+			groupsHash.insert(group->name, group);
+			
+			allGroups.insert(group);
+			
+			foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+				subgroupsHash.insert(subgroup->name, subgroup);
+
+				allSubgroups.insert(subgroup);
+			}
+		}
+	}
+	
+	QString warnings=QString("");
+	foreach(Activity* act, gt.rules.activitiesList)
+		if(act->active){
+			foreach(QString sts, act->studentsNames){
+				if(yearsHash.contains(sts)){
+					StudentsYear* year=yearsHash.value(sts);
+	
+					QSet<Activity*> acts=activitiesForYear.value(year, QSet<Activity*>());
+					acts.insert(act);
+					activitiesForYear.insert(year, acts);
+				}
+				else if(groupsHash.contains(sts)){
+					StudentsGroup* group=groupsHash.value(sts);
+
+					QSet<Activity*> acts=activitiesForGroup.value(group, QSet<Activity*>());
+					acts.insert(act);
+					activitiesForGroup.insert(group, acts);
+				}
+				else if(subgroupsHash.contains(sts)){
+					StudentsSubgroup* subgroup=subgroupsHash.value(sts);
+
+					QSet<Activity*> acts=activitiesForSubgroup.value(subgroup, QSet<Activity*>());
+					acts.insert(act);
+					activitiesForSubgroup.insert(subgroup, acts);
+				}
+				else
+					warnings+=tr("Students set %1 from activity with id %2 is inexistent in the students list. Please correct this.").arg(sts).arg(act->id)+QString("\n");
+			}
+		}
+	if(!warnings.isEmpty())
+		FetMessage::warning(this, tr("FET warning"), warnings);
+	
+	//phase 1a
+	foreach(StudentsYear* year, gt.rules.yearsList){
+		QSet<Activity*> actsYear=activitiesForYear.value(year, QSet<Activity*>());
+		foreach(StudentsGroup* group, year->groupsList){
+			QSet<Activity*> actsGroup=activitiesForGroup.value(group, QSet<Activity*>());
+			actsGroup.unite(actsYear);
+			activitiesForGroup.insert(group, actsGroup);
+		}
+	}
+	//phase 1b
+	foreach(StudentsYear* year, gt.rules.yearsList){
+		foreach(StudentsGroup* group, year->groupsList){
+			QSet<Activity*> actsGroup=activitiesForGroup.value(group, QSet<Activity*>());
+			foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+				QSet<Activity*> actsSubgroup=activitiesForSubgroup.value(subgroup, QSet<Activity*>());
+				actsSubgroup.unite(actsGroup);
+				activitiesForSubgroup.insert(subgroup, actsSubgroup);
+			}
+		}
+	}
+	//phase 2a
+	foreach(StudentsYear* year, gt.rules.yearsList){
+		foreach(StudentsGroup* group, year->groupsList){
+			QSet<Activity*> actsGroup=activitiesForGroup.value(group, QSet<Activity*>());
+			foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+				QSet<Activity*> actsSubgroup=activitiesForSubgroup.value(subgroup, QSet<Activity*>());
+				actsGroup.unite(actsSubgroup);
+			}
+			activitiesForGroup.insert(group, actsGroup);
+		}
+	}
+	//phase 2b
+	foreach(StudentsYear* year, gt.rules.yearsList){
+		QSet<Activity*> actsYear=activitiesForYear.value(year, QSet<Activity*>());
+		foreach(StudentsGroup* group, year->groupsList){
+			QSet<Activity*> actsGroup=activitiesForGroup.value(group, QSet<Activity*>());
+			actsYear.unite(actsGroup);
+		}
+		activitiesForYear.insert(year, actsYear);
+	}
+	
+	allActivities.clear();
+	allHours.clear();
+	
+	foreach(StudentsYear* year, allYears){
+		QSet<Activity*> acts=activitiesForYear.value(year, QSet<Activity*>());
+		int n=0, d=0;
+		foreach(Activity* act, acts){
+			n++;
+			d+=act->duration;
+		}
+		assert(!allActivities.contains(year->name));
+		assert(!allHours.contains(year->name));
+		allActivities.insert(year->name, n);
+		allHours.insert(year->name, d);
+	}
+	
+	foreach(StudentsGroup* group, allGroups){
+		QSet<Activity*> acts=activitiesForGroup.value(group, QSet<Activity*>());
+		int n=0, d=0;
+		foreach(Activity* act, acts){
+			n++;
+			d+=act->duration;
+		}
+		assert(!allActivities.contains(group->name));
+		assert(!allHours.contains(group->name));
+		allActivities.insert(group->name, n);
+		allHours.insert(group->name, d);
+	}
+
+	foreach(StudentsSubgroup* subgroup, allSubgroups){
+		QSet<Activity*> acts=activitiesForSubgroup.value(subgroup, QSet<Activity*>());
+		int n=0, d=0;
+		foreach(Activity* act, acts){
+			n++;
+			d+=act->duration;
+		}
+		assert(!allActivities.contains(subgroup->name));
+		assert(!allHours.contains(subgroup->name));
+		allActivities.insert(subgroup->name, n);
+		allHours.insert(subgroup->name, d);
+	}
+	
+/*
+	QSet<QString> allStudentsSets;
 
 	allStudentsSets.clear();
 	foreach(StudentsYear* year, gt.rules.yearsList){
@@ -92,7 +224,7 @@ StudentsStatisticsForm::StudentsStatisticsForm(QWidget* parent): QDialog(parent)
 	
 	///////////
 	allHours.clear();
-	allActivities.clear();	
+	allActivities.clear();
 	
 	QProgressDialog progress(this);
 	progress.setWindowTitle(tr("Computing students statistics", "Title of a progress dialog"));
@@ -180,8 +312,9 @@ StudentsStatisticsForm::StudentsStatisticsForm(QWidget* parent): QDialog(parent)
 	////////////
 
 	progress.setValue(allStudentsSets.count());
+*/
 	
-	checkBoxesModified();	
+	checkBoxesModified();
 }
 
 StudentsStatisticsForm::~StudentsStatisticsForm()
@@ -255,7 +388,7 @@ void StudentsStatisticsForm::checkBoxesModified()
 		}
 
 		if(showYearsCheckBox->isChecked() && sy){
-			currentStudentsSet++;		
+			currentStudentsSet++;
 			insertStudentsSet(year, currentStudentsSet);
 		}
 				
@@ -305,9 +438,8 @@ void StudentsStatisticsForm::insertStudentsSet(StudentsSet* set, int row)
 	
 	if(allHours.contains(set->name))
 		nHours=allHours.value(set->name);
-	else{
+	else
 		assert(0);
-	}
 		
 	if(allActivities.contains(set->name))
 		nSubActivities=allActivities.value(set->name);

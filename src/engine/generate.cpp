@@ -44,6 +44,7 @@ using namespace std;
 
 #include <QList>
 #include <QSet>
+#include <QHash>
 
 #include <QSemaphore>
 
@@ -5781,7 +5782,7 @@ impossiblestudentsmaxgapsperday:
 									if(d2!=d){
 										int g=limitHoursDaily-newSubgroupsDayNHours(sbg,d2);
 										//TODO: if g lower than 0 make g 0
-										//but with this change, speed decreases for test 25_2_2008_1.fet (private Greek sample from my80s)
+										//but with this change, speed decreases for file examples/anonymous/1/2008/anonymous-1-2008.fet
 										g=newSubgroupsDayNFirstGaps(sbg,d2)+newSubgroupsDayNGaps(sbg,d2)-g;
 										if(g>0)
 											rg-=g;
@@ -5845,7 +5846,7 @@ impossiblestudentsmaxgapsperday:
 									if(d2!=d){
 										int g=limitHoursDaily-newSubgroupsDayNHours(sbg,d2);
 										//TODO: if g lower than 0 make g 0
-										//but with this change, speed decreases for test 25_2_2008_1.fet (private Greek sample from my80s)
+										//but with this change, speed decreases for file examples/anonymous/1/2008/anonymous-1-2008.fet
 										g=newSubgroupsDayNGaps(sbg,d2)-g;
 										if(g>0)
 											rg-=g;
@@ -5909,7 +5910,7 @@ impossiblestudentsmaxgapsperday:
 										if(d2!=d){
 											int g=limitHoursDaily-sbgDayNHours[d2];
 											//TODO: if g lower than 0 make g 0
-											//but with this change, speed decreases for test 25_2_2008_1.fet (private Greek sample from my80s)
+											//but with this change, speed decreases for file examples/anonymous/1/2008/anonymous-1-2008.fet
 											g=sbgDayNFirstGaps[d2]+sbgDayNGaps[d2]-g;
 											if(g>0)
 												rg-=g;
@@ -5973,7 +5974,7 @@ impossiblestudentsmaxgapsperday:
 										if(d2!=d){
 											int g=limitHoursDaily-sbgDayNHours[d2];
 											//TODO: if g lower than 0 make g 0
-											//but with this change, speed decreases for test 25_2_2008_1.fet (private Greek sample from my80s)
+											//but with this change, speed decreases for file examples/anonymous/1/2008/anonymous-1-2008.fet
 											g=sbgDayNGaps[d2]-g;
 											if(g>0)
 												rg-=g;
@@ -7546,7 +7547,7 @@ impossibleteachersmaxgapsperday:
 								if(d2!=d){
 									int g=limitHoursDaily-newTeachersDayNHours(tch,d2);
 									//TODO: if g lower than 0 make g 0
-									//but with this change, speed decreases for test 25_2_2008_1.fet (private Greek sample from my80s)
+									//but with this change, speed decreases for file examples/anonymous/1/2008/anonymous-1-2008.fet
 									g=newTeachersDayNGaps(tch,d2)-g;
 									if(g>0)
 										rg-=g;
@@ -7609,7 +7610,7 @@ impossibleteachersmaxgapsperday:
 									if(d2!=d){
 										int g=limitHoursDaily-tchDayNHours[d2];
 										//TODO: if g lower than 0 make g 0
-										//but with this change, speed decreases for test 25_2_2008_1.fet (private Greek sample from my80s)
+										//but with this change, speed decreases for file examples/anonymous/1/2008/anonymous-1-2008.fet
 										g=tchDayNGaps[d2]-g;
 										if(g>0)
 											rg-=g;

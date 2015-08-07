@@ -42,7 +42,7 @@ ModifyConstraintStudentsSetHomeRoomForm::ModifyConstraintStudentsSetHomeRoomForm
 	
 	weightLineEdit->setText(CustomFETString::number(ctr->weightPercentage));
 
-	updateStudentsComboBox();
+	updateStudentsComboBox(parent);
 	updateRoomsComboBox();
 }
 
@@ -51,7 +51,7 @@ ModifyConstraintStudentsSetHomeRoomForm::~ModifyConstraintStudentsSetHomeRoomFor
 	saveFETDialogGeometry(this);
 }
 
-void ModifyConstraintStudentsSetHomeRoomForm::updateStudentsComboBox(){
+void ModifyConstraintStudentsSetHomeRoomForm::updateStudentsComboBox(QWidget* parent){
 	int i=0, j=-1;
 	studentsComboBox->clear();
 	for(int m=0; m<gt.rules.yearsList.size(); m++){
@@ -66,7 +66,7 @@ void ModifyConstraintStudentsSetHomeRoomForm::updateStudentsComboBox(){
 			if(stg->name==this->_ctr->studentsName)
 				j=i;
 			i++;
-			for(int p=0; p<stg->subgroupsList.size(); p++){
+			if(SHOW_SUBGROUPS_IN_COMBO_BOXES) for(int p=0; p<stg->subgroupsList.size(); p++){
 				StudentsSubgroup* sts=stg->subgroupsList[p];
 				studentsComboBox->addItem(sts->name);
 				if(sts->name==this->_ctr->studentsName)
@@ -75,7 +75,10 @@ void ModifyConstraintStudentsSetHomeRoomForm::updateStudentsComboBox(){
 			}
 		}
 	}
-	assert(j>=0);
+	if(j<0)
+		showWarningForInvisibleSubgroupConstraint(parent, this->_ctr->studentsName);
+	else
+		assert(j>=0);
 	studentsComboBox->setCurrentIndex(j);
 }
 
@@ -101,6 +104,11 @@ void ModifyConstraintStudentsSetHomeRoomForm::cancel()
 
 void ModifyConstraintStudentsSetHomeRoomForm::ok()
 {
+	if(studentsComboBox->currentIndex()<0){
+		showWarningCannotModifyConstraintInvisibleSubgroupConstraint(this, this->_ctr->studentsName);
+		return;
+	}
+
 	double weight;
 	QString tmp=weightLineEdit->text();
 	weight_sscanf(tmp, "%lf", &weight);

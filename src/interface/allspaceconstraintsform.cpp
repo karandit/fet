@@ -87,7 +87,7 @@ extern const QString COMPANY;
 extern const QString PROGRAM;
 
 const int DESCRIPTION=0;
-const int DETDESCRIPTION=1;
+//const int DETDESCRIPTION=1;
 
 const int CONTAINS=0;
 const int DOESNOTCONTAIN=1;

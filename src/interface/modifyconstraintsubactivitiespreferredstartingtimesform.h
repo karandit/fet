@@ -33,7 +33,7 @@ public:
 	~ModifyConstraintSubactivitiesPreferredStartingTimesForm();
 
 	void updateTeachersComboBox();
-	void updateStudentsComboBox();
+	void updateStudentsComboBox(QWidget* parent);
 	void updateSubjectsComboBox();
 	void updateActivityTagsComboBox();
 

@@ -20,68 +20,29 @@
 
 #include <QString>
 
+#include <QSignalMapper>
+
 #include "ui_splityearform_template.h"
 
 #include "timetable_defs.h"
 #include "timetable.h"
 #include "fet.h"
 
+const int MAX_CATEGORIES=14;
+const int MAX_SUBGROUPS_PER_YEAR=MAX_TOTAL_SUBGROUPS;
+
 class SplitYearForm : public QDialog, Ui::SplitYearForm_template  {
 	Q_OBJECT
 
 private:
 	QString _sep;
-
 	int _nCategories;
+	int _nDivisions[MAX_CATEGORIES];
+	QStringList _divisions[MAX_CATEGORIES];
 	
-	int _nDiv1;
-	int _nDiv2;
-	int _nDiv3;
-	int _nDiv4;
+	QListWidget* listWidgets[MAX_CATEGORIES];
 	
-	QString _cat1div1;
-	QString _cat1div2;
-	QString _cat1div3;
-	QString _cat1div4;
-	QString _cat1div5;
-	QString _cat1div6;
-	QString _cat1div7;
-	QString _cat1div8;
-	QString _cat1div9;
-	QString _cat1div10;
-	QString _cat1div11;
-	QString _cat1div12;
-	QString _cat1div13;
-	QString _cat1div14;
-	QString _cat1div15;
-	QString _cat1div16;
-
-	QString _cat2div1;
-	QString _cat2div2;
-	QString _cat2div3;
-	QString _cat2div4;
-	QString _cat2div5;
-	QString _cat2div6;
-	QString _cat2div7;
-	QString _cat2div8;
-	QString _cat2div9;
-	QString _cat2div10;
-	QString _cat2div11;
-	QString _cat2div12;
-
-	QString _cat3div1;
-	QString _cat3div2;
-	QString _cat3div3;
-	QString _cat3div4;
-	QString _cat3div5;
-	QString _cat3div6;
-	
-	QString _cat4div1;
-	QString _cat4div2;
-	QString _cat4div3;
-	QString _cat4div4;
-	QString _cat4div5;
-	QString _cat4div6;
+	QSignalMapper mapperModify;
 	
 public:
 	QString year;
@@ -89,13 +50,20 @@ public:
 	SplitYearForm(QWidget* parent, const QString& _year);
 	~SplitYearForm();
 	
+	void updateNumberOfSubgroups();
+	void updateDivisionsLabel();
+	
 public slots:
+	void tabIndexChanged(int i);
+	
 	void ok();
 	void numberOfCategoriesChanged();
-	void category1Changed();
-	void category2Changed();
-	void category3Changed();
-	void category4Changed();
+	
+	void addClicked();
+	void modifyClicked();
+	void modifyDoubleClicked(int i);
+	void removeClicked();
+	void removeAllClicked();
 	
 	void help();
 	void reset();

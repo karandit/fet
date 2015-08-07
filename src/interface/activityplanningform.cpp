@@ -104,9 +104,9 @@ const int ACTIVE_OR_INACTIVE = 2;
 
 extern Timetable gt;
 
-static FetStatistics statisticValues;			//maybe TODO: do it more local 
-static QList<bool> studentsDuplicates;		//maybe TODO: do it more local 
-static QList<int> yearORgroupORsubgroup;	//maybe TODO: do it more local 
+static FetStatistics statisticValues;			//maybe TODO: do it more local
+static QList<bool> studentsDuplicates;		//maybe TODO: do it more local
+static QList<int> yearORgroupORsubgroup;	//maybe TODO: do it more local
 
 //TODO: activate teachersTargetNumberOfHours again! it is usefull! seach teachersTargetNumberOfHours. Just 2 lines to delete!
 //TODO: need to setDefaultValue for the QHashs ? (sum/number of hours) (also in statisticsexport?) look like it is unneeded.
@@ -140,29 +140,35 @@ void StartActivityPlanning::startActivityPlanning(QWidget* parent){
 	statisticValues.allStudentsNames.clear();
 	studentsDuplicates.clear();
 	yearORgroupORsubgroup.clear();
+	
+	QSet<QString> allStudentsNamesSet;
+	
 	foreach(StudentsYear* sty, gt.rules.yearsList){
-		if(statisticValues.allStudentsNames.contains(sty->name)){
+		if(allStudentsNamesSet.contains(sty->name)){
 			studentsDuplicates<<true;
 		} else {
 			studentsDuplicates<<false;
 		}
 		statisticValues.allStudentsNames<<sty->name;
+		allStudentsNamesSet.insert(sty->name);
 		yearORgroupORsubgroup<<IS_YEAR;
 		foreach(StudentsGroup* stg, sty->groupsList){
-			if(statisticValues.allStudentsNames.contains(stg->name)){
+			if(allStudentsNamesSet.contains(stg->name)){
 				studentsDuplicates<<true;
 			} else {
 				studentsDuplicates<<false;
 			}
 			statisticValues.allStudentsNames<<stg->name;
+			allStudentsNamesSet.insert(stg->name);
 			yearORgroupORsubgroup<<IS_GROUP;
-			foreach(StudentsSubgroup* sts, stg->subgroupsList){
-				if(statisticValues.allStudentsNames.contains(sts->name)){
+			if(SHOW_SUBGROUPS_IN_ACTIVITY_PLANNING) foreach(StudentsSubgroup* sts, stg->subgroupsList){
+				if(allStudentsNamesSet.contains(sts->name)){
 					studentsDuplicates<<true;
 				} else {
 					studentsDuplicates<<false;
 				}
 				statisticValues.allStudentsNames<<sts->name;
+				allStudentsNamesSet.insert(sts->name);
 				yearORgroupORsubgroup<<IS_SUBGROUP;
 			}
 		}
@@ -254,6 +260,7 @@ ActivityPlanningForm::ActivityPlanningForm(QWidget *parent): QDialog(parent)
 	showGroups->setChecked(true);
 	showSubgroups=new QCheckBox(tr("Show subgroups", "Please keep translation short"));
 	showSubgroups->setChecked(false);
+	showSubgroups->setEnabled(SHOW_SUBGROUPS_IN_ACTIVITY_PLANNING);
 	showTeachers=new QCheckBox(tr("Show teachers", "Please keep translation short"));
 	showTeachers->setChecked(true);
 	//showActivityTags=new QCheckBox(tr("Show activity tags", "Please keep translation short"));
@@ -329,46 +336,6 @@ ActivityPlanningForm::ActivityPlanningForm(QWidget *parent): QDialog(parent)
 	*/
 	//mouseTracking (end 1/3)
 	
-	updateTables(0);
-	
-	//connect(activitiesTableView, SIGNAL(cellClicked(int, int)), this, SLOT(activitiesCellSelected(int, int)));
-	connect(activitiesTableView, SIGNAL(activated(const QModelIndex&)), this, SLOT(activitiesCellSelected(const QModelIndex&)));
-	
-	//connect(activitiesTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(ActivtiesCellSelected(int, int)));
-
-	//connect(teachersTable, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(teachersCellSelected(QTableWidgetItem*)));
-	connect(teachersTableView, SIGNAL(activated(const QModelIndex&)), this, SLOT(teachersCellSelected(const QModelIndex&)));
-
-	//mouseTracking (start 2/3)
-	/*
-	connect(activitiesTable, SIGNAL(cellEntered(int, int)), this, SLOT(ActivtiesCellEntered(int, int)));
-	connect(teachersTable, SIGNAL(cellEntered(int, int)), this, SLOT(TeachersCellEntered(int, int)));
-	*/
-	//mouseTracking (end 2/3)
-	
-	connect(activitiesTableView->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(activitiesTableHorizontalHeaderClicked(int)));
-	connect(activitiesTableView->verticalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(activitiesTableVerticalHeaderClicked(int)));
-
-	connect(teachersTableView->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(teachersTableHorizontalHeaderClicked(int)));
-	
-	connect(CBActive, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTables(int)));
-	connect(showDuplicates, SIGNAL(stateChanged(int)), this, SLOT(updateTablesVisual(int)));
-	connect(showYears, SIGNAL(stateChanged(int)), this, SLOT(updateTablesVisual(int)));
-	connect(showGroups, SIGNAL(stateChanged(int)), this, SLOT(updateTablesVisual(int)));
-	connect(showSubgroups, SIGNAL(stateChanged(int)), this, SLOT(updateTablesVisual(int)));
-	connect(showTeachers, SIGNAL(stateChanged(int)), this, SLOT(updateTables(int)));
-	connect(showActivityTags, SIGNAL(stateChanged(int)), this, SLOT(updateTables(int)));
-	connect(hideEmptyLines, SIGNAL(stateChanged(int)), this, SLOT(updateTablesVisual(int)));
-	connect(hideUsedTeachers, SIGNAL(stateChanged(int)), this, SLOT(updateTablesVisual(int)));
-	connect(swapAxis, SIGNAL(stateChanged(int)), this, SLOT(updateTables(int)));
-	connect(pbDeleteAll, SIGNAL(clicked()), this, SLOT(deleteAll()));
-	connect(pbPseudoActivities, SIGNAL(clicked()), this, SLOT(pseudoActivities()));
-	//connect(pbHelp, SIGNAL(clicked()), this, SLOT(help()));
-	connect(showHideButton, SIGNAL(clicked()), this, SLOT(showHide()));
-	connect(pbClose, SIGNAL(clicked()), this, SLOT(close()));
-	
-	connect(&planningCommunicationSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updateTables(int)));
-
 	int hh=560;
 	if(hh<this->minimumSizeHint().height())
 		hh=this->minimumSizeHint().height();
@@ -408,8 +375,9 @@ ActivityPlanningForm::ActivityPlanningForm(QWidget *parent): QDialog(parent)
 		showYears->setChecked(settings.value(this->metaObject()->className()+showYearsState).toBool());
 	if(settings.contains(this->metaObject()->className()+showGroupsState))
 		showGroups->setChecked(settings.value(this->metaObject()->className()+showGroupsState).toBool());
-	if(settings.contains(this->metaObject()->className()+showSubgroupsState))
-		showSubgroups->setChecked(settings.value(this->metaObject()->className()+showSubgroupsState).toBool());
+	if(SHOW_SUBGROUPS_IN_ACTIVITY_PLANNING)
+		if(settings.contains(this->metaObject()->className()+showSubgroupsState))
+			showSubgroups->setChecked(settings.value(this->metaObject()->className()+showSubgroupsState).toBool());
 	if(settings.contains(this->metaObject()->className()+showTeachersState))
 		showTeachers->setChecked(settings.value(this->metaObject()->className()+showTeachersState).toBool());
 	if(settings.contains(this->metaObject()->className()+showActivityTagsState))
@@ -420,6 +388,47 @@ ActivityPlanningForm::ActivityPlanningForm(QWidget *parent): QDialog(parent)
 		hideEmptyLines->setChecked(settings.value(this->metaObject()->className()+hideEmptyLinesState).toBool());
 	if(settings.contains(this->metaObject()->className()+swapAxisState))
 		swapAxis->setChecked(settings.value(this->metaObject()->className()+swapAxisState).toBool());
+	
+	//connect(activitiesTableView, SIGNAL(cellClicked(int, int)), this, SLOT(activitiesCellSelected(int, int)));
+	connect(activitiesTableView, SIGNAL(activated(const QModelIndex&)), this, SLOT(activitiesCellSelected(const QModelIndex&)));
+	
+	//connect(activitiesTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(ActivtiesCellSelected(int, int)));
+
+	//connect(teachersTable, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(teachersCellSelected(QTableWidgetItem*)));
+	connect(teachersTableView, SIGNAL(activated(const QModelIndex&)), this, SLOT(teachersCellSelected(const QModelIndex&)));
+
+	//mouseTracking (start 2/3)
+	/*
+	connect(activitiesTable, SIGNAL(cellEntered(int, int)), this, SLOT(ActivtiesCellEntered(int, int)));
+	connect(teachersTable, SIGNAL(cellEntered(int, int)), this, SLOT(TeachersCellEntered(int, int)));
+	*/
+	//mouseTracking (end 2/3)
+	
+	connect(activitiesTableView->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(activitiesTableHorizontalHeaderClicked(int)));
+	connect(activitiesTableView->verticalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(activitiesTableVerticalHeaderClicked(int)));
+
+	connect(teachersTableView->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(teachersTableHorizontalHeaderClicked(int)));
+	
+	connect(CBActive, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTables(int)));
+	connect(showDuplicates, SIGNAL(stateChanged(int)), this, SLOT(updateTablesVisual(int)));
+	connect(showYears, SIGNAL(stateChanged(int)), this, SLOT(updateTablesVisual(int)));
+	connect(showGroups, SIGNAL(stateChanged(int)), this, SLOT(updateTablesVisual(int)));
+	if(SHOW_SUBGROUPS_IN_ACTIVITY_PLANNING)
+		connect(showSubgroups, SIGNAL(stateChanged(int)), this, SLOT(updateTablesVisual(int)));
+	connect(showTeachers, SIGNAL(stateChanged(int)), this, SLOT(updateTables(int)));
+	connect(showActivityTags, SIGNAL(stateChanged(int)), this, SLOT(updateTables(int)));
+	connect(hideEmptyLines, SIGNAL(stateChanged(int)), this, SLOT(updateTablesVisual(int)));
+	connect(hideUsedTeachers, SIGNAL(stateChanged(int)), this, SLOT(updateTablesVisual(int)));
+	connect(swapAxis, SIGNAL(stateChanged(int)), this, SLOT(updateTables(int)));
+	connect(pbDeleteAll, SIGNAL(clicked()), this, SLOT(deleteAll()));
+	connect(pbPseudoActivities, SIGNAL(clicked()), this, SLOT(pseudoActivities()));
+	//connect(pbHelp, SIGNAL(clicked()), this, SLOT(help()));
+	connect(showHideButton, SIGNAL(clicked()), this, SLOT(showHide()));
+	connect(pbClose, SIGNAL(clicked()), this, SLOT(close()));
+	
+	connect(&planningCommunicationSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updateTables(int)));
+
+	updateTables(0);
 }
 
 ActivityPlanningForm::~ActivityPlanningForm()
@@ -443,7 +452,8 @@ ActivityPlanningForm::~ActivityPlanningForm()
 	//
 	settings.setValue(this->metaObject()->className()+showYearsState, showYears->isChecked());
 	settings.setValue(this->metaObject()->className()+showGroupsState, showGroups->isChecked());
-	settings.setValue(this->metaObject()->className()+showSubgroupsState, showSubgroups->isChecked());
+	if(SHOW_SUBGROUPS_IN_ACTIVITY_PLANNING)
+		settings.setValue(this->metaObject()->className()+showSubgroupsState, showSubgroups->isChecked());
 	settings.setValue(this->metaObject()->className()+showTeachersState, showTeachers->isChecked());
 	settings.setValue(this->metaObject()->className()+showActivityTagsState, showActivityTags->isChecked());
 	settings.setValue(this->metaObject()->className()+showDuplicatesState, showDuplicates->isChecked());
@@ -1856,10 +1866,25 @@ void ActivityPlanningForm::updateTablesVisual(int unneeded){
 	assert(studentsDuplicates.count()==statisticValues.allStudentsNames.count());
 	assert(studentsDuplicates.count()==yearORgroupORsubgroup.count());
 	
+	
+	activitiesTableView->setUpdatesEnabled(false);
+	teachersTableView->setUpdatesEnabled(false);
+
+	//(I hope) no performance slowdown, because of implicit sharing
+	/*QHash<QPair<int, int>, QString> tItems=activitiesTableView->model.items;
+	QStringList tHorizontalHeaderItems=activitiesTableView->model.horizontalHeaderItems;
+	QStringList tVerticalHeaderItems=activitiesTableView->model.verticalHeaderItems;
+	int trc=activitiesTableView->model.rowCount();
+	int tcc=activitiesTableView->model.columnCount();
+	activitiesTableView->model.clear();
+	activitiesTableView->model.resize(trc, tcc);*/
+
 	if(swapAxis->checkState()==Qt::Checked){
 		for(int students=0; students<statisticValues.allStudentsNames.count(); students++){
 			bool show=true;
 			int tmpInt=yearORgroupORsubgroup.at(students);
+			if(!SHOW_SUBGROUPS_IN_ACTIVITY_PLANNING)
+				assert(tmpInt!=IS_SUBGROUP);
 			switch(tmpInt){
 				case IS_YEAR:     if(showYears->checkState()!=Qt::Checked) show=false; break;
 				case IS_GROUP:    if(showGroups->checkState()!=Qt::Checked) show=false; break;
@@ -1891,6 +1916,8 @@ void ActivityPlanningForm::updateTablesVisual(int unneeded){
 		for(int students=0; students<statisticValues.allStudentsNames.count(); students++){
 			bool show=true;
 			int tmpInt=yearORgroupORsubgroup.at(students);
+			if(!SHOW_SUBGROUPS_IN_ACTIVITY_PLANNING)
+				assert(tmpInt!=IS_SUBGROUP);
 			switch(tmpInt){
 				case IS_YEAR:     if(showYears->checkState()!=Qt::Checked) show=false; break;
 				case IS_GROUP:    if(showGroups->checkState()!=Qt::Checked) show=false; break;
@@ -1921,6 +1948,21 @@ void ActivityPlanningForm::updateTablesVisual(int unneeded){
 				activitiesTableView->hideColumn(subject);
 		}
 	}
+
+	/*activitiesTableView->model.items=tItems;
+	activitiesTableView->model.horizontalHeaderItems=tHorizontalHeaderItems;
+	activitiesTableView->model.verticalHeaderItems=tVerticalHeaderItems;
+	activitiesTableView->allTableChanged();*/
+	
+	
+	//(I hope) no performance slowdown, because of implicit sharing
+	/*tItems=teachersTableView->model.items;
+	tHorizontalHeaderItems=teachersTableView->model.horizontalHeaderItems;
+	tVerticalHeaderItems=teachersTableView->model.verticalHeaderItems;
+	trc=teachersTableView->model.rowCount();
+	tcc=teachersTableView->model.columnCount();
+	teachersTableView->model.clear();
+	teachersTableView->model.resize(trc, tcc);*/
 	
 	for(int teacher=0; teacher<statisticValues.allTeachersNames.count(); teacher++){
 		bool show=true;
@@ -1932,14 +1974,23 @@ void ActivityPlanningForm::updateTablesVisual(int unneeded){
 		else
 			teachersTableView->hideColumn(teacher);
 	}
+
+	/*teachersTableView->model.items=tItems;
+	teachersTableView->model.horizontalHeaderItems=tHorizontalHeaderItems;
+	teachersTableView->model.verticalHeaderItems=tVerticalHeaderItems;
+	teachersTableView->allTableChanged();*/
+
 	
 	/*activitiesTable->resizeColumnsToContents();
 	activitiesTable->resizeRowsToContents();*/
 	activitiesTableView->resizeToFit();
-	
+
 	/*teachersTable->resizeColumnsToContents();
 	teachersTable->resizeRowsToContents();*/
 	teachersTableView->resizeToFit();
+
+	activitiesTableView->setUpdatesEnabled(true);
+	teachersTableView->setUpdatesEnabled(true);
 }
 
 void ActivityPlanningForm::deleteAll(){
@@ -1948,10 +1999,16 @@ void ActivityPlanningForm::deleteAll(){
 	if(ret==QMessageBox::Yes){
 		ret=QMessageBox::question(this, tr("Delete all?", "It refers to activities"), tr("Are you absolutely sure you want to remove ALL activities and related constraints from your data?"), QMessageBox::Yes | QMessageBox::No);
 		if(ret==QMessageBox::Yes){
-			while(!gt.rules.activitiesList.isEmpty()){
+			QList<int> idsToBeRemoved;
+			foreach(Activity* act, gt.rules.activitiesList)
+				idsToBeRemoved.append(act->id);
+			gt.rules.removeActivities(idsToBeRemoved, true);
+		
+			/*while(!gt.rules.activitiesList.isEmpty()){
 				Activity* act=gt.rules.activitiesList.at(0);
 				gt.rules.removeActivity(act->id, act->activityGroupId);
-			}
+			}*/
+			
 			PlanningChanged::increasePlanningCommunicationSpinBox();
 		}
 	}

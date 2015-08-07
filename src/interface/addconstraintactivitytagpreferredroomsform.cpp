@@ -90,11 +90,11 @@ void AddConstraintActivityTagPreferredRoomsForm::addConstraint()
 			tr("Empty list of selected rooms"));
 		return;
 	}
-	if(selectedRoomsListWidget->count()==1){
+	/*if(selectedRoomsListWidget->count()==1){
 		QMessageBox::warning(this, tr("FET information"),
 			tr("Only one selected room - please use constraint activity tag preferred room if you want a single room"));
 		return;
-	}
+	}*/
 	
 	if(activityTagsComboBox->currentIndex()<0 || activityTagsComboBox->count()<=0){
 		QMessageBox::warning(this, tr("FET information"),

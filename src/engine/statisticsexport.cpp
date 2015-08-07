@@ -214,7 +214,7 @@ void StatisticsExport::computeHashForIDsStatistics(FetStatistics *statisticValue
 	}*/
 }
 
-void StatisticsExport::getNamesAndHours(FetStatistics *statisticValues){	
+void StatisticsExport::getNamesAndHours(FetStatistics *statisticValues){
 	assert((*statisticValues).allStudentsNames.isEmpty());
 	assert((*statisticValues).allSubjectsNames.isEmpty());
 	assert((*statisticValues).allTeachersNames.isEmpty());
@@ -697,6 +697,7 @@ QString StatisticsExport::exportStatisticsTeachersSubjectsHtml(QWidget* parent, 
 		progress.setValue(ttt);
 		//pqapplication->processEvents();
 		if(progress.wasCanceled()){
+			progress.setValue(statisticValues.allSubjectsNames.count());
 			QMessageBox::warning(parent, tr("FET warning"), tr("Canceled"));
 			return /*false*/ tmp;
 		}
@@ -973,6 +974,7 @@ QString StatisticsExport::exportStatisticsSubjectsTeachersHtml(QWidget* parent, 
 		progress.setValue(ttt);
 		//pqapplication->processEvents();
 		if(progress.wasCanceled()){
+			progress.setValue(statisticValues.allTeachersNames.count());
 			QMessageBox::warning(parent, tr("FET warning"), tr("Canceled"));
 			return /*false*/tmp;
 		}
@@ -1246,6 +1248,7 @@ QString StatisticsExport::exportStatisticsTeachersStudentsHtml(QWidget* parent, 
 		progress.setValue(ttt);
 		//pqapplication->processEvents();
 		if(progress.wasCanceled()){
+			progress.setValue(statisticValues.allStudentsNames.count());
 			QMessageBox::warning(parent, tr("FET warning"), tr("Canceled"));
 			return /*false*/tmp;
 		}
@@ -1520,6 +1523,7 @@ QString StatisticsExport::exportStatisticsStudentsTeachersHtml(QWidget* parent, 
 		progress.setValue(ttt);
 		//pqapplication->processEvents();
 		if(progress.wasCanceled()){
+			progress.setValue(statisticValues.allTeachersNames.count());
 			QMessageBox::warning(parent, tr("FET warning"), tr("Canceled"));
 			return /*false*/tmp;
 		}
@@ -1794,6 +1798,7 @@ QString StatisticsExport::exportStatisticsSubjectsStudentsHtml(QWidget* parent, 
 		progress.setValue(ttt);
 		//pqapplication->processEvents();
 		if(progress.wasCanceled()){
+			progress.setValue(statisticValues.allStudentsNames.count());
 			QMessageBox::warning(parent, tr("FET warning"), tr("Canceled"));
 			return /*false*/tmp;
 		}
@@ -2067,6 +2072,7 @@ QString StatisticsExport::exportStatisticsStudentsSubjectsHtml(QWidget* parent, 
 		progress.setValue(ttt);
 		//pqapplication->processEvents();
 		if(progress.wasCanceled()){
+			progress.setValue(statisticValues.allSubjectsNames.count());
 			QMessageBox::warning(parent, tr("FET warning"), tr("Canceled"));
 			return /*false*/tmp;
 		}
