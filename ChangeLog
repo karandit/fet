@@ -1808,3 +1808,5 @@ Versions 5.27.0 - 5.27.v
 	- Added a partial Czech translation, by Pavel Fric.
 	- Improvement in the all time / space constraints dialogs: you can press activate / deactivate / modify the constraint and the focus
 	will remain on the constraints list widget, so that you can press the up / down arrows directly, for easier operation (suggested by Volker Dirr).
+- Version 5.27.8
+	- Corrected a compilation bug under Qt ( >= 5.0 and <5.3 ) (reported by Michel).

@@ -871,7 +871,7 @@ void StatisticsPrintForm::print(){
 		case 1: printer.setOrientation(QPrinter::Landscape); break;
 		default: assert(0==1);
 	}
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= 0x050300
 	QMarginsF printerMargins;
 	printerMargins.setLeft(leftPageMargin->value());
 	printerMargins.setRight(rightPageMargin->value());
@@ -915,7 +915,7 @@ void StatisticsPrintForm::printPreviewFull(){
 		case 1: printer.setOrientation(QPrinter::Landscape); break;
 		default: assert(0==1);
 	}
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= 0x050300
 	QMarginsF printerMargins;
 	printerMargins.setLeft(leftPageMargin->value());
 	printerMargins.setRight(rightPageMargin->value());
@@ -966,7 +966,7 @@ void StatisticsPrintForm::printPreviewSmall(){
 		case 1: printer.setOrientation(QPrinter::Landscape); break;
 		default: assert(0==1);
 	}
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= 0x050300
 	QMarginsF printerMargins;
 	printerMargins.setLeft(leftPageMargin->value());
 	printerMargins.setRight(rightPageMargin->value());
