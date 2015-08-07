@@ -1797,4 +1797,6 @@ Versions 5.27.0 - 5.27.v
 	- Updated to Qt 5.5.0.
 	- Added a new complete French translation, by Pascal Cohen.
 	- Minor bug fixes: some buttons were not translated (reported by Pascal Cohen).
-	- Added a new example file, by Laid Messaoudi.
+	- Added a new example file from Algeria, by Laid Messaoudi.
+- Version 5.27.5
+	- Minor improvements.

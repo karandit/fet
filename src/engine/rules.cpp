@@ -5651,9 +5651,12 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 			bool reportIncorrectMinDays=true;
 #endif
 		
+			bool seeNextWarnNotAddedTimeConstraint=true;
+			
 			int nc=0;
 			TimeConstraint *crt_constraint;
 			assert(xmlReader.isStartElement());
+			
 			while(xmlReader.readNextStartElement()){
 				xmlReadingLog+="   Found "+xmlReader.name().toString()+" tag\n";
 				crt_constraint=NULL;
@@ -6101,14 +6104,18 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 				}
 
 //corruptConstraintTime:
-				//here we skip invalid constraint or add valid one
+				//here we skip an invalid constraint or add a valid one
 				if(crt_constraint!=NULL){
 					assert(crt_constraint!=NULL);
 					bool tmp=this->addTimeConstraint(crt_constraint);
 					if(!tmp){
-						RulesReconcilableMessage::warning(parent, tr("FET information"),
-						 tr("Constraint\n%1\nnot added - must be a duplicate").
-						 arg(crt_constraint->getDetailedDescription(*this)));
+						if(seeNextWarnNotAddedTimeConstraint){
+							int t=RulesReconcilableMessage::warning(parent, tr("FET information"),
+							 tr("Constraint\n%1\nnot added - must be a duplicate").
+							 arg(crt_constraint->getDetailedDescription(*this)), tr("Skip rest"), tr("See next"), QString(""), 1, 0);
+							if(t==0)
+								seeNextWarnNotAddedTimeConstraint=false;
+						}
 						delete crt_constraint;
 					}
 					else
@@ -6122,6 +6129,8 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 			bool reportRoomNotAvailableChange=true;
 
 			bool reportUnspecifiedPermanentlyLockedSpace=true;
+			
+			bool seeNextWarnNotAddedSpaceConstraint=true;
 
 			int nc=0;
 			SpaceConstraint *crt_constraint;
@@ -6389,15 +6398,19 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 				}
 
 //corruptConstraintSpace:
-				//here we skip invalid constraint or add valid one
+				//here we skip an invalid constraint or add a valid one
 				if(crt_constraint!=NULL){
 					assert(crt_constraint!=NULL);
 					
 					bool tmp=this->addSpaceConstraint(crt_constraint);
 					if(!tmp){
-						RulesReconcilableMessage::warning(parent, tr("FET information"),
-						 tr("Constraint\n%1\nnot added - must be a duplicate").
-						 arg(crt_constraint->getDetailedDescription(*this)));
+						if(seeNextWarnNotAddedSpaceConstraint){
+							int t=RulesReconcilableMessage::warning(parent, tr("FET information"),
+							 tr("Constraint\n%1\nnot added - must be a duplicate").
+							 arg(crt_constraint->getDetailedDescription(*this)), tr("Skip rest"), tr("See next"), QString(""), 1, 0);
+							if(t==0)
+								seeNextWarnNotAddedSpaceConstraint=false;
+						}
 						delete crt_constraint;
 					}
 					else

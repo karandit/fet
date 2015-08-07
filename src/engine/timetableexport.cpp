@@ -2252,7 +2252,7 @@ void TimetableExport::writeStylesheetCss(QWidget* parent, const QString& cssfile
 		tos<<"tr.studentsset, div.studentsset {\n\n}\n\n";
 		tos<<"tr.teacher, div.teacher {\n\n}\n\n";
 		tos<<"tr.room, div.room {\n\n}\n\n";
-		tos<<"tr.line0 {\n  font-size: smaller;\n}\n\n";
+                tos<<"tr.line0, div.line0 {\n  font-size: smaller;\n}\n\n";
 		tos<<"tr.line1, div.line1 {\n\n}\n\n";
 		tos<<"tr.line2, div.line2 {\n  font-size: smaller;\n  color: gray;\n}\n\n";
 		tos<<"tr.line3, div.line3 {\n  font-size: smaller;\n  color: silver;\n}\n\n";
