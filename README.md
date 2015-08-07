@@ -1,4 +1,4 @@
-This is FET version 5.27.1
+This is FET version 5.27.2
 
 
 Program description:
@@ -14,7 +14,7 @@ Program description:
 
 Requirements:
 
-	FET is created in the following environment: openSUSE 13.2 GNU/Linux distribution, Linux 3.16.7, Xfce 4.10,
+	FET is created in the following environment: openSUSE 13.2 GNU/Linux distribution, Linux 3.16.7, Xfce 4.12,
 	Midnight Commander 4.8.13, KDiff3 0.9.97, Qt 5.4.1, gcc 4.8.3, g++ 4.8.3, make 4.0, sed 4.2.2,
 	Valgrind 3.10.0, Coverity Scan 7.6.0, Cppcheck 1.69, other great free tools.
 	FET can be run on any platform supported by the free software Qt (GNU/Linux, Windows, Mac OS X).
@@ -141,6 +141,9 @@ Compiling FET:
 					^
 	compilation terminated.
 	you may need to install additional packages before compiling FET. For instance, under my GNU/Linux openSuse I need to install Mesa-devel.
+
+	Note 5: If you only want to compile the command-line version, open the file fet.pro with a text editor and from the second line remove the
+	text "src/src.pro ".
 
 
 	GNU/Linux:

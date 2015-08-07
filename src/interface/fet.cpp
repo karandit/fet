@@ -41,6 +41,7 @@ File fet.cpp - this is where the program FET starts
 static QSet<QString> languagesSet;
 
 #include <ctime>
+#include <cstdlib>
 
 #include "timetableexport.h"
 #include "generate.h"
