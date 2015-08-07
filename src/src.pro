@@ -1266,10 +1266,12 @@ FORMS += \
 TRANSLATIONS += \
 	../translations/fet_ar.ts \
 	../translations/fet_ca.ts \
+	../translations/fet_cs.ts \
 	../translations/fet_da.ts \
 	../translations/fet_de.ts \
 	../translations/fet_el.ts \
 	../translations/fet_es.ts \
+	../translations/fet_eu.ts \
 	../translations/fet_fa.ts \
 	../translations/fet_fr.ts \
 	../translations/fet_gl.ts \

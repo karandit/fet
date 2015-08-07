@@ -354,6 +354,9 @@ void AllTimeConstraintsForm::modifyConstraint()
 	int i=constraintsListWidget->currentRow();
 	if(i<0){
 		QMessageBox::information(this, tr("FET information"), tr("Invalid selected constraint"));
+	
+		constraintsListWidget->setFocus();
+
 		return;
 	}
 	
@@ -779,6 +782,8 @@ void AllTimeConstraintsForm::modifyConstraint()
 
 	if(i>=0)
 		constraintsListWidget->setCurrentRow(i);
+	
+	constraintsListWidget->setFocus();
 }
 
 void AllTimeConstraintsForm::removeConstraint()
@@ -923,6 +928,9 @@ void AllTimeConstraintsForm::activateConstraint()
 	int i=constraintsListWidget->currentRow();
 	if(i<0){
 		QMessageBox::information(this, tr("FET information"), tr("Invalid selected constraint"));
+	
+		constraintsListWidget->setFocus();
+
 		return;
 	}
 	
@@ -956,6 +964,8 @@ void AllTimeConstraintsForm::activateConstraint()
 		 "%1 represents the number of visible active time constraints, %2 represents the total number of visible time constraints")
 		 .arg(n_active).arg(visibleTimeConstraintsList.count()));
 	}
+	
+	constraintsListWidget->setFocus();
 }
 
 void AllTimeConstraintsForm::deactivateConstraint()
@@ -963,12 +973,15 @@ void AllTimeConstraintsForm::deactivateConstraint()
 	int i=constraintsListWidget->currentRow();
 	if(i<0){
 		QMessageBox::information(this, tr("FET information"), tr("Invalid selected constraint"));
+	
+		constraintsListWidget->setFocus();
+
 		return;
 	}
 	
 	assert(i<visibleTimeConstraintsList.count());
 	TimeConstraint* ctr=visibleTimeConstraintsList.at(i);
-	
+
 	if(ctr->active){
 		if(ctr->type==CONSTRAINT_BASIC_COMPULSORY_TIME){
 			QMessageBox::warning(this, tr("FET warning"), tr("You are not allowed to deactivate the basic compulsory time constraints"));
@@ -1001,6 +1014,8 @@ void AllTimeConstraintsForm::deactivateConstraint()
 		 "%1 represents the number of visible active time constraints, %2 represents the total number of visible time constraints")
 		 .arg(n_active).arg(visibleTimeConstraintsList.count()));
 	}
+	
+	constraintsListWidget->setFocus();
 }
 
 /*static int timeConstraintsAscendingByComments(const TimeConstraint* t1, const TimeConstraint* t2)

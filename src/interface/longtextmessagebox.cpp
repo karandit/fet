@@ -116,11 +116,11 @@ int LongTextMessageBox::confirmationWithDimensions
 		pb0->setDefault(true);
 		pb0->setFocus();
 	}
-	if(pb1!=NULL && defaultButton==1){
+	else if(pb1!=NULL && defaultButton==1){
 		pb1->setDefault(true);
 		pb1->setFocus();
 	}
-	if(pb2!=NULL && defaultButton==2){
+	else if(pb2!=NULL && defaultButton==2){
 		pb2->setDefault(true);
 		pb2->setFocus();
 	}

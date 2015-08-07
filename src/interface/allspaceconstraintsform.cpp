@@ -306,6 +306,9 @@ void AllSpaceConstraintsForm::modifyConstraint()
 	int i=constraintsListWidget->currentRow();
 	if(i<0){
 		QMessageBox::information(this, tr("FET information"), tr("Invalid selected constraint"));
+	
+		constraintsListWidget->setFocus();
+
 		return;
 	}
 
@@ -503,6 +506,8 @@ void AllSpaceConstraintsForm::modifyConstraint()
 
 	if(i>=0)
 		constraintsListWidget->setCurrentRow(i);
+	
+	constraintsListWidget->setFocus();
 }
 
 void AllSpaceConstraintsForm::removeConstraint()
@@ -644,6 +649,9 @@ void AllSpaceConstraintsForm::activateConstraint()
 	int i=constraintsListWidget->currentRow();
 	if(i<0){
 		QMessageBox::information(this, tr("FET information"), tr("Invalid selected constraint"));
+	
+		constraintsListWidget->setFocus();
+
 		return;
 	}
 	
@@ -677,6 +685,8 @@ void AllSpaceConstraintsForm::activateConstraint()
 		 "%1 represents the number of visible active space constraints, %2 represents the total number of visible space constraints")
 		 .arg(n_active).arg(visibleSpaceConstraintsList.count()));
 	}
+	
+	constraintsListWidget->setFocus();
 }
 
 void AllSpaceConstraintsForm::deactivateConstraint()
@@ -684,12 +694,15 @@ void AllSpaceConstraintsForm::deactivateConstraint()
 	int i=constraintsListWidget->currentRow();
 	if(i<0){
 		QMessageBox::information(this, tr("FET information"), tr("Invalid selected constraint"));
+	
+		constraintsListWidget->setFocus();
+
 		return;
 	}
 	
 	assert(i<visibleSpaceConstraintsList.count());
 	SpaceConstraint* ctr=visibleSpaceConstraintsList.at(i);
-	
+
 	if(ctr->active){
 		if(ctr->type==CONSTRAINT_BASIC_COMPULSORY_SPACE){
 			QMessageBox::warning(this, tr("FET warning"), tr("You are not allowed to deactivate the basic compulsory space constraints"));
@@ -722,6 +735,8 @@ void AllSpaceConstraintsForm::deactivateConstraint()
 		 "%1 represents the number of visible active space constraints, %2 represents the total number of visible space constraints")
 		 .arg(n_active).arg(visibleSpaceConstraintsList.count()));
 	}
+	
+	constraintsListWidget->setFocus();
 }
 
 /*static int spaceConstraintsAscendingByComments(const SpaceConstraint* s1, const SpaceConstraint* s2)
