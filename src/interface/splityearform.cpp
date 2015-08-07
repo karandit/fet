@@ -8,10 +8,10 @@
 
 /***************************************************************************
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License as        *
+ *   published by the Free Software Foundation, either version 3 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
 
@@ -458,12 +458,15 @@ again_here_1:
 	QHash<QString, StudentsGroup*> groupsHash;
 	
 	StudentsYear* yearPointer=NULL;
-	foreach(StudentsYear* y, gt.rules.yearsList)
-		if(y->name==year){
-			yearPointer=y;
+	int yearIndex=-1;
+	for(int i=0; i<gt.rules.yearsList.count(); i++)
+		if(gt.rules.yearsList[i]->name==year){
+			yearPointer=gt.rules.yearsList[i];
+			yearIndex=i;
 			break;
 		}
 	assert(yearPointer!=NULL);
+	assert(yearIndex>=0);
 	
 	QSet<QString> notExistingGroupsSet;
 	QSet<QString> notExistingSubgroupsSet;
@@ -614,11 +617,9 @@ again_here_2:
 		}
 	}
 	
-	for(int i=0; i<gt.rules.yearsList.count(); i++)
-		if(gt.rules.yearsList[i]==yearPointer){
-			gt.rules.yearsList[i]=newYear;
-			break;
-		}
+	assert(yearIndex>=0 && yearIndex<gt.rules.yearsList.count());
+	assert(gt.rules.yearsList[yearIndex]==yearPointer);
+	gt.rules.yearsList[yearIndex]=newYear;
 	
 	QString s=QString("");
 	
@@ -627,6 +628,7 @@ again_here_2:
 	int nSpaceConstraintsBefore=gt.rules.spaceConstraintsList.count();
 	int nGroupActivitiesInInitialOrderItemsBefore=gt.rules.groupActivitiesInInitialOrderList.count();
 	
+	gt.rules.computePermanentStudentsHash();
 	gt.rules.removeYearPointerAfterSplit(yearPointer);
 
 	int nActivitiesAfter=gt.rules.activitiesList.count();

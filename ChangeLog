@@ -1718,7 +1718,7 @@ Versions 5.23.0 - 5.23.4
 - Version 5.23.3
 	- Updated to Qt 5.3.2.
 	- Added a fet.desktop file (by Alexey Loginov).
-	- Fixed some comments concerning the GNU GPL license (reported by Alexey Loginov).
+	- Fixed some comments concerning the license (reported by Alexey Loginov).
 	- Added a "make install" option (suggested by Alexey Loginov and other users, done by Zsolt Udvari and Liviu Lalescu).
 	- Added an icon (suggested by Alexey Loginov and other users).
 	- Added an option at compilation time so that FET automatically detects the system locale (suggested by Alexey Loginov and other users).
@@ -1747,7 +1747,7 @@ Version 5.24.0
 	- Added a new example file from Namibia, by Bobby Wise.
 	- Added two anonymous example files.
 ---------------------------------------------------------------------------------
-Versions 5.25.0 - 5.25.x
+Version 5.25.0
 - Version 5.25.0
 	- Improved the split year dialog: groups and subgroups which will exist in this year after the division will retain their activities and constraints.
 	- Sort (temporarily) the constraints by description in the all time/space constraints dialogs. Also, removed the 'Sort by comments' button,
@@ -1755,3 +1755,13 @@ Versions 5.25.0 - 5.25.x
 	- Fixed a bug introduced in version 5.24.0: when having individually modified activities, removing teachers, subjects, activity tags,
 	or students sets could remove only some components of the large split activity.
 	- Some minor strings improvements.
+---------------------------------------------------------------------------------
+Versions 5.26.0 - 5.26.v
+- Version 5.26.0
+	- FET is now licensed under the GNU Affero General Public License version 3 or later (suggested by Volker Dirr).
+	- Improved the speed of importing from comma separated values (CSV) files, especially when dealing with many students sets.
+	- Improved the speed of adding/modifying the (sub)activities from the corresponding dialogs (not noticeable, in usual cases).
+	- Other speed improvements in the interface.
+	- Leak and crash bug fixes (not usually met).
+	- Some minor strings improvements.
+	- Code cleanup.

@@ -12,10 +12,10 @@ File rules.cpp
 
 /***************************************************************************
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License as        *
+ *   published by the Free Software Foundation, either version 3 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
 
@@ -124,6 +124,8 @@ void Rules::init() //initializes the rules (empty, but with default hours and da
 	this->hoursOfTheDay[11]=tr("19:00", "Hour name");
 	//this->hoursOfTheDay[12]=tr("20:00", "Hours name");
 
+	permanentStudentsHash.clear();
+	
 	activitiesPointerHash.clear();
 	bctSet.clear();
 	btSet.clear();
@@ -805,8 +807,10 @@ void Rules::kill() //clears memory for the rules, destroys them
 	foreach(StudentsSubgroup* subgroup, isubgroups){
 		assert(subgroup!=NULL);
 		delete subgroup;
-	}	
+	}
 	yearsList.clear();
+	
+	permanentStudentsHash.clear();
 	//////////////////
 
 	//kill augmented students sets
@@ -1622,9 +1626,46 @@ bool Rules::augmentedSetsShareStudentsFaster(const QString& studentsSet1, const 
 	
 }
 
+void Rules::computePermanentStudentsHash()
+{
+	//The commented tests are good, but bring a somewhat slowdown.
+	permanentStudentsHash.clear();
+	
+	foreach(StudentsYear* year, yearsList){
+		assert(!permanentStudentsHash.contains(year->name));
+		permanentStudentsHash.insert(year->name, year);
+		
+		//QSet<QString> groupsInYear;
+		
+		foreach(StudentsGroup* group, year->groupsList){
+			//assert(!groupsInYear.contains(group->name));
+			//groupsInYear.insert(group->name);
+		
+			if(!permanentStudentsHash.contains(group->name))
+				permanentStudentsHash.insert(group->name, group);
+			else
+				assert(permanentStudentsHash.value(group->name)==group);
+			
+			//QSet<QString> subgroupsInGroup;
+			
+			foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+				//assert(!subgroupsInGroup.contains(subgroup->name));
+				//subgroupsInGroup.insert(subgroup->name);
+			
+				if(!permanentStudentsHash.contains(subgroup->name))
+					permanentStudentsHash.insert(subgroup->name, subgroup);
+				else
+					assert(permanentStudentsHash.value(subgroup->name)==subgroup);
+			}
+		}
+	}
+}
+
 StudentsSet* Rules::searchStudentsSet(const QString& setName)
 {
-	for(int i=0; i<this->yearsList.size(); i++){
+	return permanentStudentsHash.value(setName, NULL);
+
+	/*for(int i=0; i<this->yearsList.size(); i++){
 		StudentsYear* sty=this->yearsList[i];
 		if(sty->name==setName)
 			return sty;
@@ -1639,7 +1680,7 @@ StudentsSet* Rules::searchStudentsSet(const QString& setName)
 			}
 		}
 	}
-	return NULL;
+	return NULL;*/
 }
 
 StudentsSet* Rules::searchAugmentedStudentsSet(const QString& setName)
@@ -1671,6 +1712,10 @@ bool Rules::addYear(StudentsYear* year)
 	//if(this->searchStudentsSet(year->name)!=NULL)
 	//	return false;
 	this->yearsList << year;
+	
+	assert(!permanentStudentsHash.contains(year->name));
+	permanentStudentsHash.insert(year->name, year);
+	
 	this->internalStructureComputed=false;
 	setRulesModifiedAndOtherThings(this);
 	return true;
@@ -1684,7 +1729,7 @@ bool Rules::addYearFast(StudentsYear* year)
 	return true;
 }
 
-bool Rules::removeYear(const QString& yearName)
+/*bool Rules::removeYear(const QString& yearName)
 {
 	return removeYear(yearName, true);
 }
@@ -1692,10 +1737,12 @@ bool Rules::removeYear(const QString& yearName)
 bool Rules::emptyYear(const QString& yearName)
 {
 	return removeYear(yearName, false);
-}
+}*/
 
-bool Rules::removeYear(const QString& yearName, bool removeAlsoThisYear)
+bool Rules::removeYear(const QString& yearName/*, bool removeAlsoThisYear*/)
 {
+	const bool removeAlsoThisYear=true;
+
 	StudentsYear* yearPointer=NULL;
 	foreach(StudentsYear* ty, this->yearsList){
 		if(ty->name==yearName){
@@ -1745,8 +1792,12 @@ bool Rules::removeYear(const QString& yearName, bool removeAlsoThisYear)
 		yearPointer->groupsList.clear();
 	}
 	
-	foreach(StudentsSet* studentsSet, toBeRemoved)
+	foreach(StudentsSet* studentsSet, toBeRemoved){
+		assert(permanentStudentsHash.contains(studentsSet->name));
+		permanentStudentsHash.remove(studentsSet->name);
+	
 		delete studentsSet;
+	}
 		
 	if(toBeRemoved.count()>0)
 		updateConstraintsAfterRemoval();
@@ -1761,7 +1812,7 @@ bool Rules::removeYearPointerAfterSplit(StudentsYear* yearPointer)
 	assert(yearPointer!=NULL);
 	
 	//names
-	QSet<QString> tmpSet;
+	/*QSet<QString> tmpSet;
 	foreach(StudentsYear* year, yearsList){
 		tmpSet.insert(year->name);
 		foreach(StudentsGroup* group, year->groupsList){
@@ -1769,7 +1820,7 @@ bool Rules::removeYearPointerAfterSplit(StudentsYear* yearPointer)
 			foreach(StudentsSubgroup* subgroup, group->subgroupsList)
 				tmpSet.insert(subgroup->name);
 		}
-	}
+	}*/
 	
 	QSet<StudentsSet*> toBeRemoved;
 	//Not here, because there exists another pointer with the same name (to the new year),
@@ -1777,11 +1828,11 @@ bool Rules::removeYearPointerAfterSplit(StudentsYear* yearPointer)
 	//toBeRemoved.insert(yearPointer);
 	foreach(StudentsGroup* group, yearPointer->groupsList){
 		assert(!toBeRemoved.contains(group));
-		if(!tmpSet.contains(group->name))
+		if(!permanentStudentsHash.contains(group->name))
 			toBeRemoved.insert(group);
 		foreach(StudentsSubgroup* subgroup, group->subgroupsList){
 			//assert(!toBeRemoved.contains(subgroup));
-			if(!tmpSet.contains(subgroup->name) && !toBeRemoved.contains(subgroup))
+			if(!permanentStudentsHash.contains(subgroup->name) && !toBeRemoved.contains(subgroup))
 				toBeRemoved.insert(subgroup);
 		}
 	}
@@ -1947,6 +1998,12 @@ bool Rules::modifyStudentsSet(const QString& initialStudentsSetName, const QStri
 	studentsSet->name=finalStudentsSetName;
 	studentsSet->numberOfStudents=finalNumberOfStudents;
 	
+	assert(permanentStudentsHash.contains(initialStudentsSetName));
+	if(initialStudentsSetName!=finalStudentsSetName){
+		permanentStudentsHash.remove(initialStudentsSetName);
+		permanentStudentsHash.insert(studentsSet->name, studentsSet);
+	}
+	
 	this->internalStructureComputed=false;
 	setRulesModifiedAndOtherThings(this);
 	
@@ -1978,6 +2035,9 @@ bool Rules::addGroup(const QString& yearName, StudentsGroup* group)
 	}
 	
 	sty->groupsList << group; //append
+	
+	if(!permanentStudentsHash.contains(group->name))
+		permanentStudentsHash.insert(group->name, group);
 
 	/*
 	foreach(StudentsYear* y, yearsList)
@@ -2058,8 +2118,12 @@ bool Rules::removeGroup(const QString& yearName, const QString& groupName)
 			break;
 		}
 	
-	foreach(StudentsSet* studentsSet, toBeRemoved)
+	foreach(StudentsSet* studentsSet, toBeRemoved){
+		assert(permanentStudentsHash.contains(studentsSet->name));
+		permanentStudentsHash.remove(studentsSet->name);
+	
 		delete studentsSet;
+	}
 		
 	if(toBeRemoved.count()>0)
 		updateConstraintsAfterRemoval();
@@ -2128,6 +2192,9 @@ bool Rules::addSubgroup(const QString& yearName, const QString& groupName, Stude
 	}
 	
 	stg->subgroupsList << subgroup; //append
+	
+	if(!permanentStudentsHash.contains(subgroup->name))
+		permanentStudentsHash.insert(subgroup->name, subgroup);
 
 	/*
 	foreach(StudentsYear* y, yearsList)
@@ -2201,8 +2268,12 @@ bool Rules::removeSubgroup(const QString& yearName, const QString& groupName, co
 			break;
 		}
 	
-	foreach(StudentsSet* studentsSet, toBeRemoved)
+	foreach(StudentsSet* studentsSet, toBeRemoved){
+		assert(permanentStudentsHash.contains(studentsSet->name));
+		permanentStudentsHash.remove(studentsSet->name);
+	
 		delete studentsSet;
+	}
 		
 	if(toBeRemoved.count()>0)
 		updateConstraintsAfterRemoval();
@@ -2275,7 +2346,7 @@ void Rules::sortSubgroupsAlphabetically(const QString& yearName, const QString& 
 	setRulesModifiedAndOtherThings(this);
 }
 
-bool Rules::addSimpleActivity(
+/*bool Rules::addSimpleActivity(
 	QWidget* parent,
 	int _id,
 	int _activityGroupId,
@@ -2283,7 +2354,7 @@ bool Rules::addSimpleActivity(
 	const QString& _subjectName,
 	const QStringList& _activityTagsNames,
 	const QStringList& _studentsNames,
-	int _duration, /*duration, in hours*/
+	int _duration,
 	int _totalDuration,
 	bool _active,
 	bool _computeNTotalStudents,
@@ -2304,9 +2375,31 @@ bool Rules::addSimpleActivity(
 	if(t>0)
 		RulesReconcilableMessage::warning(parent, tr("FET warning"), tr("Activity with Id=%1 contains %2 duplicate activity tags - please correct that")
 		 .arg(_id).arg(t));
+		
+	int computedNumberOfStudents;
+	if(_computeNTotalStudents){
+		computedNumberOfStudents=0;
+		QHash<QString, int> numberOfStudentsForStudentsSet;
+		foreach(StudentsYear* year, yearsList){
+			numberOfStudentsForStudentsSet.insert(year->name, year->numberOfStudents);
+			foreach(StudentsGroup* group, year->groupsList){
+				numberOfStudentsForStudentsSet.insert(group->name, group->numberOfStudents);
+				foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+					numberOfStudentsForStudentsSet.insert(subgroup->name, subgroup->numberOfStudents);
+				}
+			}
+		}
+		foreach(QString studentsSet, _studentsNames){
+			assert(numberOfStudentsForStudentsSet.contains(studentsSet));
+			computedNumberOfStudents+=numberOfStudentsForStudentsSet.value(studentsSet);
+		}
+	}
+	else{
+		computedNumberOfStudents=_nTotalStudents;
+	}
 
 	Activity *act=new Activity(*this, _id, _activityGroupId, _teachersNames, _subjectName, _activityTagsNames,
-		_studentsNames, _duration, _totalDuration, _active, _computeNTotalStudents, _nTotalStudents);
+		_studentsNames, _duration, _totalDuration, _active, _computeNTotalStudents, _nTotalStudents, computedNumberOfStudents);
 
 	this->activitiesList << act; //append
 	
@@ -2317,9 +2410,9 @@ bool Rules::addSimpleActivity(
 	setRulesModifiedAndOtherThings(this);
 
 	return true;
-}
+}*/
 
-bool Rules::addSimpleActivityRulesFast(
+bool Rules::addSimpleActivityFast(
 	QWidget* parent,
 	int _id,
 	int _activityGroupId,
@@ -2327,7 +2420,7 @@ bool Rules::addSimpleActivityRulesFast(
 	const QString& _subjectName,
 	const QStringList& _activityTagsNames,
 	const QStringList& _studentsNames,
-	int _duration, /*duration, in hours*/
+	int _duration,
 	int _totalDuration,
 	bool _active,
 	bool _computeNTotalStudents,
@@ -2364,7 +2457,7 @@ bool Rules::addSimpleActivityRulesFast(
 	return true;
 }
 
-bool Rules::addSplitActivity(
+/*bool Rules::addSplitActivity(
 	QWidget* parent,
 	int _firstActivityId,
 	int _activityGroupId,
@@ -2400,13 +2493,101 @@ bool Rules::addSplitActivity(
 
 	assert(_firstActivityId==_activityGroupId);
 
+	int computedNumberOfStudents;
+	
+	if(_computeNTotalStudents){
+		computedNumberOfStudents=0;
+		QHash<QString, int> numberOfStudentsForStudentsSet;
+		foreach(StudentsYear* year, yearsList){
+			numberOfStudentsForStudentsSet.insert(year->name, year->numberOfStudents);
+			foreach(StudentsGroup* group, year->groupsList){
+				numberOfStudentsForStudentsSet.insert(group->name, group->numberOfStudents);
+				foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+					numberOfStudentsForStudentsSet.insert(subgroup->name, subgroup->numberOfStudents);
+				}
+			}
+		}
+		foreach(QString studentsSet, _studentsNames){
+			assert(numberOfStudentsForStudentsSet.contains(studentsSet));
+			computedNumberOfStudents+=numberOfStudentsForStudentsSet.value(studentsSet);
+		}
+	}
+	else{
+		computedNumberOfStudents=_nTotalStudents;
+	}
+
 	QList<int> acts;
 
 	acts.clear();
 	for(int i=0; i<_nSplits; i++){
 		Activity *act=new Activity(*this, _firstActivityId+i, _activityGroupId,
 		 _teachersNames, _subjectName, _activityTagsNames, _studentsNames,
-		 _durations[i], _totalDuration, _active[i], _computeNTotalStudents, _nTotalStudents);
+		 _durations[i], _totalDuration, _active[i], _computeNTotalStudents, _nTotalStudents, computedNumberOfStudents);
+
+		this->activitiesList << act; //append
+
+		assert(!activitiesPointerHash.contains(act->id));
+		activitiesPointerHash.insert(act->id, act);
+
+		acts.append(_firstActivityId+i);
+	}
+
+	if(_minDayDistance>0){
+		TimeConstraint *constr=new ConstraintMinDaysBetweenActivities(_weightPercentage, _consecutiveIfSameDay, _nSplits, acts, _minDayDistance);
+		bool tmp=this->addTimeConstraint(constr);
+		assert(tmp);
+	}
+
+	this->internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(this);
+
+	return true;
+}*/
+
+bool Rules::addSplitActivityFast(
+	QWidget* parent,
+	int _firstActivityId,
+	int _activityGroupId,
+	const QStringList& _teachersNames,
+	const QString& _subjectName,
+	const QStringList& _activityTagsNames,
+	const QStringList& _studentsNames,
+	int _nSplits,
+	int _totalDuration,
+	int _durations[],
+	bool _active[],
+	int _minDayDistance,
+	double _weightPercentage,
+	bool _consecutiveIfSameDay,
+	bool _computeNTotalStudents,
+	int _nTotalStudents,
+	int _computedNumberOfStudents)
+{
+	//check for duplicates - idea and code by Volker Dirr
+	int t=QStringList(_teachersNames).removeDuplicates();
+	if(t>0)
+		RulesReconcilableMessage::warning(parent, tr("FET warning"), tr("Activities with group_Id=%1 contain %2 duplicate teachers - please correct that")
+		 .arg(_activityGroupId).arg(t));
+
+	t=QStringList(_studentsNames).removeDuplicates();
+	if(t>0)
+		RulesReconcilableMessage::warning(parent, tr("FET warning"), tr("Activities with group_Id=%1 contain %2 duplicate students sets - please correct that")
+		 .arg(_activityGroupId).arg(t));
+
+	t=QStringList(_activityTagsNames).removeDuplicates();
+	if(t>0)
+		RulesReconcilableMessage::warning(parent, tr("FET warning"), tr("Activities with group_Id=%1 contain %2 duplicate activity tags - please correct that")
+		 .arg(_activityGroupId).arg(t));
+
+	assert(_firstActivityId==_activityGroupId);
+
+	QList<int> acts;
+
+	acts.clear();
+	for(int i=0; i<_nSplits; i++){
+		Activity *act=new Activity(*this, _firstActivityId+i, _activityGroupId,
+		 _teachersNames, _subjectName, _activityTagsNames, _studentsNames,
+		 _durations[i], _totalDuration, _active[i], _computeNTotalStudents, _nTotalStudents, _computedNumberOfStudents);
 
 		this->activitiesList << act; //append
 
@@ -2526,7 +2707,7 @@ void Rules::modifyActivity(
 			i++;
 		}
 	}
-		
+	
 	assert(i==_nSplits);
 	
 	this->internalStructureComputed=false;
@@ -3396,8 +3577,8 @@ void Rules::updateActivitiesWhenRemovingStudents(const QSet<StudentsSet*>& stude
 
 	QHash<QString, int> numberOfStudentsPerSet;
 	
-	foreach(StudentsSet* set, studentsSets)
-		numberOfStudentsPerSet.insert(set->name, set->numberOfStudents);
+	foreach(StudentsSet* studentsSet, studentsSets)
+		numberOfStudentsPerSet.insert(studentsSet->name, studentsSet->numberOfStudents);
 		
 	foreach(Activity* act, activitiesList){
 		QStringList newStudents;
@@ -3427,7 +3608,7 @@ void Rules::updateConstraintsAfterRemoval()
 
 	QSet<int> existingActivitiesIds;
 	QSet<QString> existingTeachersNames;
-	QSet<QString> existingStudentsNames;
+	//QSet<QString> existingStudentsNames;
 	QSet<QString> existingSubjectsNames;
 	QSet<QString> existingActivityTagsNames;
 	QSet<QString> existingRoomsNames;
@@ -3441,14 +3622,14 @@ void Rules::updateConstraintsAfterRemoval()
 	foreach(Teacher* tch, teachersList)
 		existingTeachersNames.insert(tch->name);
 		
-	foreach(StudentsYear* sty, yearsList){
+	/*foreach(StudentsYear* sty, yearsList){
 		existingStudentsNames.insert(sty->name);
 		foreach(StudentsGroup* stg, sty->groupsList){
 			existingStudentsNames.insert(stg->name);
 			foreach(StudentsSubgroup* sts, stg->subgroupsList)
 				existingStudentsNames.insert(sts->name);
 		}
-	}
+	}*/
 	
 	foreach(Subject* sbj, subjectsList)
 		existingSubjectsNames.insert(sbj->name);
@@ -3467,7 +3648,7 @@ void Rules::updateConstraintsAfterRemoval()
 		}
 		else if(tc->type==CONSTRAINT_STUDENTS_SET_NOT_AVAILABLE_TIMES){
 			ConstraintStudentsSetNotAvailableTimes* c=(ConstraintStudentsSetNotAvailableTimes*)tc;
-			if(!existingStudentsNames.contains(c->students))
+			if(!permanentStudentsHash.contains(c->students))
 				toBeRemovedTime.append(tc);
 		}
 		else if(tc->type==CONSTRAINT_ACTIVITIES_SAME_STARTING_TIME){
@@ -3532,7 +3713,7 @@ void Rules::updateConstraintsAfterRemoval()
 		}
 		else if(tc->type==CONSTRAINT_STUDENTS_SET_MAX_GAPS_PER_WEEK){
 			ConstraintStudentsSetMaxGapsPerWeek* c=(ConstraintStudentsSetMaxGapsPerWeek*)tc;
-			if(!existingStudentsNames.contains(c->students))
+			if(!permanentStudentsHash.contains(c->students))
 				toBeRemovedTime.append(tc);
 		}
 		else if(tc->type==CONSTRAINT_TEACHER_MAX_GAPS_PER_WEEK){
@@ -3547,17 +3728,17 @@ void Rules::updateConstraintsAfterRemoval()
 		}
 		else if(tc->type==CONSTRAINT_STUDENTS_SET_EARLY_MAX_BEGINNINGS_AT_SECOND_HOUR){
 			ConstraintStudentsSetEarlyMaxBeginningsAtSecondHour* c=(ConstraintStudentsSetEarlyMaxBeginningsAtSecondHour*)tc;
-			if(!existingStudentsNames.contains(c->students))
+			if(!permanentStudentsHash.contains(c->students))
 				toBeRemovedTime.append(tc);
 		}
 		else if(tc->type==CONSTRAINT_STUDENTS_SET_MAX_HOURS_DAILY){
 			ConstraintStudentsSetMaxHoursDaily* c=(ConstraintStudentsSetMaxHoursDaily*)tc;
-			if(!existingStudentsNames.contains(c->students))
+			if(!permanentStudentsHash.contains(c->students))
 				toBeRemovedTime.append(tc);
 		}
 		else if(tc->type==CONSTRAINT_STUDENTS_SET_MAX_HOURS_CONTINUOUSLY){
 			ConstraintStudentsSetMaxHoursContinuously* c=(ConstraintStudentsSetMaxHoursContinuously*)tc;
-			if(!existingStudentsNames.contains(c->students))
+			if(!permanentStudentsHash.contains(c->students))
 				toBeRemovedTime.append(tc);
 		}
 		else if(tc->type==CONSTRAINT_STUDENTS_ACTIVITY_TAG_MAX_HOURS_CONTINUOUSLY){
@@ -3567,12 +3748,12 @@ void Rules::updateConstraintsAfterRemoval()
 		}
 		else if(tc->type==CONSTRAINT_STUDENTS_SET_ACTIVITY_TAG_MAX_HOURS_CONTINUOUSLY){
 			ConstraintStudentsSetActivityTagMaxHoursContinuously* c=(ConstraintStudentsSetActivityTagMaxHoursContinuously*)tc;
-			if(!existingActivityTagsNames.contains(c->activityTagName) || !existingStudentsNames.contains(c->students))
+			if(!existingActivityTagsNames.contains(c->activityTagName) || !permanentStudentsHash.contains(c->students))
 				toBeRemovedTime.append(tc);
 		}
 		else if(tc->type==CONSTRAINT_STUDENTS_SET_MIN_HOURS_DAILY){
 			ConstraintStudentsSetMinHoursDaily* c=(ConstraintStudentsSetMinHoursDaily*)tc;
-			if(!existingStudentsNames.contains(c->students))
+			if(!permanentStudentsHash.contains(c->students))
 				toBeRemovedTime.append(tc);
 		}
 		else if(tc->type==CONSTRAINT_ACTIVITY_PREFERRED_STARTING_TIME){
@@ -3595,7 +3776,7 @@ void Rules::updateConstraintsAfterRemoval()
 		else if(tc->type==CONSTRAINT_ACTIVITIES_PREFERRED_TIME_SLOTS){
 			ConstraintActivitiesPreferredTimeSlots* c=(ConstraintActivitiesPreferredTimeSlots*)tc;
 			if( (c->p_teacherName!="" && !existingTeachersNames.contains(c->p_teacherName)) ||
-			 (c->p_studentsName!="" && !existingStudentsNames.contains(c->p_studentsName)) ||
+			 (c->p_studentsName!="" && !permanentStudentsHash.contains(c->p_studentsName)) ||
 			 (c->p_subjectName!="" && !existingSubjectsNames.contains(c->p_subjectName)) ||
 			 (c->p_activityTagName!="" && !existingActivityTagsNames.contains(c->p_activityTagName)) )
 				toBeRemovedTime.append(tc);
@@ -3603,7 +3784,7 @@ void Rules::updateConstraintsAfterRemoval()
 		else if(tc->type==CONSTRAINT_SUBACTIVITIES_PREFERRED_TIME_SLOTS){
 			ConstraintSubactivitiesPreferredTimeSlots* c=(ConstraintSubactivitiesPreferredTimeSlots*)tc;
 			if( (c->p_teacherName!="" && !existingTeachersNames.contains(c->p_teacherName)) ||
-			 (c->p_studentsName!="" && !existingStudentsNames.contains(c->p_studentsName)) ||
+			 (c->p_studentsName!="" && !permanentStudentsHash.contains(c->p_studentsName)) ||
 			 (c->p_subjectName!="" && !existingSubjectsNames.contains(c->p_subjectName)) ||
 			 (c->p_activityTagName!="" && !existingActivityTagsNames.contains(c->p_activityTagName)) )
 				toBeRemovedTime.append(tc);
@@ -3611,7 +3792,7 @@ void Rules::updateConstraintsAfterRemoval()
 		else if(tc->type==CONSTRAINT_ACTIVITIES_PREFERRED_STARTING_TIMES){
 			ConstraintActivitiesPreferredStartingTimes* c=(ConstraintActivitiesPreferredStartingTimes*)tc;
 			if( (c->teacherName!="" && !existingTeachersNames.contains(c->teacherName)) ||
-			 (c->studentsName!="" && !existingStudentsNames.contains(c->studentsName)) ||
+			 (c->studentsName!="" && !permanentStudentsHash.contains(c->studentsName)) ||
 			 (c->subjectName!="" && !existingSubjectsNames.contains(c->subjectName)) ||
 			 (c->activityTagName!="" && !existingActivityTagsNames.contains(c->activityTagName)) )
 				toBeRemovedTime.append(tc);
@@ -3619,7 +3800,7 @@ void Rules::updateConstraintsAfterRemoval()
 		else if(tc->type==CONSTRAINT_SUBACTIVITIES_PREFERRED_STARTING_TIMES){
 			ConstraintSubactivitiesPreferredStartingTimes* c=(ConstraintSubactivitiesPreferredStartingTimes*)tc;
 			if( (c->teacherName!="" && !existingTeachersNames.contains(c->teacherName)) ||
-			 (c->studentsName!="" && !existingStudentsNames.contains(c->studentsName)) ||
+			 (c->studentsName!="" && !permanentStudentsHash.contains(c->studentsName)) ||
 			 (c->subjectName!="" && !existingSubjectsNames.contains(c->subjectName)) ||
 			 (c->activityTagName!="" && !existingActivityTagsNames.contains(c->activityTagName)) )
 				toBeRemovedTime.append(tc);
@@ -3678,13 +3859,13 @@ void Rules::updateConstraintsAfterRemoval()
 		}
 		else if(tc->type==CONSTRAINT_STUDENTS_SET_INTERVAL_MAX_DAYS_PER_WEEK){
 			ConstraintStudentsSetIntervalMaxDaysPerWeek* c=(ConstraintStudentsSetIntervalMaxDaysPerWeek*)tc;
-			if(!existingStudentsNames.contains(c->students))
+			if(!permanentStudentsHash.contains(c->students))
 				toBeRemovedTime.append(tc);
 		}
 		else if(tc->type==CONSTRAINT_ACTIVITIES_END_STUDENTS_DAY){
 			ConstraintActivitiesEndStudentsDay* c=(ConstraintActivitiesEndStudentsDay*)tc;
 			if( (c->teacherName!="" && !existingTeachersNames.contains(c->teacherName)) ||
-			 (c->studentsName!="" && !existingStudentsNames.contains(c->studentsName)) ||
+			 (c->studentsName!="" && !permanentStudentsHash.contains(c->studentsName)) ||
 			 (c->subjectName!="" && !existingSubjectsNames.contains(c->subjectName)) ||
 			 (c->activityTagName!="" && !existingActivityTagsNames.contains(c->activityTagName)) )
 				toBeRemovedTime.append(tc);
@@ -3706,12 +3887,12 @@ void Rules::updateConstraintsAfterRemoval()
 		}
 		else if(tc->type==CONSTRAINT_STUDENTS_SET_ACTIVITY_TAG_MAX_HOURS_DAILY){
 			ConstraintStudentsSetActivityTagMaxHoursDaily* c=(ConstraintStudentsSetActivityTagMaxHoursDaily*)tc;
-			if(!existingActivityTagsNames.contains(c->activityTagName) || !existingStudentsNames.contains(c->students))
+			if(!existingActivityTagsNames.contains(c->activityTagName) || !permanentStudentsHash.contains(c->students))
 				toBeRemovedTime.append(tc);
 		}
 		else if(tc->type==CONSTRAINT_STUDENTS_SET_MAX_GAPS_PER_DAY){
 			ConstraintStudentsSetMaxGapsPerDay* c=(ConstraintStudentsSetMaxGapsPerDay*)tc;
-			if(!existingStudentsNames.contains(c->students))
+			if(!permanentStudentsHash.contains(c->students))
 				toBeRemovedTime.append(tc);
 		}
 		else if(tc->type==CONSTRAINT_ACTIVITIES_OCCUPY_MAX_TIME_SLOTS_FROM_SELECTION){
@@ -3728,7 +3909,7 @@ void Rules::updateConstraintsAfterRemoval()
 		}
 		else if(tc->type==CONSTRAINT_STUDENTS_SET_MAX_DAYS_PER_WEEK){
 			ConstraintStudentsSetMaxDaysPerWeek* c=(ConstraintStudentsSetMaxDaysPerWeek*)tc;
-			if(!existingStudentsNames.contains(c->students))
+			if(!permanentStudentsHash.contains(c->students))
 				toBeRemovedTime.append(tc);
 		}
 	}
@@ -3762,12 +3943,12 @@ void Rules::updateConstraintsAfterRemoval()
 		}
 		else if(sc->type==CONSTRAINT_STUDENTS_SET_HOME_ROOM){
 			ConstraintStudentsSetHomeRoom* c=(ConstraintStudentsSetHomeRoom*)sc;
-			if(!existingStudentsNames.contains(c->studentsName) || !existingRoomsNames.contains(c->roomName))
+			if(!permanentStudentsHash.contains(c->studentsName) || !existingRoomsNames.contains(c->roomName))
 				toBeRemovedSpace.append(sc);
 		}
 		else if(sc->type==CONSTRAINT_STUDENTS_SET_HOME_ROOMS){
 			ConstraintStudentsSetHomeRooms* c=(ConstraintStudentsSetHomeRooms*)sc;
-			if(!existingStudentsNames.contains(c->studentsName))
+			if(!permanentStudentsHash.contains(c->studentsName))
 				toBeRemovedSpace.append(sc);
 			else{
 				QStringList newRooms;
@@ -3858,17 +4039,17 @@ void Rules::updateConstraintsAfterRemoval()
 		}
 		else if(sc->type==CONSTRAINT_STUDENTS_SET_MAX_BUILDING_CHANGES_PER_DAY){
 			ConstraintStudentsSetMaxBuildingChangesPerDay* c=(ConstraintStudentsSetMaxBuildingChangesPerDay*)sc;
-			if(!existingStudentsNames.contains(c->studentsName))
+			if(!permanentStudentsHash.contains(c->studentsName))
 				toBeRemovedSpace.append(sc);
 		}
 		else if(sc->type==CONSTRAINT_STUDENTS_SET_MAX_BUILDING_CHANGES_PER_WEEK){
 			ConstraintStudentsSetMaxBuildingChangesPerWeek* c=(ConstraintStudentsSetMaxBuildingChangesPerWeek*)sc;
-			if(!existingStudentsNames.contains(c->studentsName))
+			if(!permanentStudentsHash.contains(c->studentsName))
 				toBeRemovedSpace.append(sc);
 		}
 		else if(sc->type==CONSTRAINT_STUDENTS_SET_MIN_GAPS_BETWEEN_BUILDING_CHANGES){
 			ConstraintStudentsSetMinGapsBetweenBuildingChanges* c=(ConstraintStudentsSetMinGapsBetweenBuildingChanges*)sc;
-			if(!existingStudentsNames.contains(c->studentsName))
+			if(!permanentStudentsHash.contains(c->studentsName))
 				toBeRemovedSpace.append(sc);
 		}
 		else if(sc->type==CONSTRAINT_TEACHER_MAX_BUILDING_CHANGES_PER_DAY){
@@ -4374,6 +4555,8 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 						RulesReconcilableMessage::warning(parent, tr("FET warning"),
 						 tr("Duplicate teacher %1 found - ignoring").arg(teacher->name));
 						xmlReadingLog+="   Teacher not added - duplicate\n";
+						
+						delete teacher;
 					}
 					else{
 						teachersRead.insert(teacher->name);
@@ -4422,6 +4605,8 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 						RulesReconcilableMessage::warning(parent, tr("FET warning"),
 						 tr("Duplicate subject %1 found - ignoring").arg(subject->name));
 						xmlReadingLog+="   Subject not added - duplicate\n";
+						
+						delete subject;
 					}
 					else{
 						subjectsRead.insert(subject->name);
@@ -4473,6 +4658,8 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 						RulesReconcilableMessage::warning(parent, tr("FET warning"),
 						 tr("Duplicate activity tag %1 found - ignoring").arg(activityTag->name));
 						xmlReadingLog+="   Activity tag not added - duplicate\n";
+						
+						delete activityTag;
 					}
 					else{
 						activityTagsRead.insert(activityTag->name);
@@ -4521,6 +4708,8 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 						RulesReconcilableMessage::warning(parent, tr("FET warning"),
 						 tr("Duplicate activity tag %1 found - ignoring").arg(activityTag->name));
 						xmlReadingLog+="   Activity tag not added - duplicate\n";
+						
+						delete activityTag;
 					}
 					else{
 						activityTagsRead.insert(activityTag->name);
@@ -4543,7 +4732,13 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 			}
 		}
 		else if(xmlReader.name()=="Students_List"){
-			QHash<QString, StudentsSet*> studentsHash;
+			QSet<StudentsSet*> allAllocatedStudentsSets;
+		
+			bool okStudents=true;
+	
+			//permanentStudentsHash.clear();
+		
+			QHash<QString, StudentsSet*> currentStudentsHash;
 		
 			int tsgr=0;
 			int tgr=0;
@@ -4554,6 +4749,7 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 				xmlReadingLog+="   Found "+xmlReader.name().toString()+" tag\n";
 				if(xmlReader.name()=="Year"){
 					StudentsYear* sty=new StudentsYear();
+					allAllocatedStudentsSets.insert(sty);
 					int ng=0;
 					
 					QSet<QString> groupsInYear;
@@ -4570,29 +4766,42 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 							if(!skipDuplicatedStudentsSets){
 								QString nn=text;
 								//StudentsSet* ss=this->searchStudentsSet(nn);
-								StudentsSet* ss=studentsHash.value(nn, NULL);
+								StudentsSet* ss=currentStudentsHash.value(nn, NULL);
 								if(ss!=NULL){
 									QString str;
 									
 									if(ss->type==STUDENTS_YEAR)
-										str=tr("Trying to add year %1, which is already added as another year - your file will be loaded but probably contains errors, please correct them after loading").arg(nn);
+										str=tr("Trying to add year %1, which is already added as another year.").arg(nn);
 									else if(ss->type==STUDENTS_GROUP)
-										str=tr("Trying to add year %1, which is already added as another group - your file will be loaded but probably contains errors, please correct them after loading").arg(nn);
+										str=tr("Trying to add year %1, which is already added as another group.").arg(nn);
 									else if(ss->type==STUDENTS_SUBGROUP)
-										str=tr("Trying to add year %1, which is already added as another subgroup - your file will be loaded but probably contains errors, please correct them after loading").arg(nn);
+										str=tr("Trying to add year %1, which is already added as another subgroup.").arg(nn);
+										
+									xmlReader.raiseError(str);
+									okStudents=false;
+
+									int t=1;
+									
+									/*str=tr("Could not read file - XML parse error at line %1, column %2:\n%3", "The error description is %3")
+									 .arg(xmlReader.lineNumber()).arg(xmlReader.columnNumber()).arg(str);
 								
-									int t=RulesReconcilableMessage::warning(parent, tr("FET warning"), str,
+									int t=RulesIrreconcilableMessage::warning(parent, tr("FET warning"), str,
 									 tr("Skip rest"), tr("See next"), QString(),
 									 1, 0 );
-				 	
+									
+									if(okStudents){
+										//xmlReader.raiseError(tr("Students structure error(s)."));
+										okStudents=false;
+									}*/
+					
 									if(t==0)
 										skipDuplicatedStudentsSets=true;
 								}
-							}						
+							}
 						
 							sty->name=text;
-							if(!studentsHash.contains(sty->name))
-								studentsHash.insert(sty->name, sty);
+							if(!currentStudentsHash.contains(sty->name))
+								currentStudentsHash.insert(sty->name, sty);
 							xmlReadingLog+="    Read year name: "+sty->name+"\n";
 						}
 						else if(xmlReader.name()=="Number_of_Students"){
@@ -4601,7 +4810,10 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 							xmlReadingLog+="    Read year number of students: "+CustomFETString::number(sty->numberOfStudents)+"\n";
 						}
 						else if(xmlReader.name()=="Group"){
+							QSet<StudentsSubgroup*> allocatedSubgroups;
+						
 							StudentsGroup* stg=new StudentsGroup();
+							allAllocatedStudentsSets.insert(stg);
 							int ns=0;
 
 							QSet<QString> subgroupsInGroup;
@@ -4617,29 +4829,48 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 									QString text=xmlReader.readElementText();
 									if(!skipDuplicatedStudentsSets){
 										QString nn=text;
-										StudentsSet* ss=studentsHash.value(nn, NULL);
+										StudentsSet* ss=currentStudentsHash.value(nn, NULL);
 										if(ss!=NULL){
 											QString str;
+											bool haveError=false;
 									
-											if(ss->type==STUDENTS_YEAR)
-												str=tr("Trying to add group %1, which is already added as another year - your file will be loaded but probably contains errors, please correct them after loading").arg(nn);
+											if(ss->type==STUDENTS_YEAR){
+												str=tr("Trying to add group %1, which is already added as another year.").arg(nn);
+												haveError=true;
+											}
 											else if(ss->type==STUDENTS_GROUP){
 												if(groupsInYear.contains(nn)){
-													str=tr("Trying to add group %1 in year %2 but it is already added - your file will be loaded but probably contains errors, please correct them after loading").arg(nn).arg(sty->name);
+													str=tr("Trying to add group %1 in year %2 but it is already added.").arg(nn).arg(sty->name);
+													haveError=true;
 												}
-												else
+												else{
 													str="";
+													assert(haveError==false);
+												}
 											}
-											else if(ss->type==STUDENTS_SUBGROUP)
-												str=tr("Trying to add group %1, which is already added as another subgroup - your file will be loaded but probably contains errors, please correct them after loading").arg(nn);
+											else if(ss->type==STUDENTS_SUBGROUP){
+												str=tr("Trying to add group %1, which is already added as another subgroup.").arg(nn);
+												haveError=true;
+											}
 								
 											int t=1;
-											if(str!=""){
-												t=RulesReconcilableMessage::warning(parent, tr("FET warning"), str,
+											if(haveError){
+												xmlReader.raiseError(str);
+												okStudents=false;
+
+												/*str=tr("Could not read file - XML parse error at line %1, column %2:\n%3", "The error description is %3")
+												 .arg(xmlReader.lineNumber()).arg(xmlReader.columnNumber()).arg(str);
+
+												t=RulesIrreconcilableMessage::warning(parent, tr("FET warning"), str,
 												 tr("Skip rest"), tr("See next"), QString(),
 												 1, 0 );
+												
+												if(okStudents){
+													//xmlReader.raiseError(tr("Students structure error(s)."));
+													okStudents=false;
+												}*/
 											}
-				 	
+					
 											if(t==0)
 												skipDuplicatedStudentsSets=true;
 										}
@@ -4647,13 +4878,30 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 									
 									groupsInYear.insert(text);
 
-									if(studentsHash.contains(text)){
+									if(currentStudentsHash.contains(text)){
+										foreach(StudentsSubgroup* sts, allocatedSubgroups){
+											assert(currentStudentsHash.contains(sts->name));
+											currentStudentsHash.remove(sts->name);
+											
+											assert(allAllocatedStudentsSets.contains(sts));
+											allAllocatedStudentsSets.remove(sts);
+											delete sts;
+										}
+										allocatedSubgroups.clear(); //not really needed
+									
+										assert(allAllocatedStudentsSets.contains(stg));
+										allAllocatedStudentsSets.remove(stg);
 										delete stg;
-										stg=(StudentsGroup*)(studentsHash.value(text));
-
-										bool tmp4=this->addGroupFast(sty, stg);
-										assert(tmp4==true);
-										//ng++;
+										
+										if(okStudents){
+											assert(currentStudentsHash.value(text)->type==STUDENTS_GROUP);
+											stg=(StudentsGroup*)(currentStudentsHash.value(text));
+	
+											bool tmp4=this->addGroupFast(sty, stg);
+											assert(tmp4==true);
+											//ng++;
+										}
+										
 										xmlReader.skipCurrentElement();
 										break;
 									}
@@ -4663,8 +4911,8 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 									ng++;
 
 									stg->name=text;
-									if(!studentsHash.contains(stg->name))
-										studentsHash.insert(stg->name, stg);
+									if(!currentStudentsHash.contains(stg->name))
+										currentStudentsHash.insert(stg->name, stg);
 									xmlReadingLog+="     Read group name: "+stg->name+"\n";
 								}
 								else if(xmlReader.name()=="Number_of_Students"){
@@ -4674,6 +4922,7 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 								}
 								else if(xmlReader.name()=="Subgroup"){
 									StudentsSubgroup* sts=new StudentsSubgroup();
+									allAllocatedStudentsSets.insert(sts);
 
 									/*bool tmp6=this->addSubgroupFast(sty, stg, sts);
 									assert(tmp6==true);
@@ -4686,29 +4935,48 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 											QString text=xmlReader.readElementText();
 											if(!skipDuplicatedStudentsSets){
 												QString nn=text;
-												StudentsSet* ss=studentsHash.value(nn, NULL);
+												StudentsSet* ss=currentStudentsHash.value(nn, NULL);
 												if(ss!=NULL){
 													QString str;
+													bool haveError=false;
 									
-													if(ss->type==STUDENTS_YEAR)
-														str=tr("Trying to add subgroup %1, which is already added as another year - your file will be loaded but probably contains errors, please correct them after loading").arg(nn);
-													else if(ss->type==STUDENTS_GROUP)
-														str=tr("Trying to add subgroup %1, which is already added as another group - your file will be loaded but probably contains errors, please correct them after loading").arg(nn);
+													if(ss->type==STUDENTS_YEAR){
+														str=tr("Trying to add subgroup %1, which is already added as another year.").arg(nn);
+														haveError=true;
+													}
+													else if(ss->type==STUDENTS_GROUP){
+														str=tr("Trying to add subgroup %1, which is already added as another group.").arg(nn);
+														haveError=true;
+													}
 													else if(ss->type==STUDENTS_SUBGROUP){
 														if(subgroupsInGroup.contains(nn)){
-															str=tr("Trying to add subgroup %1 in year %2, group %3 but it is already added - your file will be loaded but probably contains errors, please correct them after loading").arg(nn).arg(sty->name).arg(stg->name);
+															str=tr("Trying to add subgroup %1 in year %2, group %3 but it is already added.").arg(nn).arg(sty->name).arg(stg->name);
+															haveError=true;
 														}
-														else
+														else{
 															str="";
+															assert(haveError==false);
+														}
 													}
 								
 													int t=1;
-													if(str!=""){
-														t=RulesReconcilableMessage::warning(parent, tr("FET warning"), str,
+													if(haveError){
+														xmlReader.raiseError(str);
+														okStudents=false;
+
+														/*str=tr("Could not read file - XML parse error at line %1, column %2:\n%3", "The error description is %3")
+														 .arg(xmlReader.lineNumber()).arg(xmlReader.columnNumber()).arg(str);
+
+														t=RulesIrreconcilableMessage::warning(parent, tr("FET warning"), str,
 														 tr("Skip rest"), tr("See next"), QString(),
 														 1, 0 );
+														
+														if(okStudents){
+															//xmlReader.raiseError(tr("Students structure error(s)."));
+															okStudents=false;
+														}*/
 													}
-						 	
+							
 													if(t==0)
 														skipDuplicatedStudentsSets=true;
 												}
@@ -4716,15 +4984,25 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 											
 											subgroupsInGroup.insert(text);
 
-											if(studentsHash.contains(text)){
+											if(currentStudentsHash.contains(text)){
+												assert(allAllocatedStudentsSets.contains(sts));
+												allAllocatedStudentsSets.remove(sts);
 												delete sts;
-												sts=(StudentsSubgroup*)(studentsHash.value(text));
-
-												bool tmp6=this->addSubgroupFast(sty, stg, sts);
-												assert(tmp6==true);
-												//ns++;
+												
+												if(okStudents){
+													assert(currentStudentsHash.value(text)->type==STUDENTS_SUBGROUP);
+													sts=(StudentsSubgroup*)(currentStudentsHash.value(text));
+	
+													bool tmp6=this->addSubgroupFast(sty, stg, sts);
+													assert(tmp6==true);
+													//ns++;
+												}
+												
 												xmlReader.skipCurrentElement();
 												break;
+											}
+											else{
+												allocatedSubgroups.insert(sts);
 											}
 
 											bool tmp6=this->addSubgroupFast(sty, stg, sts);
@@ -4732,8 +5010,8 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 											ns++;
 											
 											sts->name=text;
-											if(!studentsHash.contains(sts->name))
-												studentsHash.insert(sts->name, sts);
+											if(!currentStudentsHash.contains(sts->name))
+												currentStudentsHash.insert(sts->name, sts);
 											xmlReadingLog+="     Read subgroup name: "+sts->name+"\n";
 										}
 										else if(xmlReader.name()=="Number_of_Students"){
@@ -4783,7 +5061,7 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 			assert(this->yearsList.size()==ny);
 
 			//BEGIN test for number of students is the same in all sets with the same name
-			bool reportWrongNumberOfStudents=true;
+			/*bool reportWrongNumberOfStudents=true;
 			foreach(StudentsYear* year, yearsList){
 				assert(studentsHash.contains(year->name));
 				StudentsSet* sy=studentsHash.value(year->name);
@@ -4854,8 +5132,19 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 						}
 					}
 				}
-			}
+			}*/
 			//END test for number of students is the same in all sets with the same name
+			
+			if(okStudents){
+				//This is redundant, but I make this an additional test, just in case anything was wrong.
+				computePermanentStudentsHash();
+				assert(permanentStudentsHash==currentStudentsHash);
+			}
+			else{
+				foreach(StudentsSet* studentsSet, allAllocatedStudentsSets)
+					delete studentsSet;
+				yearsList.clear();
+			}
 		}
 		else if(xmlReader.name()=="Activities_List"){
 			QSet<QString> allTeachers;
@@ -5080,12 +5369,12 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 								assert(studentsSetsCount.contains(_s));
 								_ns+=studentsSetsCount.value(_s);
 							}
-							this->addSimpleActivityRulesFast(parent, id, gid, tl, sjn, atl, stl,
+							this->addSimpleActivityFast(parent, id, gid, tl, sjn, atl, stl,
 								d, td, ac, cnos, nos, _ns);
 						}
 						else{
-							this->addSimpleActivity(parent, id, gid, tl, sjn, atl, stl,
-								d, td, ac, cnos, nos);
+							this->addSimpleActivityFast(parent, id, gid, tl, sjn, atl, stl,
+								d, td, ac, cnos, nos, nos);
 						}
 						
 						this->activitiesList[this->activitiesList.count()-1]->comments=cm;
@@ -5144,6 +5433,8 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 						RulesReconcilableMessage::warning(parent, tr("FET warning"),
 						 tr("Duplicate building %1 found - ignoring").arg(bu->name));
 						xmlReadingLog+="   Building not added - duplicate\n";
+						
+						delete bu;
 					}
 					else{
 						buildingsRead.insert(bu->name);
@@ -5215,6 +5506,8 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 						RulesReconcilableMessage::warning(parent, tr("FET warning"),
 						 tr("Duplicate room %1 found - ignoring").arg(rm->name));
 						xmlReadingLog+="   Room not added - duplicate\n";
+						
+						delete rm;
 					}
 					else{
 						roomsRead.insert(rm->name);
@@ -6317,19 +6610,19 @@ int Rules::activateStudents(const QString& studentsName)
 {
 	QSet<QString> allSets;
 	
-	StudentsSet* set=this->searchStudentsSet(studentsName);
-	assert(set!=NULL);
-	if(set->type==STUDENTS_SUBGROUP)
+	StudentsSet* studentsSet=this->searchStudentsSet(studentsName);
+	assert(studentsSet!=NULL);
+	if(studentsSet->type==STUDENTS_SUBGROUP)
 		allSets.insert(studentsName);
-	else if(set->type==STUDENTS_GROUP){
+	else if(studentsSet->type==STUDENTS_GROUP){
 		allSets.insert(studentsName);
-		StudentsGroup* g=(StudentsGroup*)set;
+		StudentsGroup* g=(StudentsGroup*)studentsSet;
 		foreach(StudentsSubgroup* s, g->subgroupsList)
 			allSets.insert(s->name);
 	}
-	else if(set->type==STUDENTS_YEAR){
+	else if(studentsSet->type==STUDENTS_YEAR){
 		allSets.insert(studentsName);
-		StudentsYear* y=(StudentsYear*)set;
+		StudentsYear* y=(StudentsYear*)studentsSet;
 		foreach(StudentsGroup* g, y->groupsList){
 			allSets.insert(g->name);
 			foreach(StudentsSubgroup* s, g->subgroupsList)
@@ -6341,8 +6634,8 @@ int Rules::activateStudents(const QString& studentsName)
 	for(int i=0; i<this->activitiesList.size(); i++){
 		Activity* act=this->activitiesList[i];
 		if(!act->active){
-			foreach(QString set, act->studentsNames){
-				if(allSets.contains(set)){
+			foreach(QString studentsSetName, act->studentsNames){
+				if(allSets.contains(studentsSetName)){
 					count++;
 					act->active=true;
 					break;
@@ -6415,19 +6708,19 @@ int Rules::deactivateStudents(const QString& studentsName)
 {
 	QSet<QString> allSets;
 	
-	StudentsSet* set=this->searchStudentsSet(studentsName);
-	assert(set!=NULL);
-	if(set->type==STUDENTS_SUBGROUP)
+	StudentsSet* studentsSet=this->searchStudentsSet(studentsName);
+	assert(studentsSet!=NULL);
+	if(studentsSet->type==STUDENTS_SUBGROUP)
 		allSets.insert(studentsName);
-	else if(set->type==STUDENTS_GROUP){
+	else if(studentsSet->type==STUDENTS_GROUP){
 		allSets.insert(studentsName);
-		StudentsGroup* g=(StudentsGroup*)set;
+		StudentsGroup* g=(StudentsGroup*)studentsSet;
 		foreach(StudentsSubgroup* s, g->subgroupsList)
 			allSets.insert(s->name);
 	}
-	else if(set->type==STUDENTS_YEAR){
+	else if(studentsSet->type==STUDENTS_YEAR){
 		allSets.insert(studentsName);
-		StudentsYear* y=(StudentsYear*)set;
+		StudentsYear* y=(StudentsYear*)studentsSet;
 		foreach(StudentsGroup* g, y->groupsList){
 			allSets.insert(g->name);
 			foreach(StudentsSubgroup* s, g->subgroupsList)
@@ -6439,8 +6732,8 @@ int Rules::deactivateStudents(const QString& studentsName)
 	for(int i=0; i<this->activitiesList.size(); i++){
 		Activity* act=this->activitiesList[i];
 		if(act->active){
-			foreach(QString set, act->studentsNames){
-				if(allSets.contains(set)){
+			foreach(QString studentsSetName, act->studentsNames){
+				if(allSets.contains(studentsSetName)){
 					count++;
 					act->active=false;
 					break;

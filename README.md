@@ -1,9 +1,9 @@
-This is FET version 5.25.0
+This is FET version 5.26.0
 
 
 Program description:
 
-	FET is free timetabling software (licensed under GNU GPL v2 or later).
+	FET is free timetabling software (licensed under the GNU Affero General Public License version 3 or later).
 	This program aims to automatically generate the timetable of a school, high-school or university.
 	It may be used for other timetabling purposes.
 
@@ -55,7 +55,7 @@ Getting - compiling - installing Qt:
 
 	You will need Qt 5.4.0 or compatible to compile FET (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
 	You can get the corresponding version of Qt with your package manager or from the Qt homepage.
-	Qt can be used with the LGPL, GPL or commercial license.
+	Qt can be used with the LGPL or commercial license.
 
 	GNU/Linux: It is possible to use YaST (or Adept Manager) or other package managers to get your version of Qt, pre-compiled.
 	Or you can download, (possibly) compile and install Qt from its homepage.
@@ -277,7 +277,7 @@ Running FET:
 	
 	If you want to be completely independent from Qt, using only standard C++, you can remove all the Qt includes and
 	reimplement the used Qt classes QString, QList, QSet, and others (only the member functions which are necessary). Or just get the corresponding
-	code from Qt (Please review the Qt licensing options, in this case. Currently, they include LGPL, GPL and commercial).
+	code from Qt (Please review the Qt licensing options, in this case. Currently, they include LGPL and commercial).
 	The program should have independence of a particular implementation of QSet and QHash so, if you reimplement these two containers,
 	any order of elements should lead to the same generation results. Contrary behavior should be reported as a bug.
 

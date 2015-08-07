@@ -12,10 +12,10 @@ File timetable_defs.cpp
 
 /***************************************************************************
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License as        *
+ *   published by the Free Software Foundation, either version 3 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
 
@@ -34,7 +34,7 @@ QString internetVersion;
 /**
 FET version
 */
-const QString FET_VERSION="5.25.0";
+const QString FET_VERSION="5.26.0";
 
 /**
 FET language

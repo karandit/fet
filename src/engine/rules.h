@@ -12,10 +12,10 @@ File rules.h
 
 /***************************************************************************
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License as        *
+ *   published by the Free Software Foundation, either version 3 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
 
@@ -165,6 +165,10 @@ public:
 	QHash<int, QSet<ConstraintMinDaysBetweenActivities*> > mdbaHash;
 	QHash<QString, QSet<ConstraintTeacherNotAvailableTimes*> > tnatHash;
 	QHash<QString, QSet<ConstraintStudentsSetNotAvailableTimes*> > ssnatHash;
+	
+	//not internal
+	QHash<QString, StudentsSet*> permanentStudentsHash;
+	
 	//internal
 	QHash<QString, int> teachersHash;
 	QHash<QString, int> subjectsHash;
@@ -368,6 +372,8 @@ public:
 	A function to sort the activity tags alphabetically
 	*/
 	void sortActivityTagsAlphabetically();
+	
+	void computePermanentStudentsHash();
 
 	/**
 	Returns a pointer to the structure containing this student set
@@ -396,9 +402,9 @@ public:
 	*/
 	bool addYearFast(StudentsYear* year);
 
-	bool emptyYear(const QString& yearName);
+//	bool emptyYear(const QString& yearName);
 	bool removeYear(const QString& yearName);
-	bool removeYear(const QString& yearName, bool removeAlsoThisYear);
+//	bool removeYear(const QString& yearName, bool removeAlsoThisYear);
 	
 	bool removeYearPointerAfterSplit(StudentsYear* yearPointer);
 
@@ -476,7 +482,7 @@ public:
 	Returns true if successful or false if the maximum
 	number of activities was reached.
 	*/
-	bool addSimpleActivity(
+	/*bool addSimpleActivity(
 		QWidget* parent,
 		int _id,
 		int _activityGroupId,
@@ -484,16 +490,16 @@ public:
 		const QString& _subjectName,
 		const QStringList& _activityTagsNames,
 		const QStringList& _studentsNames,
-		int _duration, /*duration, in hours*/
+		int _duration,
 		int _totalDuration,
 		bool _active,
 		bool _computeNTotalStudents,
-		int _nTotalStudents);
+		int _nTotalStudents);*/
 
 	/*
-	Faster, when reading rules (no need to recompute the number of students in activity constructor
+	Faster (no need to recompute the number of students in activity constructor)
 	*/
-	bool addSimpleActivityRulesFast(
+	bool addSimpleActivityFast(
 		QWidget* parent,
 		int _id,
 		int _activityGroupId,
@@ -501,7 +507,7 @@ public:
 		const QString& _subjectName,
 		const QStringList& _activityTagsNames,
 		const QStringList& _studentsNames,
-		int _duration, /*duration, in hours*/
+		int _duration,
 		int _totalDuration,
 		bool _active,
 		bool _computeNTotalStudents,
@@ -515,7 +521,7 @@ public:
 	If _minDayDistance>0, there will automatically added a compulsory
 	ConstraintMinDaysBetweenActivities.
 	*/
-	bool addSplitActivity(
+	/*bool addSplitActivity(
 		QWidget* parent,
 		int _firstActivityId,
 		int _activityGroupId,
@@ -531,7 +537,26 @@ public:
 		double _weightPercentage,
 		bool _consecutiveIfSameDay,
 		bool _computeNTotalStudents,
-		int _nTotalStudents);
+		int _nTotalStudents);*/
+
+	bool addSplitActivityFast(
+		QWidget* parent,
+		int _firstActivityId,
+		int _activityGroupId,
+		const QStringList& _teachersNames,
+		const QString& _subjectName,
+		const QStringList& _activityTagsNames,
+		const QStringList& _studentsNames,
+		int _nSplits,
+		int _totalDuration,
+		int _durations[],
+		bool _active[],
+		int _minDayDistance,
+		double _weightPercentage,
+		bool _consecutiveIfSameDay,
+		bool _computeNTotalStudents,
+		int _nTotalStudents,
+		int _computedNumberOfStudents);
 
 	/**
 	Removes only the activity with this id.

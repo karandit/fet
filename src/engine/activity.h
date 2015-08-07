@@ -12,10 +12,10 @@ File activity.h
 
 /***************************************************************************
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License as        *
+ *   published by the Free Software Foundation, either version 3 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
 
@@ -199,7 +199,7 @@ public:
 	As a must, for non-split activities, _activityGroupId==0.
 	For the split ones, it is >0
 	*/
-	Activity(
+	/*Activity(
 		Rules& r,
 		int _id,
 		int _activityGroupId,
@@ -212,8 +212,9 @@ public:
 		//int _parity,
 		bool _active,
 		bool _computeNTotalStudents,
-		int _nTotalStudents);
+		int _nTotalStudents);*/
 		
+	//deprecated comment below - this function is used in more places.
 	//this is used only when reading a file (Rules), so that the computed number of students is known faster
 	Activity(
 		Rules& r,

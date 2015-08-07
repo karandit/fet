@@ -8,10 +8,10 @@
 
 /***************************************************************************
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License as        *
+ *   published by the Free Software Foundation, either version 3 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
 
@@ -121,9 +121,9 @@ void HelpFaqForm::setText()
 	s+="\n\n";
 
 	s+=tr("Q: Is it possible to use non-integer weights for constraints?\n\n"
-		"A: Yes. Using values like 99.75% might be good sometimes. "
-		"The precision in FET is limited to %1 decimal digits after the decimal point, "
-		"but probably nobody will use such a fine precision").arg(CUSTOM_DOUBLE_PRECISION);
+		"A: Yes. If a constraint is allowed values under 100%, you can use any weight, even fractional numbers like 99.75%. It might help "
+		"in constraints like min days, preferred rooms or max hours daily. The precision in FET is limited to %1 decimal digits after the decimal point, "
+		"but probably nobody will use such a fine precision.").arg(CUSTOM_DOUBLE_PRECISION);
 
 	s+="\n\n";
 	s+="--------------------";
@@ -319,15 +319,6 @@ void HelpFaqForm::setText()
 	s+="\n\n";
 	s+="--------------------";
 	s+="\n\n";
-
-	s+=tr("Q: Is it allowed to use non-integer weights?\n\n"
-		"A: If a constraint is allowed values under 100%, you can use any weight, even fractional numbers like 99.75%. It might help "
-		"in constraints like min days, preferred rooms or max hours daily.");
-
-	s+="\n\n";
-	s+="--------------------";
-	s+="\n\n";
-
 
 	s+=tr("Q: I have a sports room which allows more than 1 activity simultaneously in it. How to make the preferred room constraints? "
 		"Can FET accept more than one activity at the same time in a single room?\n\n"

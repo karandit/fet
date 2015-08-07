@@ -12,10 +12,10 @@ File activity.cpp
 
 /***************************************************************************
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License as        *
+ *   published by the Free Software Foundation, either version 3 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
 
@@ -131,7 +131,7 @@ Activity::Activity()
 	comments=QString("");
 }
 
-Activity::Activity(
+/*Activity::Activity(
 	Rules& r,
 	int _id,
 	int _activityGroupId,
@@ -170,7 +170,7 @@ Activity::Activity(
 		assert(_nTotalStudents>=0);
 		this->nTotalStudents=_nTotalStudents;
 	}
-}
+}*/
 
 Activity::Activity(
 	Rules& r,
@@ -188,7 +188,7 @@ Activity::Activity(
 	int _computedNumberOfStudents)
 {
 	Q_UNUSED(r);
-	Q_UNUSED(_nTotalStudents);
+	//Q_UNUSED(_nTotalStudents);
 
 	comments=QString("");
 
@@ -203,7 +203,11 @@ Activity::Activity(
 	this->active=_active;
 	this->computeNTotalStudents=_computeNTotalStudents;
 	
-	assert(_computeNTotalStudents);
+	//assert(_computeNTotalStudents);
+	if(_computeNTotalStudents)
+		assert(_nTotalStudents==-1);
+	else
+		assert(_nTotalStudents==_computedNumberOfStudents);
 	this->nTotalStudents=_computedNumberOfStudents;
 }
 

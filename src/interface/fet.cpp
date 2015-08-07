@@ -12,10 +12,10 @@ File fet.cpp - this is where the program FET starts
 
 /***************************************************************************
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License as        *
+ *   published by the Free Software Foundation, either version 3 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
 
@@ -967,13 +967,13 @@ int main(int argc, char **argv)
 	
 			//QString qv=qVersion();
 			out<<"FET version "<<qPrintable(FET_VERSION)<<endl;
-			out<<"Free timetabling software, licensed under GNU GPL v2 or later"<<endl;
-			out<<"Copyright (C) 2002-2014 Liviu Lalescu, Volker Dirr"<<endl;
+			out<<"Free timetabling software, licensed under the GNU Affero General Public License version 3 or later"<<endl;
+			out<<"Copyright (C) 2002-2015 Liviu Lalescu, Volker Dirr"<<endl;
 			out<<"Homepage: http://lalescu.ro/liviu/fet/"<<endl;
 			//out<<" (Using Qt version "<<qPrintable(qv)<<")"<<endl;
 			cout<<"FET version "<<qPrintable(FET_VERSION)<<endl;
-			cout<<"Free timetabling software, licensed under GNU GPL v2 or later"<<endl;
-			cout<<"Copyright (C) 2002-2014 Liviu Lalescu, Volker Dirr"<<endl;
+			cout<<"Free timetabling software, licensed under the GNU Affero General Public License version 3 or later"<<endl;
+			cout<<"Copyright (C) 2002-2015 Liviu Lalescu, Volker Dirr"<<endl;
 			cout<<"Homepage: http://lalescu.ro/liviu/fet/"<<endl;
 			//cout<<" (Using Qt version "<<qPrintable(qv)<<")"<<endl;
 

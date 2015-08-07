@@ -15,10 +15,10 @@ File import.cpp
                          : http://www.timetabling.de/
  ***************************************************************************
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License as        *
+ *   published by the Free Software Foundation, either version 3 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
 
@@ -38,6 +38,11 @@ File import.cpp
 #endif
 
 #include <QProgressDialog>
+
+#include <QSet>
+#include <QHash>
+#include <QList>
+#include <QPair>
 
 #include "centerwidgetonscreen.h"
 
@@ -1178,31 +1183,36 @@ FILE_STRIPPED_NAME
 		headTableText->setText(Import::tr("There is no usable data in the file."));
 
 	QTableWidget* fieldsTable= new QTableWidget;
+	
+	//fieldsTable->setUpdatesEnabled(false);
+	
 	fieldsTable->setRowCount(max);
 	QStringList fieldsTabelLabel;
 
-	int colums=0;
+	int columns=0;
 	for(int i=0; i<NUMBER_OF_FIELDS; i++){
 		if(fieldNumber[i]>DO_NOT_IMPORT){
 			fieldsTabelLabel<<tr("%1").arg(fieldName[i]);
-			colums++;
+			columns++;
 		}
 	}
-	fieldsTable->setColumnCount(colums);
+	fieldsTable->setColumnCount(columns);
 	fieldsTable->setHorizontalHeaderLabels(fieldsTabelLabel);
 	for(int i=0; i<max; i++){
-		int colum=0;
+		int column=0;
 		for(int f=0; f<NUMBER_OF_FIELDS; f++){
 			if(fieldNumber[f]>DO_NOT_IMPORT){
 				QTableWidgetItem* newItem=new QTableWidgetItem(fieldList[f][i]);
 				newItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-				fieldsTable->setItem(i, colum, newItem);
-				colum++;
+				fieldsTable->setItem(i, column, newItem);
+				column++;
 			}
 		}
 	}
 	fieldsTable->resizeColumnsToContents();
-	fieldsTable->resizeRowsToContents();
+	//fieldsTable->resizeRowsToContents(); This takes too long for many rows, and it is also useless.
+
+	//fieldsTable->setUpdatesEnabled(true);
 
 	//Start current data warning
 	QVBoxLayout* dataWarningBox=new QVBoxLayout();
@@ -1324,9 +1334,10 @@ void Import::importCSVActivityTags(QWidget* parent){
 	//check empty fields (end)
 
 	//check if already in memory (start)
+	QSet<QString> tmpSet=fieldList[FIELD_ACTIVITY_TAG_NAME].toSet();
 	for(int i=0; i<gt.rules.activityTagsList.size(); i++){
 		ActivityTag* a=gt.rules.activityTagsList[i];
-		if(fieldList[FIELD_ACTIVITY_TAG_NAME].contains(a->name))
+		if(tmpSet.contains(a->name))
 			dataWarning<<Import::tr("%1 is already in FET data.").arg(a->name);
 	}
 	//check if already in memory (end)
@@ -1336,19 +1347,23 @@ void Import::importCSVActivityTags(QWidget* parent){
 	newParent=newParent2;
 	if(!ok) return;
 
-	//add subjects (start) - similar to teachersform.cpp by Liviu modified by Volker
+	//add activity tags (start) - similar to teachersform.cpp by Liviu modified by Volker
+	tmpSet.clear();
+	foreach(ActivityTag* at, gt.rules.activityTagsList)
+		tmpSet.insert(at->name);
 	int count=0;
 	for(int i=0; i<fieldList[FIELD_ACTIVITY_TAG_NAME].size(); i++){
-		if(!fieldList[FIELD_ACTIVITY_TAG_NAME][i].isEmpty()){
+		if(!fieldList[FIELD_ACTIVITY_TAG_NAME][i].isEmpty() && !tmpSet.contains(fieldList[FIELD_ACTIVITY_TAG_NAME][i])){
 			ActivityTag* a=new ActivityTag();
 			a->name=fieldList[FIELD_ACTIVITY_TAG_NAME][i];
-			if(!gt.rules.addActivityTag(a)){
+			if(!gt.rules.addActivityTagFast(a)){
 				delete a;
+				assert(0);
 			} else count++;
 		}
 	}
-	QMessageBox::information(newParent, tr("FET information"), Import::tr("%1 activity tags added. Please check activity tag form.").arg(count));
-	//add subjects (end) - similar to teachersform.cpp by Liviu modified by Volker
+	QMessageBox::information(newParent, tr("FET information"), Import::tr("%1 activity tags added. Please check activity tags form.").arg(count));
+	//add activity tags (end) - similar to teachersform.cpp by Liviu modified by Volker
 	int tmp=fileName.lastIndexOf(FILE_SEP);
 	IMPORT_DIRECTORY=fileName.left(tmp);
 	gt.rules.internalStructureComputed=false;
@@ -1421,18 +1436,20 @@ void Import::importCSVRoomsAndBuildings(QWidget* parent){
 	//check empty buildings (end)
 
 	//check if rooms are already in memory (start)
+	QSet<QString> tmpSet=fieldList[FIELD_ROOM_NAME].toSet();
 	for(int i=0; i<gt.rules.roomsList.size(); i++){
 		Room* r=gt.rules.roomsList[i];
-		if(fieldList[FIELD_ROOM_NAME].contains(r->name))
+		if(tmpSet.contains(r->name))
 			dataWarning<<Import::tr("%1 is already in FET data.").arg(r->name);
 	}
 	//check if rooms are already in memory (end)
 
 	//check if buildings are already in memory (start)
 	if(fieldNumber[FIELD_ROOM_NAME]<0){
+		tmpSet=fieldList[FIELD_BUILDING_NAME].toSet();
 		for(int i=0; i<gt.rules.buildingsList.size(); i++){
 			Building* b=gt.rules.buildingsList[i];
-			if(fieldList[FIELD_BUILDING_NAME].contains(b->name))
+			if(tmpSet.contains(b->name))
 				dataWarning<<Import::tr("%1 is already in FET data.").arg(b->name);
 		}
 	}
@@ -1445,22 +1462,29 @@ void Import::importCSVRoomsAndBuildings(QWidget* parent){
 	if(!ok) return;
 
 	//add buildings (start) - similar to teachersform.cpp by Liviu modified by Volker
+	tmpSet.clear();
+	foreach(Building* bu, gt.rules.buildingsList)
+		tmpSet.insert(bu->name);
 	int count=0;
 	for(int i=0; i<fieldList[FIELD_BUILDING_NAME].size(); i++){
-		if(!fieldList[FIELD_BUILDING_NAME][i].isEmpty()){
+		if(!fieldList[FIELD_BUILDING_NAME][i].isEmpty() && !tmpSet.contains(fieldList[FIELD_BUILDING_NAME][i])){
 			Building* b=new Building();
 			b->name=fieldList[FIELD_BUILDING_NAME][i];
-			if(!gt.rules.addBuilding(b)){
+			if(!gt.rules.addBuildingFast(b)){
 				delete b;
+				assert(0);
 			} else count++;
 		}
 	}
 	//add buildings (end) - similar to teachersform.cpp by Liviu modified by Volker
 
 	//add rooms (start) - similar to teachersform.cpp by Liviu modified by Volker
+	tmpSet.clear();
+	foreach(Room* rm, gt.rules.roomsList)
+		tmpSet.insert(rm->name);
 	int countroom=0;
 	for(int i=0; i<fieldList[FIELD_BUILDING_NAME].size(); i++){
-		if(!fieldList[FIELD_ROOM_NAME][i].isEmpty()){
+		if(!fieldList[FIELD_ROOM_NAME][i].isEmpty() && !tmpSet.contains(fieldList[FIELD_ROOM_NAME][i])){
 			Room* r=new Room();
 			r->name=fieldList[FIELD_ROOM_NAME][i];
 			if(fieldNumber[FIELD_BUILDING_NAME]!=DO_NOT_IMPORT)
@@ -1473,14 +1497,15 @@ void Import::importCSVRoomsAndBuildings(QWidget* parent){
 			}
 			else
 				assert(0==1);
-			if(!gt.rules.addRoom(r)){
+			if(!gt.rules.addRoomFast(r)){
 				delete r;
+				assert(0);
 			} else countroom++;
 		}
 	}
 	//add rooms (end) - similar to teachersform.cpp by Liviu modified by Volker
-	QMessageBox::information(newParent, tr("FET information"), 
-	 Import::tr("%1 buildings added. Please check rooms form.").arg(count)+"\n"+tr("%2 rooms added. Please check rooms form.").arg(countroom));
+	QMessageBox::information(newParent, tr("FET information"),
+	 Import::tr("%1 buildings added. Please check buildings form.").arg(count)+"\n"+tr("%1 rooms added. Please check rooms form.").arg(countroom));
 
 	int tmp=fileName.lastIndexOf(FILE_SEP);
 	IMPORT_DIRECTORY=fileName.left(tmp);
@@ -1526,9 +1551,10 @@ void Import::importCSVSubjects(QWidget* parent){
 	//check empty fields (end)
 
 	//check if already in memory (start)
+	QSet<QString> tmpSet=fieldList[FIELD_SUBJECT_NAME].toSet();
 	for(int i=0; i<gt.rules.subjectsList.size(); i++){
 		Subject* s=gt.rules.subjectsList[i];
-		if(fieldList[FIELD_SUBJECT_NAME].contains(s->name))
+		if(tmpSet.contains(s->name))
 			dataWarning<<Import::tr("%1 is already in FET data.").arg(s->name);
 	}
 	//check if already in memory (end)
@@ -1540,13 +1566,17 @@ void Import::importCSVSubjects(QWidget* parent){
 	if(!ok) return;
 
 	//add subjects (start) - similar to teachersform.cpp by Liviu modified by Volker
+	tmpSet.clear();
+	foreach(Subject* sbj, gt.rules.subjectsList)
+		tmpSet.insert(sbj->name);
 	int count=0;
 	for(int i=0; i<fieldList[FIELD_SUBJECT_NAME].size(); i++){
-		if(!fieldList[FIELD_SUBJECT_NAME][i].isEmpty()){
+		if(!fieldList[FIELD_SUBJECT_NAME][i].isEmpty() && !tmpSet.contains(fieldList[FIELD_SUBJECT_NAME][i])){
 			Subject* s=new Subject();
 			s->name=fieldList[FIELD_SUBJECT_NAME][i];
-			if(!gt.rules.addSubject(s)){
+			if(!gt.rules.addSubjectFast(s)){
 				delete s;
+				assert(0);
 			} else count++;
 		}
 	}
@@ -1597,9 +1627,10 @@ void Import::importCSVTeachers(QWidget* parent){
 	//check empty fields (end)
 
 	//check if already in memory (start)
+	QSet<QString> tmpSet=fieldList[FIELD_TEACHER_NAME].toSet();
 	for(int i=0; i<gt.rules.teachersList.size(); i++){
 		Teacher* t=gt.rules.teachersList[i];
-		if(fieldList[FIELD_TEACHER_NAME].contains(t->name))
+		if(tmpSet.contains(t->name))
 			dataWarning<<Import::tr("%1 is already in FET data.").arg(t->name);
 	}
 	//check if already in memory (end)
@@ -1611,13 +1642,17 @@ void Import::importCSVTeachers(QWidget* parent){
 	if(!ok) return;
 
 	//add teachers (start) - similar to teachersform.cpp by Liviu modified by Volker
+	tmpSet.clear();
+	foreach(Teacher* tch, gt.rules.teachersList)
+		tmpSet.insert(tch->name);
 	int count=0;
 	for(int i=0; i<fieldList[FIELD_TEACHER_NAME].size(); i++){
-		if(!fieldList[FIELD_TEACHER_NAME][i].isEmpty()){
+		if(!fieldList[FIELD_TEACHER_NAME][i].isEmpty() && !tmpSet.contains(fieldList[FIELD_TEACHER_NAME][i])){
 			Teacher* tch=new Teacher();
 			tch->name=fieldList[FIELD_TEACHER_NAME][i];
-			if(!gt.rules.addTeacher(tch)){
+			if(!gt.rules.addTeacherFast(tch)){
 				delete tch;
+				assert(0);
 			} else count++;
 		}
 	}
@@ -1668,7 +1703,7 @@ void Import::importCSVStudents(QWidget* parent){
 	QString yearName;
 	QString groupName;
 	QString subgroupName;
-	QSet<QString> usedCSVYearNames;			// this is much fater then QStringList
+	QSet<QString> usedCSVYearNames;			// this is much faster than QStringList
 	QSet<QString> usedCSVGroupNames;
 	QSet<QString> usedCSVSubgroupNames;
 
@@ -1768,7 +1803,7 @@ void Import::importCSVStudents(QWidget* parent){
 			if(usedCSVYearNames.contains(stg->name))
 				dataWarning<<Import::tr("Can't import year %1. Name is already taken for a group.").arg(stg->name);
 			if(usedCSVGroupNames.contains(stg->name))
-				dataWarning<<Import::tr("Group name %1 is already in FET data (In the same or in an other year).").arg(stg->name);
+				dataWarning<<Import::tr("Group name %1 is already in FET data (in the same or in another year).").arg(stg->name);
 			if(usedCSVSubgroupNames.contains(stg->name))
 				dataWarning<<Import::tr("Can't import subgroup %1. Name is already taken for a group.").arg(stg->name);
 			for(int k=0; k<stg->subgroupsList.size(); k++){
@@ -1787,7 +1822,7 @@ void Import::importCSVStudents(QWidget* parent){
 				if(usedCSVGroupNames.contains(sts->name))
 					dataWarning<<Import::tr("Can't import group %1. Name is taken for a subgroup.").arg(sts->name);
 				if(usedCSVSubgroupNames.contains(sts->name))
-					dataWarning<<Import::tr("Subgroup name %1 is already in FET data (In the same or in an other group).").arg(sts->name);
+					dataWarning<<Import::tr("Subgroup name %1 is already in FET data (in the same or in another group).").arg(sts->name);
 			}
 		}
 	}
@@ -1813,6 +1848,21 @@ void Import::importCSVStudents(QWidget* parent){
 	progress3.setRange(0, fieldList[FIELD_YEAR_NAME].size());
 	//cout<<"progress3 in importCSVStudents starts, range="<<fieldList[FIELD_YEAR_NAME].size()<<endl;
 	
+	QHash<QString, StudentsSet*> studentsHash;
+	QSet<QPair<QString, QString> > groupsInYearSet; //first year, then group
+	QSet<QPair<QString, QString> > subgroupsInGroupSet; //first group, then subgroup
+	foreach(StudentsYear* year, gt.rules.yearsList){
+		studentsHash.insert(year->name, year);
+		foreach(StudentsGroup* group, year->groupsList){
+			studentsHash.insert(group->name, group);
+			groupsInYearSet.insert(QPair<QString, QString> (year->name, group->name));
+			foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+				studentsHash.insert(subgroup->name, subgroup);
+				subgroupsInGroupSet.insert(QPair<QString, QString> (group->name, subgroup->name));
+			}
+		}
+	}
+	
 	for(int i=0; i<fieldList[FIELD_YEAR_NAME].size(); i++){
 		progress3.setValue(i);
 		if(progress3.wasCanceled()){
@@ -1829,7 +1879,8 @@ void Import::importCSVStudents(QWidget* parent){
 		else
 			yearName=fieldDefaultItem[FIELD_YEAR_NAME];
 		assert(!yearName.isEmpty());
-		StudentsSet* ss=gt.rules.searchStudentsSet(yearName);
+		//StudentsSet* ss=gt.rules.searchStudentsSet(yearName);
+		StudentsSet* ss=studentsHash.value(yearName, NULL);
 		if(ss!=NULL){
 			if(ss->type==STUDENTS_SUBGROUP)
 				ok=false;
@@ -1839,6 +1890,8 @@ void Import::importCSVStudents(QWidget* parent){
 				ok=false;
 				tryNext=true;
 			}
+			else
+				assert(0);
 		}
 		if(ok){
 			StudentsYear* sy=new StudentsYear();
@@ -1846,12 +1899,29 @@ void Import::importCSVStudents(QWidget* parent){
 			QString tmpString=fieldList[FIELD_YEAR_NUMBER_OF_STUDENTS][i];
 			sy->numberOfStudents=tmpString.toInt();
 			assert(!fieldList[FIELD_YEAR_NUMBER_OF_STUDENTS].isEmpty());
-			if(gt.rules.searchYear(yearName) >=0 )
+			/*if(gt.rules.searchYear(yearName) >=0 )
 				delete sy;
 			else {
 				bool tmp=gt.rules.addYear(sy);
 				assert(tmp);
 				addedYears++;
+			}*/
+			StudentsSet* studentsSet=ss; //studentsHash.value(yearName, NULL);
+			bool yearExists=false;
+			if(studentsSet!=NULL){
+				assert(0);
+				if(studentsSet->type==STUDENTS_YEAR)
+					yearExists=true;
+			}
+			if(yearExists){
+				delete sy;
+				assert(0);
+			}
+			else{
+				bool tmp=gt.rules.addYearFast(sy);
+				assert(tmp);
+				addedYears++;
+				studentsHash.insert(sy->name, sy);
 			}
 		}
 		if((tryNext || ok) && fieldNumber[FIELD_GROUP_NAME]!=DO_NOT_IMPORT){
@@ -1866,16 +1936,18 @@ void Import::importCSVStudents(QWidget* parent){
 			if(groupName.isEmpty())
 				ok=false;
 			else {
-				if(ok && gt.rules.searchGroup(yearName, groupName)>=0){
+				//if(ok && gt.rules.searchGroup(yearName, groupName)>=0){
+				if(ok && groupsInYearSet.contains(QPair<QString, QString> (yearName, groupName))){
 					ok=false;
 					tryNext=true;
 				}
-				StudentsSet* ss=gt.rules.searchStudentsSet(groupName);
+				//StudentsSet* ss=gt.rules.searchStudentsSet(groupName);
+				StudentsSet* ss=studentsHash.value(groupName, NULL);
 				if(ss!=NULL && ss->type==STUDENTS_YEAR)
 					ok=false;
-				if(ss!=NULL && ss->type==STUDENTS_SUBGROUP)
+				else if(ss!=NULL && ss->type==STUDENTS_SUBGROUP)
 					ok=false;
-				if(ss!=NULL && ss->type==STUDENTS_GROUP){
+				else if(ss!=NULL && ss->type==STUDENTS_GROUP){
 					if(fieldNumber[FIELD_SUBGROUP_NAME]==DO_NOT_IMPORT)
 						lastWarning+=Import::tr("Group name %1 exists in another year. It means that some years share the same group.").arg(groupName)+"\n";
 					if(fieldNumber[FIELD_SUBGROUP_NAME]!=DO_NOT_IMPORT)
@@ -1885,16 +1957,26 @@ void Import::importCSVStudents(QWidget* parent){
 				if(ss!=NULL&&ok){
 					sg=(StudentsGroup*)ss;
 				}
-				if(ss==NULL&&ok){
+				else if(ss==NULL&&ok){
 					sg=new StudentsGroup();
 					sg->name=groupName;
 					QString tmpString=fieldList[FIELD_GROUP_NUMBER_OF_STUDENTS][i];
 					sg->numberOfStudents=tmpString.toInt();
 					assert(ok);
 					assert(!fieldList[FIELD_GROUP_NUMBER_OF_STUDENTS].isEmpty());
+
+					studentsHash.insert(sg->name, sg);
 				}
 				if(ok){
-					gt.rules.addGroup(yearName, sg);
+					StudentsSet* tmpStudentsSet=studentsHash.value(yearName, NULL);
+					assert(tmpStudentsSet->type==STUDENTS_YEAR);
+					
+					StudentsYear* year=(StudentsYear*)tmpStudentsSet;
+					assert(year!=NULL);
+					gt.rules.addGroupFast(year, sg);
+
+					groupsInYearSet.insert(QPair<QString, QString> (yearName, sg->name));
+
 					addedGroups++;
 				}
 			}
@@ -1908,39 +1990,59 @@ void Import::importCSVStudents(QWidget* parent){
 			if(subgroupName.isEmpty())
 				ok=false;
 			else {
-				if(ok && gt.rules.searchSubgroup(yearName, groupName, subgroupName)>=0){
+				//if(ok && gt.rules.searchSubgroup(yearName, groupName, subgroupName)>=0){
+				if(ok && subgroupsInGroupSet.contains(QPair<QString, QString> (groupName, subgroupName))){
 					ok=false;
 				}
-				StudentsSet* ss=gt.rules.searchStudentsSet(subgroupName);
+				//StudentsSet* ss=gt.rules.searchStudentsSet(subgroupName);
+				StudentsSet* ss=studentsHash.value(subgroupName, NULL);
 				StudentsSubgroup* sts;
 				sts=NULL;
 				if(ss!=NULL && ss->type==STUDENTS_YEAR){
 					ok=false;
 				}
-				if(ss!=NULL && ss->type==STUDENTS_GROUP){
+				else if(ss!=NULL && ss->type==STUDENTS_GROUP){
 					ok=false;
 				}
-				if(ss!=NULL && ss->type==STUDENTS_SUBGROUP){
+				else if(ss!=NULL && ss->type==STUDENTS_SUBGROUP){
 					lastWarning+=Import::tr("Subgroup name %1 exists in another group. It means that some groups share the same subgroup.").arg(subgroupName)+"\n";
 				}
 				if(ss!=NULL&&ok){
 					sts=(StudentsSubgroup*)ss;
 				}
-				if(ss==NULL&&ok) {
+				else if(ss==NULL&&ok) {
 					sts=new StudentsSubgroup();
 					sts->name=subgroupName;
 					QString tmpString=fieldList[FIELD_SUBGROUP_NUMBER_OF_STUDENTS][i];
 					sts->numberOfStudents=tmpString.toInt();
 					assert(ok);
 					assert(!fieldList[FIELD_SUBGROUP_NUMBER_OF_STUDENTS].isEmpty());
+
+					studentsHash.insert(sts->name, sts);
 				}
 				if(ok){
-					gt.rules.addSubgroup(yearName, groupName, sts);
+					StudentsSet* tmpStudentsSet=studentsHash.value(yearName, NULL);
+					assert(tmpStudentsSet->type==STUDENTS_YEAR);
+				
+					StudentsYear* year=(StudentsYear*)tmpStudentsSet;
+					assert(year!=NULL);
+					
+					tmpStudentsSet=studentsHash.value(groupName, NULL);
+					assert(tmpStudentsSet->type==STUDENTS_GROUP);
+					
+					StudentsGroup* group=(StudentsGroup*)tmpStudentsSet;
+					assert(group!=NULL);
+
+					gt.rules.addSubgroupFast(year, group, sts);
+
+					subgroupsInGroupSet.insert(QPair<QString, QString> (groupName, sts->name));
+
 					addedSubgroups++;
 				}
 			}
 		}
 	}
+
 	progress3.setValue(fieldList[FIELD_YEAR_NAME].size());
 	//cout<<"progress3 in importCSVStudents ends"<<endl;
 	//add students (end) - similar to adding items by Liviu modified by Volker
@@ -1952,6 +2054,8 @@ ifUserCanceledProgress3:
 	lastWarning.insert(0,Import::tr("%1 subgroups added. Please check subgroups form.").arg(addedSubgroups)+"\n");
 	lastWarning.insert(0,Import::tr("%1 groups added. Please check groups form.").arg(addedGroups)+"\n");
 	lastWarning.insert(0,Import::tr("%1 years added. Please check years form.").arg(addedYears)+"\n");
+	
+	gt.rules.computePermanentStudentsHash();
 
 	LastWarningsDialog lwd(newParent);
 	int w=chooseWidth(lwd.sizeHint().width());
@@ -2105,6 +2209,18 @@ void Import::importCSVActivities(QWidget* parent){
 
 	//check if already in memory (start)
 	//check if students set is in memory
+	/*QHash<QString, StudentsSet*> studentsHash;
+	foreach(StudentsYear* year, gt.rules.yearsList){
+		studentsHash.insert(year->name, year);
+		foreach(StudentsGroup* group, year->groupsList){
+			studentsHash.insert(group->name, group);
+			foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+				studentsHash.insert(subgroup->name, subgroup);
+			}
+		}
+	}*/
+	const QHash<QString, StudentsSet*>& studentsHash=gt.rules.permanentStudentsHash;
+	
 	lastWarning.clear();
 	QString line;
 	QStringList students;
@@ -2116,7 +2232,8 @@ void Import::importCSVActivities(QWidget* parent){
 		students=line.split("+", QString::SkipEmptyParts);
 		if(!fieldList[FIELD_STUDENTS_SET][i].isEmpty()){
 			for(int s=0; s<students.size(); s++){
-				StudentsSet* ss=gt.rules.searchStudentsSet(students[s]);
+				//StudentsSet* ss=gt.rules.searchStudentsSet(students[s]);
+				StudentsSet* ss=studentsHash.value(students[s], NULL);
 				if(ss==NULL){
 					if(firstWarning){
 						lastWarning+=Import::tr("FET can't import activities, because FET needs to know the stucture of the "
@@ -2147,11 +2264,11 @@ void Import::importCSVActivities(QWidget* parent){
 	//check if teacher is in memory
 	assert(fieldList[FIELD_TEACHER_NAME].isEmpty());
 	QStringList teachers;
-	QStringList tmpList;
-	tmpList.clear();
+	QSet<QString> tmpSet;
+	tmpSet.clear();
 	for(int i=0; i<gt.rules.teachersList.size(); i++){
 		Teacher* t=gt.rules.teachersList[i];
-		tmpList<<t->name;
+		tmpSet.insert(t->name);
 	}
 	for(int i=0; i<fieldList[FIELD_TEACHERS_SET].size(); i++){
 		line.clear();
@@ -2160,37 +2277,37 @@ void Import::importCSVActivities(QWidget* parent){
 		teachers=line.split("+", QString::SkipEmptyParts);
 		for(int t=0; t<teachers.size(); t++){
 			bool add=true;
-			if(tmpList.contains(teachers[t]) || teachers[t]=="")
+			if(tmpSet.contains(teachers[t]) || teachers[t]=="")
 				add=false;
 			if(add){
 				dataWarning<<Import::tr("%1 %2 will be added.", "For instance 'Subject Math will be added', so use singular").arg(fieldName[FIELD_TEACHER_NAME]).arg(teachers[t]);
-				tmpList<<teachers[t];
+				tmpSet.insert(teachers[t]);
 				fieldList[FIELD_TEACHER_NAME]<<teachers[t];
 			}
 		}
 	}
-	//check is subject is in memory
-	tmpList.clear();
+	//check if subject is in memory
+	tmpSet.clear();
 	for(int i=0; i<gt.rules.subjectsList.size(); i++){
 		Subject* s=gt.rules.subjectsList[i];
-		tmpList<<s->name;
+		tmpSet.insert(s->name);
 	}
 	for(int sn=0; sn<fieldList[FIELD_SUBJECT_NAME].size(); sn++){
 		bool add=true;
-		if(tmpList.contains(fieldList[FIELD_SUBJECT_NAME][sn]) || fieldList[FIELD_SUBJECT_NAME][sn]=="")
+		if(tmpSet.contains(fieldList[FIELD_SUBJECT_NAME][sn]) || fieldList[FIELD_SUBJECT_NAME][sn]=="")
 			add=false;
 		if(add){
 			dataWarning<<Import::tr("%1 %2 will be added.", "For instance 'Subject Math will be added', so use singular").arg(fieldName[FIELD_SUBJECT_NAME]).arg(fieldList[FIELD_SUBJECT_NAME][sn]);
-			tmpList<<fieldList[FIELD_SUBJECT_NAME][sn];
-		}			
+			tmpSet.insert(fieldList[FIELD_SUBJECT_NAME][sn]);
+		}
 	}
-	//check is activity tag is in memory
+	//check if activity tag is in memory
 	assert(fieldList[FIELD_ACTIVITY_TAG_NAME].isEmpty());
 	QStringList activityTags;
-	tmpList.clear();
+	tmpSet.clear();
 	for(int i=0; i<gt.rules.activityTagsList.size(); i++){
 		ActivityTag* at=gt.rules.activityTagsList[i];
-		tmpList<<at->name;
+		tmpSet.insert(at->name);
 	}
 	for(int i=0; i<fieldList[FIELD_ACTIVITY_TAGS_SET].size(); i++){
 		line.clear();
@@ -2199,16 +2316,16 @@ void Import::importCSVActivities(QWidget* parent){
 		activityTags=line.split("+", QString::SkipEmptyParts);
 		for(int at=0; at<activityTags.size(); at++){
 			bool add=true;
-			if(tmpList.contains(activityTags[at]) || activityTags[at]=="")
+			if(tmpSet.contains(activityTags[at]) || activityTags[at]=="")
 				add=false;
 			if(add){
 				dataWarning<<Import::tr("%1 %2 will be added.", "For instance 'Subject Math will be added', so use singular").arg(fieldName[FIELD_ACTIVITY_TAG_NAME]).arg(activityTags[at]);
-				tmpList<<activityTags[at];
+				tmpSet.insert(activityTags[at]);
 				fieldList[FIELD_ACTIVITY_TAG_NAME]<<activityTags[at];
 			}
 		}
 	}
-	tmpList.clear();
+	tmpSet.clear();
 	//check if already in memory (end)
 
 	QDialog* newParent2;
@@ -2219,15 +2336,21 @@ void Import::importCSVActivities(QWidget* parent){
 
 	//add teachers
 	//maybe TODO write a function, so also import teacher csv can share this code
+	tmpSet.clear();
+	foreach(Teacher* tch, gt.rules.teachersList)
+		tmpSet.insert(tch->name);
 	int count=0;
 	for(int i=0; i<fieldList[FIELD_TEACHER_NAME].size(); i++){
 		if(!fieldList[FIELD_TEACHER_NAME][i].isEmpty()){
 			Teacher* tch=new Teacher();
 			tch->name=fieldList[FIELD_TEACHER_NAME][i];
-			if(!gt.rules.addTeacher(tch)){
+			assert(!tmpSet.contains(tch->name));
+			if(!gt.rules.addTeacherFast(tch)){
 				delete tch;
+				assert(0);
 			} else
 				count++;
+			tmpSet.insert(tch->name);
 		}
 	}
 	fieldList[FIELD_TEACHER_NAME].clear();
@@ -2235,30 +2358,42 @@ void Import::importCSVActivities(QWidget* parent){
 		lastWarning+=Import::tr("%1 teachers added. Please check teachers form.").arg(count)+"\n";
 	//add subjects
 	//maybe TODO write a function, so also import subjects csv can share this code
+	tmpSet.clear();
+	foreach(Subject* sbj, gt.rules.subjectsList)
+		tmpSet.insert(sbj->name);
 	count=0;
 	for(int i=0; i<fieldList[FIELD_SUBJECT_NAME].size(); i++){
-		if(!fieldList[FIELD_SUBJECT_NAME][i].isEmpty()){
+		if(!fieldList[FIELD_SUBJECT_NAME][i].isEmpty() && !tmpSet.contains(fieldList[FIELD_SUBJECT_NAME][i])){
 			Subject* s=new Subject();
 			s->name=fieldList[FIELD_SUBJECT_NAME][i];
-			if(!gt.rules.addSubject(s)){
+			assert(!tmpSet.contains(s->name));
+			if(!gt.rules.addSubjectFast(s)){
 				delete s;
+				assert(0);
 			} else
 				count++;
+			tmpSet.insert(s->name);
 		}
 	}
 	if(count>0)
 		lastWarning+=Import::tr("%1 subjects added. Please check subjects form.").arg(count)+"\n";
 	//add activity tags
 	//maybe TODO write a function, so also import activity tags csv can share this code
+	tmpSet.clear();
+	foreach(ActivityTag* at, gt.rules.activityTagsList)
+		tmpSet.insert(at->name);
 	count=0;
 	for(int i=0; i<fieldList[FIELD_ACTIVITY_TAG_NAME].size(); i++){
 		if(!fieldList[FIELD_ACTIVITY_TAG_NAME][i].isEmpty()){
 			ActivityTag* a=new ActivityTag();
 			a->name=fieldList[FIELD_ACTIVITY_TAG_NAME][i];
+			assert(!tmpSet.contains(a->name));
 			if(!gt.rules.addActivityTag(a)){
 				delete a;
+				assert(0);
 			} else
 				count++;
+			tmpSet.insert(a->name);
 		}
 	}
 	if(count>0)
@@ -2268,7 +2403,7 @@ void Import::importCSVActivities(QWidget* parent){
 	count=0;
 	int count2=0;
 	int activityid=0; //We set the id of this newly added activity = (the largest existing id + 1)
-	for(int i=0; i<gt.rules.activitiesList.size(); i++){	//TODO: do it the same in addactivityfor.cpp (calculate activityid just one time)
+	for(int i=0; i<gt.rules.activitiesList.size(); i++){	//TODO: do it the same in addactivityform.cpp (calculate activity id just one time)
 		Activity* act=gt.rules.activitiesList[i];
 		if(act->id > activityid)
 			activityid = act->id;
@@ -2282,7 +2417,7 @@ void Import::importCSVActivities(QWidget* parent){
 	progress4.setRange(0, fieldList[FIELD_SUBJECT_NAME].size());
 
 	bool incorrect_bool_consecutive=false;
-
+	
 	for(int i=0; i<fieldList[FIELD_SUBJECT_NAME].size(); i++){
 		progress4.setValue(i);
 		if(progress4.wasCanceled()){
@@ -2292,6 +2427,7 @@ void Import::importCSVActivities(QWidget* parent){
 			ok=false;
 			goto ifUserCanceledProgress4;
 		}
+
 		bool ok2;
 		QString tmpStr=fieldList[FIELD_MIN_DAYS_WEIGHT][i];
 //		double weight=tmpStr.toDouble(&ok2);
@@ -2311,6 +2447,13 @@ void Import::importCSVActivities(QWidget* parent){
 		QStringList students_names;
 		if(!fieldList[FIELD_STUDENTS_SET][i].isEmpty())
 			students_names = fieldList[FIELD_STUDENTS_SET][i].split("+", QString::SkipEmptyParts);
+
+		int numberOfStudents=0;
+		foreach(QString studentsSet, students_names){
+			assert(studentsHash.contains(studentsSet));
+			numberOfStudents+=studentsHash.value(studentsSet)->numberOfStudents;
+		}
+
 		QStringList splitDurationList;
 		splitDurationList.clear();
 		assert(!fieldList[FIELD_SPLIT_DURATION][i].isEmpty());
@@ -2324,7 +2467,8 @@ void Import::importCSVActivities(QWidget* parent){
 			/*QStringList activity_tag_names;
 			activity_tag_names<<activity_tag_name;*/
 			//workaround only. Please rethink. (end)
-			Activity a(gt.rules, activityid, 0, teachers_names, subject_name, activity_tags_names, students_names, duration, duration, active, true, -1);
+			
+			/*Activity a(gt.rules, activityid, 0, teachers_names, subject_name, activity_tags_names, students_names, duration, duration, active, true, -1);
 	
 			bool already_existing=false;
 			for(int i=0; i<gt.rules.activitiesList.size(); i++){
@@ -2334,9 +2478,9 @@ void Import::importCSVActivities(QWidget* parent){
 			}
 			if(already_existing){
 				lastWarning+=Import::tr("Activity %1 already exists. A duplicate activity is imported. Please check the dataset!").arg(activityid)+"\n";
-			}
-			bool tmp=gt.rules.addSimpleActivity(newParent, activityid, 0, teachers_names, subject_name, activity_tags_names,
-				students_names,	duration, duration, active, true, -1);
+			}*/
+			bool tmp=gt.rules.addSimpleActivityFast(newParent, activityid, 0, teachers_names, subject_name, activity_tags_names,
+				students_names, duration, duration, active, true, -1, numberOfStudents);
 			activityid++;
 			if(tmp){
 				count++;
@@ -2387,10 +2531,10 @@ void Import::importCSVActivities(QWidget* parent){
 			/*QStringList activity_tag_names;
 			activity_tag_names<<activity_tag_name;*/
 			//workaround only. Please rethink. (end)
-			bool tmp=gt.rules.addSplitActivity(newParent, activityid, activityid,
+			bool tmp=gt.rules.addSplitActivityFast(newParent, activityid, activityid,
 				teachers_names, subject_name, activity_tags_names, students_names,
 				nsplit, totalduration, durations,
-				active, minD, weight, force, true, -1);
+				active, minD, weight, force, true, -1, numberOfStudents);
 			activityid+=nsplit;
 			if(tmp){
 				count++;
@@ -2411,7 +2555,7 @@ ifUserCanceledProgress4:
 	if(!lastWarning.isEmpty())
 		lastWarning.insert(0,Import::tr("Notes:")+"\n");
 	if(count>0)
-		lastWarning.insert(0,Import::tr("%1 container activities (%2 total activities) added. Please check activity form.").arg(count).arg(count2)+"\n");
+		lastWarning.insert(0,Import::tr("%1 container activities (%2 total activities) added. Please check activities form.").arg(count).arg(count2)+"\n");
 
 	QDialog* newParent3=new LastWarningsDialog(newParent);
 	//DON'T ADD THIS! newParent3->deleteLater();

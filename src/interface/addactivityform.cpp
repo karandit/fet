@@ -8,10 +8,10 @@
 
 /***************************************************************************
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License as        *
+ *   published by the Free Software Foundation, either version 3 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
 
@@ -234,6 +234,22 @@ AddActivityForm::AddActivityForm(QWidget* parent, const QString& teacherName, co
 	}
 	if(activityTagName!="")
 		selectedActivityTagsListWidget->addItem(activityTagName);
+		
+	foreach(Teacher* tch, gt.rules.teachersList)
+		teacherNamesSet.insert(tch->name);
+	foreach(Subject* sbj, gt.rules.subjectsList)
+		subjectNamesSet.insert(sbj->name);
+	foreach(ActivityTag* at, gt.rules.activityTagsList)
+		activityTagNamesSet.insert(at->name);
+	/*foreach(StudentsYear* year, gt.rules.yearsList){
+		numberOfStudentsHash.insert(year->name, year->numberOfStudents);
+		foreach(StudentsGroup* group, year->groupsList){
+			numberOfStudentsHash.insert(group->name, group->numberOfStudents);
+			foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+				numberOfStudentsHash.insert(subgroup->name, subgroup->numberOfStudents);
+			}
+		}
+	}*/
 }
 
 AddActivityForm::~AddActivityForm()
@@ -402,15 +418,14 @@ void AddActivityForm::updateStudentsListWidget()
 				allStudentsListWidget->addItem(begin+stg->name+end);
 				canonicalStudentsSetsNames.append(stg->name);
 			}
-			for(int k=0; k<stg->subgroupsList.size(); k++){
+			if(showSubgroups) for(int k=0; k<stg->subgroupsList.size(); k++){
 				StudentsSubgroup* sts=stg->subgroupsList[k];
-				if(showSubgroups){
-					QString begin=QString("");
-					QString end=QString("");
-					begin=QString(2*INDENT, ' ');
-					allStudentsListWidget->addItem(begin+sts->name+end);
-					canonicalStudentsSetsNames.append(sts->name);
-				}
+
+				QString begin=QString("");
+				QString end=QString("");
+				begin=QString(2*INDENT, ' ');
+				allStudentsListWidget->addItem(begin+sts->name+end);
+				canonicalStudentsSetsNames.append(sts->name);
 			}
 		}
 	}
@@ -573,15 +588,18 @@ void AddActivityForm::addActivity()
 	}
 	else{
 		for(int i=0; i<selectedTeachersListWidget->count(); i++){
-			assert(gt.rules.searchTeacher(selectedTeachersListWidget->item(i)->text())>=0);
+			//assert(gt.rules.searchTeacher(selectedTeachersListWidget->item(i)->text())>=0);
+			assert(teacherNamesSet.contains(selectedTeachersListWidget->item(i)->text()));
 			teachers_names.append(selectedTeachersListWidget->item(i)->text());
 		}
 	}
 
 	//subject
 	QString subject_name=subjectsComboBox->currentText();
-	int subject_index=gt.rules.searchSubject(subject_name);
-	if(subject_index<0){
+	bool found=subjectNamesSet.contains(subject_name);
+	/*int subject_index=gt.rules.searchSubject(subject_name);
+	if(subject_index<0){*/
+	if(!found){
 		QMessageBox::warning(this, tr("FET warning"),
 			tr("Invalid subject"));
 		return;
@@ -589,11 +607,13 @@ void AddActivityForm::addActivity()
 
 	QStringList activity_tags_names;
 	for(int i=0; i<selectedActivityTagsListWidget->count(); i++){
-		assert(gt.rules.searchActivityTag(selectedActivityTagsListWidget->item(i)->text())>=0);
+		//assert(gt.rules.searchActivityTag(selectedActivityTagsListWidget->item(i)->text())>=0);
+		assert(activityTagNamesSet.contains(selectedActivityTagsListWidget->item(i)->text()));
 		activity_tags_names.append(selectedActivityTagsListWidget->item(i)->text());
 	}
 
 	//students
+	int numberOfStudents=0;
 	QStringList students_names;
 	if(selectedStudentsListWidget->count()<=0){
 		int t=QMessageBox::question(this, tr("FET question"),
@@ -605,9 +625,16 @@ void AddActivityForm::addActivity()
 	}
 	else{
 		for(int i=0; i<selectedStudentsListWidget->count(); i++){
-			assert(gt.rules.searchStudentsSet(selectedStudentsListWidget->item(i)->text())!=NULL);
+			//assert(gt.rules.searchStudentsSet(selectedStudentsListWidget->item(i)->text())!=NULL);
+			/*assert(numberOfStudentsHash.contains(selectedStudentsListWidget->item(i)->text()));
+			numberOfStudents+=numberOfStudentsHash.value(selectedStudentsListWidget->item(i)->text());*/
+			assert(gt.rules.permanentStudentsHash.contains(selectedStudentsListWidget->item(i)->text()));
+			numberOfStudents+=gt.rules.permanentStudentsHash.value(selectedStudentsListWidget->item(i)->text())->numberOfStudents;
 			students_names.append(selectedStudentsListWidget->item(i)->text());
 		}
+
+		if(nStudentsSpinBox->value()>=0)
+			numberOfStudents=nStudentsSpinBox->value();
 	}
 
 	if(splitSpinBox->value()==1){ //indivisible activity
@@ -630,7 +657,7 @@ void AddActivityForm::addActivity()
 		}
 		activityid++;
 		Activity a(gt.rules, activityid, 0, teachers_names, subject_name, activity_tags_names, students_names,
-			duration, duration, /*parity,*/ active, (nStudentsSpinBox->value()==-1), nStudentsSpinBox->value());
+			duration, duration, /*parity,*/ active, (nStudentsSpinBox->value()==-1), nStudentsSpinBox->value(), numberOfStudents);
 
 		bool already_existing=false;
 		for(int i=0; i<gt.rules.activitiesList.size(); i++){
@@ -651,9 +678,9 @@ void AddActivityForm::addActivity()
 				return;
 		}
 
-		bool tmp=gt.rules.addSimpleActivity(this, activityid, 0, teachers_names, subject_name, activity_tags_names,
+		bool tmp=gt.rules.addSimpleActivityFast(this, activityid, 0, teachers_names, subject_name, activity_tags_names,
 			students_names, duration, duration, active,
-			(nStudentsSpinBox->value()==-1), nStudentsSpinBox->value());
+			(nStudentsSpinBox->value()==-1), nStudentsSpinBox->value(), numberOfStudents);
 		if(tmp)
 			QMessageBox::information(this, tr("FET information"), tr("Activity added"));
 		else
@@ -712,11 +739,11 @@ void AddActivityForm::addActivity()
 		firstactivityid++;
 
 		int minD=minDayDistanceSpinBox->value();
-		bool tmp=gt.rules.addSplitActivity(this, firstactivityid, firstactivityid,
+		bool tmp=gt.rules.addSplitActivityFast(this, firstactivityid, firstactivityid,
 			teachers_names, subject_name, activity_tags_names, students_names,
 			nsplit, totalduration, durations,
 			active, minD, weight, forceConsecutiveCheckBox->isChecked(),
-			(nStudentsSpinBox->value()==-1), nStudentsSpinBox->value());
+			(nStudentsSpinBox->value()==-1), nStudentsSpinBox->value(), numberOfStudents);
 		if(tmp){
 			if(minD>1 && weight<100.0){
 				SecondMinDaysDialog second(this, minD, weight);

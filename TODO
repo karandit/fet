@@ -3348,3 +3348,25 @@ From Vanyo Georgiev (on forum):
 There are translations of the FET User manual in several languages http://lalescu.ro/liviu/fet/doc/
 
 I think it would be nice, when there is an User manual in the currently set language of the FET interface, by clicking on the Help -> Online -> Help contents the User manual in the  language of the FET interface is opened.
+
+207---------------------------------------------------------
+From Volker Dirr:
+
+someone used split year automatically.
+
+this year he doesn't need all classes again. class / group "5 d" is not
+needed.
+so he deletes group "5 d".
+but in fact that doesn't improve speed (much), because the number of
+subgroups stays the same.
+
+but if there will be a question after removing a group (or year) like "do
+you also want to remove all subgroups of this group in all other groups?",
+then the number of subgroups will be reduced and it will be easier to
+generate.
+
+(Yes, instead of removing a group he could simply use the split year
+automatically once again, but maybe he forgot, he has got a new computer, he
+already changed "presettings" because of other years or the simply fear
+that he will do it incorrect; so he like to use delete group only, because
+it is easier.)

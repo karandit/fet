@@ -15,16 +15,16 @@ File export.cpp
                          : http://www.timetabling.de/
  ***************************************************************************
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License as        *
+ *   published by the Free Software Foundation, either version 3 of the    *
+ *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
 
 // Code contributed by Volker Dirr ( http://www.timetabling.de/ )
 
-//TODO: protect export strings. textquote must be dubbled
+//TODO: protect export strings. textquote must be doubled
 //TODO: count skipped min day constraints?
 //TODO: add cancel button
 
@@ -736,7 +736,7 @@ bool Export::exportCSVActivities(QWidget* parent, QString& lastWarnings, const Q
 				<<textquote<<"Consecutive"<<textquote<<endl;
 
 	//code by Liviu Lalescu (begin)
-	//better detection of min day constraint
+	//better detection of min days constraint
 	QHash<int, int> activitiesRepresentant;
 	QHash<int, int> activitiesNumberOfSubactivities;
 	QHash<int, ConstraintMinDaysBetweenActivities*>activitiesConstraints;
