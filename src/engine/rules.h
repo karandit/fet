@@ -438,6 +438,9 @@ public:
 
 	bool removeGroup(const QString& yearName, const QString& groupName);
 
+	//Remove this group from all the years in which it exists
+	bool purgeGroup(const QString& groupName);
+
 	/**
 	Returns -1 if not found or the index of this group in the groups list
 	of this year.
@@ -463,6 +466,9 @@ public:
 	bool addSubgroupFast(StudentsYear* year, StudentsGroup* group, StudentsSubgroup* subgroup);
 
 	bool removeSubgroup(const QString& yearName, const QString& groupName, const QString& subgroupName);
+
+	//Remove this subgroup from all the groups in which it exists
+	bool purgeSubgroup(const QString& subgroupName);
 
 	/**
 	Returns -1 if not found or the index of the subgroup in the list of subgroups of this group

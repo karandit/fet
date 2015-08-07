@@ -153,6 +153,11 @@ int GeneratePreReconcilableMessage::mediumConfirmation(QWidget* parent, const QS
 	 defaultButton, escapeButton);
 }
 
+void GeneratePreReconcilableMessage::largeInformation(QWidget* parent, const QString& title, const QString& message)
+{
+	LongTextMessageBox::largeInformation(parent, title, message);
+}
+
 void GeneratePreIrreconcilableMessage::information(QWidget* parent, const QString& title, const QString& message)
 {
 	LongTextMessageBox::mediumInformation(parent, title, message);

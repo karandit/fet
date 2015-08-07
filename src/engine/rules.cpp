@@ -40,7 +40,6 @@ using namespace std;
 
 #include <QXmlStreamReader>
 
-#include <QString>
 #include <QTranslator>
 
 #include <QtAlgorithms>
@@ -504,13 +503,15 @@ bool Rules::computeInternalStructure(QWidget* parent)
 			
 			for(int j=0; j<act->iSubgroupsList.count(); j++){
 				int k=act->iSubgroupsList.at(j);
-				assert(!internalSubgroupsList[k]->activitiesForSubgroup.contains(activei));
+				//The test below takes time
+				//assert(!internalSubgroupsList[k]->activitiesForSubgroup.contains(activei));
 				internalSubgroupsList[k]->activitiesForSubgroup.append(activei);
 			}
 			
 			for(int j=0; j<act->iTeachersList.count(); j++){
 				int k=act->iTeachersList.at(j);
-				assert(!internalTeachersList[k]->activitiesForTeacher.contains(activei));
+				//The test below takes time
+				//assert(!internalTeachersList[k]->activitiesForTeacher.contains(activei));
 				internalTeachersList[k]->activitiesForTeacher.append(activei);
 			}
 			
@@ -2085,9 +2086,10 @@ bool Rules::removeGroup(const QString& yearName, const QString& groupName)
 	QSet<StudentsSet*> tmpSet;
 	foreach(StudentsYear* year, yearsList){
 		if(year->name!=yearName){
-			tmpSet.insert(year);
+			//tmpSet.insert(year); useless
 			foreach(StudentsGroup* group, year->groupsList){
-				tmpSet.insert(group);
+				if(group->name==groupName) //we shall not purge groupName, because it still exists in the current year
+					tmpSet.insert(group);
 				foreach(StudentsSubgroup* subgroup, group->subgroupsList)
 					tmpSet.insert(subgroup);
 			}
@@ -2095,7 +2097,7 @@ bool Rules::removeGroup(const QString& yearName, const QString& groupName)
 		else{
 			foreach(StudentsGroup* group, year->groupsList)
 				if(group->name!=groupName){
-					tmpSet.insert(group);
+					//tmpSet.insert(group); //useless
 					foreach(StudentsSubgroup* subgroup, group->subgroupsList)
 						tmpSet.insert(subgroup);
 				}
@@ -2103,7 +2105,8 @@ bool Rules::removeGroup(const QString& yearName, const QString& groupName)
 	}
 	
 	QSet<StudentsSet*> toBeRemoved;
-	toBeRemoved.insert(groupPointer);
+	if(!tmpSet.contains(groupPointer))
+		toBeRemoved.insert(groupPointer);
 	foreach(StudentsSubgroup* subgroup, groupPointer->subgroupsList){
 		assert(!toBeRemoved.contains(subgroup));
 		if(!tmpSet.contains(subgroup))
@@ -2117,6 +2120,62 @@ bool Rules::removeGroup(const QString& yearName, const QString& groupName)
 			yearPointer->groupsList.removeAt(i);
 			break;
 		}
+	
+	foreach(StudentsSet* studentsSet, toBeRemoved){
+		assert(permanentStudentsHash.contains(studentsSet->name));
+		permanentStudentsHash.remove(studentsSet->name);
+	
+		delete studentsSet;
+	}
+		
+	if(toBeRemoved.count()>0)
+		updateConstraintsAfterRemoval();
+	
+	this->internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(this);
+	return true;
+}
+
+bool Rules::purgeGroup(const QString& groupName)
+{
+	StudentsGroup* groupPointer=NULL;
+	foreach(StudentsYear* year, yearsList){
+		int j=-1;
+		for(int i=0; i<year->groupsList.count(); i++){
+			if(year->groupsList.at(i)->name==groupName){
+				j=i;
+				if(groupPointer==NULL)
+					groupPointer=year->groupsList.at(i);
+				else
+					assert(groupPointer==year->groupsList.at(i));
+				break;
+			}
+		}
+		if(j>=0)
+			year->groupsList.removeAt(j);
+	}
+	
+	assert(groupPointer!=NULL);
+
+	//pointers
+	QSet<StudentsSet*> tmpSet;
+	foreach(StudentsYear* year, yearsList)
+		foreach(StudentsGroup* group, year->groupsList)
+			foreach(StudentsSubgroup* subgroup, group->subgroupsList)
+				tmpSet.insert(subgroup);
+	
+	QSet<StudentsSet*> toBeRemoved;
+	if(!tmpSet.contains(groupPointer))
+		toBeRemoved.insert(groupPointer);
+	else
+		assert(0);
+	foreach(StudentsSubgroup* subgroup, groupPointer->subgroupsList){
+		assert(!toBeRemoved.contains(subgroup));
+		if(!tmpSet.contains(subgroup))
+			toBeRemoved.insert(subgroup);
+	}
+	
+	updateActivitiesWhenRemovingStudents(toBeRemoved, false);
 	
 	foreach(StudentsSet* studentsSet, toBeRemoved){
 		assert(permanentStudentsHash.contains(studentsSet->name));
@@ -2275,6 +2334,49 @@ bool Rules::removeSubgroup(const QString& yearName, const QString& groupName, co
 		delete studentsSet;
 	}
 		
+	if(toBeRemoved.count()>0)
+		updateConstraintsAfterRemoval();
+	
+	this->internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(this);
+	return true;
+}
+
+bool Rules::purgeSubgroup(const QString& subgroupName)
+{
+	StudentsSubgroup* subgroupPointer=NULL;
+	foreach(StudentsYear* year, yearsList)
+		foreach(StudentsGroup* group, year->groupsList){
+			int j=-1;
+			for(int i=0; i<group->subgroupsList.count(); i++){
+				if(group->subgroupsList.at(i)->name==subgroupName){
+					j=i;
+					if(subgroupPointer==NULL)
+						subgroupPointer=group->subgroupsList.at(i);
+					else
+						assert(subgroupPointer==group->subgroupsList.at(i));
+					break;
+				}
+			}
+			if(j>=0)
+				group->subgroupsList.removeAt(j);
+		}
+
+	assert(subgroupPointer!=NULL);
+	
+	//pointers
+	QSet<StudentsSet*> toBeRemoved;
+	toBeRemoved.insert(subgroupPointer);
+	
+	updateActivitiesWhenRemovingStudents(toBeRemoved, false);
+	
+	foreach(StudentsSet* studentsSet, toBeRemoved){
+		assert(permanentStudentsHash.contains(studentsSet->name));
+		permanentStudentsHash.remove(studentsSet->name);
+	
+		delete studentsSet;
+	}
+	
 	if(toBeRemoved.count()>0)
 		updateConstraintsAfterRemoval();
 	

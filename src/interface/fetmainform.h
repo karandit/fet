@@ -158,6 +158,7 @@ public slots:
 	void showSubgroupsInComboBoxesToggled(bool checked);
 	void showSubgroupsInActivityPlanningToggled(bool checked);
 	void on_settingsShowShortcutsOnMainWindowAction_toggled();
+	void on_settingsShowToolTipsForConstraintsWithTablesAction_toggled();
 	
 	///write timetables options
 	void on_enableConflictsTimetableAction_toggled();
@@ -184,6 +185,8 @@ public slots:
 	void on_settingsConfirmRemoveRedundantAction_toggled();
 	void on_settingsConfirmSaveTimetableAction_toggled();
 	//////
+
+	void showWarningForSubgroupsWithTheSameActivitiesToggled(bool checked);
 	
 	void enableActivityTagMaxHoursDailyToggled(bool checked);
 	void enableStudentsMaxGapsPerDayToggled(bool checked);

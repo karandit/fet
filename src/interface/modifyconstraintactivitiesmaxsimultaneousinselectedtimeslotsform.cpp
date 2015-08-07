@@ -86,15 +86,6 @@ ModifyConstraintActivitiesMaxSimultaneousInSelectedTimeSlotsForm::ModifyConstrai
 		selectedTimesTable->setVerticalHeaderItem(i, item);
 	}
 
-	for(int i=0; i<gt.rules.nHoursPerDay; i++)
-		for(int j=0; j<gt.rules.nDaysPerWeek; j++){
-			QTableWidgetItem* item=new QTableWidgetItem(NO);
-			item->setTextAlignment(Qt::AlignCenter);
-			item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-			colorItem(item);
-			selectedTimesTable->setItem(i, j, item);
-		}
-		
 	//bool currentMatrix[MAX_HOURS_PER_DAY][MAX_DAYS_PER_WEEK];
 	Matrix2D<bool> currentMatrix;
 	currentMatrix.resize(gt.rules.nHoursPerDay, gt.rules.nDaysPerWeek);
@@ -117,6 +108,8 @@ ModifyConstraintActivitiesMaxSimultaneousInSelectedTimeSlotsForm::ModifyConstrai
 			QTableWidgetItem* item = new QTableWidgetItem();
 			item->setTextAlignment(Qt::AlignCenter);
 			item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+			if(SHOW_TOOLTIPS_FOR_CONSTRAINTS_WITH_TABLES)
+				item->setToolTip(gt.rules.daysOfTheWeek[j]+QString("\n")+gt.rules.hoursOfTheDay[i]);
 			selectedTimesTable->setItem(i, j, item);
 
 			if(!currentMatrix[i][j])

@@ -30,6 +30,7 @@ public:
 public slots:
 	void addGroup();
 	void removeGroup();
+	void purgeGroup();
 	void modifyGroup();
 	
 	void sortGroups();

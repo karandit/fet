@@ -22,6 +22,8 @@
 #include "timetable.h"
 #include "fet.h"
 
+#include "longtextmessagebox.h"
+
 #include <QMessageBox>
 
 #include <QListWidget>
@@ -32,6 +34,10 @@
 #include <QSettings>
 #include <QObject>
 #include <QMetaObject>
+
+#include <QSet>
+#include <QList>
+#include <QPair>
 
 extern const QString COMPANY;
 extern const QString PROGRAM;
@@ -52,10 +58,11 @@ SubgroupsForm::SubgroupsForm(QWidget* parent): QDialog(parent)
 	connect(groupsListWidget, SIGNAL(currentTextChanged(const QString&)), this, SLOT(groupChanged(const QString&)));
 	connect(addSubgroupPushButton, SIGNAL(clicked()), this, SLOT(addSubgroup()));
 	connect(removeSubgroupPushButton, SIGNAL(clicked()), this, SLOT(removeSubgroup()));
+	connect(purgeSubgroupPushButton, SIGNAL(clicked()), this, SLOT(purgeSubgroup()));
 	connect(closePushButton, SIGNAL(clicked()), this, SLOT(close()));
 	connect(subgroupsListWidget, SIGNAL(currentTextChanged(const QString&)), this, SLOT(subgroupChanged(const QString&)));
 	connect(modifySubgroupPushButton, SIGNAL(clicked()), this, SLOT(modifySubgroup()));
-	connect(removeSubgroupPushButton_2, SIGNAL(clicked()), this, SLOT(sortSubgroups()));
+	connect(sortSubgroupsPushButton, SIGNAL(clicked()), this, SLOT(sortSubgroups()));
 	connect(activateStudentsPushButton, SIGNAL(clicked()), this, SLOT(activateStudents()));
 	connect(deactivateStudentsPushButton, SIGNAL(clicked()), this, SLOT(deactivateStudents()));
 	connect(subgroupsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(modifySubgroup()));
@@ -144,11 +151,38 @@ void SubgroupsForm::removeSubgroup()
 	QString subgroupName=subgroupsListWidget->currentItem()->text();
 	int subgroupIndex=gt.rules.searchSubgroup(yearName, groupName, subgroupName);
 	assert(subgroupIndex>=0);
+	
+	QList<QPair<QString, QString> > yearsGroupsContainingSubgroup_List;
+	//QSet<QPair<QString, QString> > yearsGroupsContainingSubgroup_Set;
+	foreach(StudentsYear* year, gt.rules.yearsList)
+		foreach(StudentsGroup* group, year->groupsList)
+			foreach(StudentsSubgroup* subgroup, group->subgroupsList)
+				if(subgroup->name==subgroupName)
+					yearsGroupsContainingSubgroup_List.append(QPair<QString, QString>(year->name, group->name));
+			
+	assert(yearsGroupsContainingSubgroup_List.count()>=1);
+	QString s;
+	if(yearsGroupsContainingSubgroup_List.count()==1)
+		s=tr("This subgroup exists only in year %1, group %2. This means that"
+		 " all the related activities and constraints will be removed. Do you want to continue?").arg(yearName).arg(groupName);
+	else{
+		s=tr("This subgroup exists in more places, listed below. It will only be removed from the current year/group,"
+		 " and the related activities and constraints will not be removed. Do you want to continue?");
+		s+="\n";
+		QPair<QString, QString> pair;
+		foreach(pair, yearsGroupsContainingSubgroup_List)
+			s+=QString("\n")+pair.first+QString(", ")+pair.second;
+	}
+	
+	int t=LongTextMessageBox::mediumConfirmation(this, tr("FET confirmation"), s,
+		tr("Yes"), tr("No"), QString(), 0, 1);
+	if(t==1)
+		return;
 
-	if(QMessageBox::warning( this, tr("FET"),
+	/*if(QMessageBox::warning( this, tr("FET"),
 		tr("Are you sure you want to delete subgroup %1 and all related activities and constraints?").arg(subgroupName),
 		tr("Yes"), tr("No"), 0, 0, 1 ) == 1)
-		return;
+		return;*/
 
 	bool tmp=gt.rules.removeSubgroup(yearName, groupName, subgroupName);
 	assert(tmp);
@@ -168,9 +202,91 @@ void SubgroupsForm::removeSubgroup()
 			subgroupTextEdit->setPlainText(QString(""));
 	}
 
-	if(gt.rules.searchStudentsSet(subgroupName)!=NULL)
+	/*if(gt.rules.searchStudentsSet(subgroupName)!=NULL)
 		QMessageBox::information( this, tr("FET"), tr("This subgroup still exists into another group. "
-		"The related activities and constraints were not removed"));
+		"The related activities and constraints were not removed"));*/
+}
+
+void SubgroupsForm::purgeSubgroup()
+{
+	if(yearsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected year"));
+		return;
+	}
+	QString yearName=yearsListWidget->currentItem()->text();
+	int yearIndex=gt.rules.searchYear(yearName);
+	assert(yearIndex>=0);
+
+	if(groupsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected group"));
+		return;
+	}
+	QString groupName=groupsListWidget->currentItem()->text();
+	int groupIndex=gt.rules.searchGroup(yearName, groupName);
+	assert(groupIndex>=0);
+
+	if(subgroupsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected subgroup"));
+		return;
+	}
+	
+	QString subgroupName=subgroupsListWidget->currentItem()->text();
+	int subgroupIndex=gt.rules.searchSubgroup(yearName, groupName, subgroupName);
+	assert(subgroupIndex>=0);
+	
+	QList<QPair<QString, QString> > yearsGroupsContainingSubgroup_List;
+	//QSet<QPair<QString, QString> > yearsGroupsContainingSubgroup_Set;
+	foreach(StudentsYear* year, gt.rules.yearsList)
+		foreach(StudentsGroup* group, year->groupsList)
+			foreach(StudentsSubgroup* subgroup, group->subgroupsList)
+				if(subgroup->name==subgroupName)
+					yearsGroupsContainingSubgroup_List.append(QPair<QString, QString>(year->name, group->name));
+			
+	assert(yearsGroupsContainingSubgroup_List.count()>=1);
+	QString s;
+	if(yearsGroupsContainingSubgroup_List.count()==1)
+		s=tr("This subgroup exists only in year %1, group %2. All the related activities and constraints "
+		 "will be removed. Do you want to continue?").arg(yearName).arg(groupName);
+	else{
+		s=tr("This subgroup exists in more places, listed below. It will be removed from all these places."
+		 " All the related activities and constraints will be removed. Do you want to continue?");
+		s+="\n";
+		QPair<QString, QString> pair;
+		foreach(pair, yearsGroupsContainingSubgroup_List)
+			s+=QString("\n")+pair.first+QString(", ")+pair.second;
+	}
+	
+	int t=LongTextMessageBox::mediumConfirmation(this, tr("FET confirmation"), s,
+		tr("Yes"), tr("No"), QString(), 0, 1);
+	if(t==1)
+		return;
+
+	/*if(QMessageBox::warning( this, tr("FET"),
+		tr("Are you sure you want to delete subgroup %1 and all related activities and constraints?").arg(subgroupName),
+		tr("Yes"), tr("No"), 0, 0, 1 ) == 1)
+		return;*/
+
+	bool tmp=gt.rules.purgeSubgroup(subgroupName);
+	assert(tmp);
+	if(tmp){
+		int q=subgroupsListWidget->currentRow();
+		
+		subgroupsListWidget->setCurrentRow(-1);
+		QListWidgetItem* item;
+		item=subgroupsListWidget->takeItem(q);
+		delete item;
+		
+		if(q>=subgroupsListWidget->count())
+			q=subgroupsListWidget->count()-1;
+		if(q>=0)
+			subgroupsListWidget->setCurrentRow(q);
+		else
+			subgroupTextEdit->setPlainText(QString(""));
+	}
+
+	/*if(gt.rules.searchStudentsSet(subgroupName)!=NULL)
+		QMessageBox::information( this, tr("FET"), tr("This subgroup still exists into another group. "
+		"The related activities and constraints were not removed"));*/
 }
 
 void SubgroupsForm::yearChanged(const QString &yearName)

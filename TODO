@@ -3370,3 +3370,60 @@ automatically once again, but maybe he forgot, he has got a new computer, he
 already changed "presettings" because of other years or the simply fear
 that he will do it incorrect; so he like to use delete group only, because
 it is easier.)
+
+208---------------------------------------------------------
+From Volker Dirr:
+
+Code more checks to warn users about conflicting constraints before generating. For example:
+min days between activities and consecutive/grouped activities constraints.
+
+209---------------------------------------------------------
+From andrealva:
+
+He is referring to the facility to sort constraints by comments, which was dropped (being considered useless) in FET-5.25.0 and subsequent versions:
+
+One use though, which can be given to sorting the comments, is to arrange together all the constraints related to a teacher(s) or a class(es) ...
+it would help to quickly identify them without using the filter ....
+
+210--------------------------DONE---------------------------
+From dotosouza:
+
+DONE since FET-5.26.1 on 6 February 2015 --> Since a min days between activities constraints with consecutive if same day true cannot place
+activities over a break, he suggests that the constraint of type break to be removed from FET. Also because activities with duration >=2 cannot
+be split over a break. He had impossible timetable because he didn't know this.
+
+Or add a warning about this in the break time constraint dialog. <-- DONE, it was added a warning in the break constraints dialog.
+
+211---------------------------------------------------------
+From Volker Dirr:
+
+FET asks if the user is sure he wants to add an activity without students. Maybe the question must also
+include something like "it is correct if you want to add a teacher meeting."
+
+So that the user is not deterred by the warning in situations in which an activity without students is OK.
+
+212---------------------------------------------------------
+From Bob Hairgrove (on forum):
+
+Colors can be enabled for highlighting the cells. However, looking at this function in the FET source code, it is clear that these are hard-coded values:
+
+Code:
+
+void AddConstraintStudentsSetNotAvailableTimesForm::colorItem(QTableWidgetItem* item)
+{
+	if(USE_GUI_COLORS){
+		if(item->text()==NO)
+			item->setBackground(QBrush(Qt::darkGreen));
+		else
+			item->setBackground(QBrush(Qt::darkRed));
+		item->setForeground(QBrush(Qt::lightGray));
+	}
+}
+
+I think the colors should be configurable. For example, I would like to use a light green background for available times and white for not available times in the "student set not available" dialog, whereas for the corresponding teacher dialog, perhaps different colors could be used (white = available; dark grey = not available). In case the colors are used, you could hide the "X" by setting the foreground color to the same as the background color since it would be superfluous. That way, you could keep the rest of the functionality the way it is.
+
+213---------------------------------------------------------
+From Volker Dirr:
+
+if a user removes a subgroup FET should also ask if this subgroup should
+be removed everywhere.

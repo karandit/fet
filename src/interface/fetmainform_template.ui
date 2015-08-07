@@ -1221,6 +1221,8 @@
      </property>
      <addaction name="randomSeedAction"/>
      <addaction name="separator"/>
+     <addaction name="showWarningForSubgroupsWithTheSameActivitiesAction"/>
+     <addaction name="separator"/>
      <addaction name="enableActivityTagMaxHoursDailyAction"/>
      <addaction name="enableStudentsMaxGapsPerDayAction"/>
      <addaction name="showWarningForNotPerfectConstraintsAction"/>
@@ -1238,6 +1240,8 @@
      <addaction name="settingsShowShortcutsOnMainWindowAction"/>
      <addaction name="separator"/>
      <addaction name="settingsUseColorsAction"/>
+     <addaction name="separator"/>
+     <addaction name="settingsShowToolTipsForConstraintsWithTablesAction"/>
      <addaction name="separator"/>
      <addaction name="settingsShowSubgroupsInComboBoxesAction"/>
      <addaction name="settingsShowSubgroupsInActivityPlanningAction"/>
@@ -2584,6 +2588,28 @@
    </property>
    <property name="text">
     <string>Soft conflicts</string>
+   </property>
+  </action>
+  <action name="settingsShowToolTipsForConstraintsWithTablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show tool tips for constraints with tables</string>
+   </property>
+  </action>
+  <action name="showWarningForSubgroupsWithTheSameActivitiesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Warn subgroups with the same activities</string>
    </property>
   </action>
  </widget>

@@ -1,4 +1,4 @@
-This is FET version 5.26.0
+This is FET version 5.26.1
 
 
 Program description:
@@ -16,7 +16,7 @@ Requirements:
 
 	FET is created in the following environment: openSUSE 13.2 GNU/Linux distribution, Linux 3.16.7, Xfce 4.10,
 	Midnight Commander 4.8.13, KDiff3 0.9.97, Qt 5.4.0, gcc 4.8.3, g++ 4.8.3, make 4.0, sed 4.2.2,
-	Valgrind 3.10.0, Coverity Scan 7.5.0, Cppcheck 1.68, other great free tools.
+	Valgrind 3.10.0, Coverity Scan 7.6.0, Cppcheck 1.68, other great free tools.
 	FET can be run on any platform supported by the free software Qt (GNU/Linux, Windows, Mac OS X).
 
 	GNU/Linux, Mac OS X:
@@ -225,7 +225,7 @@ Running FET:
 	 [--writetimetablessubjects=wt13] [--writetimetablesactivities=wt14]
 	 [--printactivitytags=a] [--printnotavailable=u] [--printbreak=b] [--dividetimeaxisbydays=v] [--duplicateverticalheaders=e]
 	 [--printsimultaneousactivities=w] [--randomseedx=rx --randomseedy=ry] [--warnifusingnotperfectconstraints=s]
-	 [--warnifusingstudentsminhoursdailywithallowemptydays=p] [--verbose=r]",
+	 [--warnifusingstudentsminhoursdailywithallowemptydays=p] [--warnsubgroupswiththesameactivities=ssa] [--verbose=r]",
 	where	x is the input file, for instance "data.fet"
 			d is the path to results directory, without trailing slash or backslash (default is current working path).
 				Make sure you have write permissions there.
@@ -251,6 +251,8 @@ Running FET:
 				(activity tag max hours daily or students max gaps per day) (default true).
 			p is either true or false, represents whether you want a message box to be shown, with a warning, if the input file contains nonstandard constraints
 				students min hours daily with allow empty days (default true).
+			ssa is either true or false, represents whether you want a message box to be show, with a warning, if your input file contains subgroups which have
+				the same activities (default true).
 			r is either true or false, represents whether you want additional generation messages and other messages to be shown on the command line (default false).
 
 	Alternatively, you can run "fet-cl --version [--outputdir=d]" to get the current FET version.

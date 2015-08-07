@@ -746,6 +746,11 @@ void SplitYearForm::help()
 	s+=tr("Maybe an alternative to dividing a year into many categories/subgroups would be to enter individual students as FET subgroups and add into"
 		" each group the corresponding subgroups. But this is hard to do from the FET interface - maybe a solution would be to use an automatic"
 		" tool to convert your instition data into a file in .fet format.");
+	s+=" ";
+	s+=tr("Or you might use the FET feature to import students sets from comma separated values (CSV) files.");
+	s+=" ";
+	s+=tr("In such cases (individual students as FET subgroups), remember that a smaller number of total subgroups means faster generation time, so"
+		" you might want to consider a single subgroup for two or more students who have the exact same activities and constraints.");
 	
 	//show the message in a dialog
 	QDialog dialog(this);

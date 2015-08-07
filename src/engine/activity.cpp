@@ -23,6 +23,8 @@ File activity.cpp
 #include "activity.h"
 #include "rules.h"
 
+#include <QSet>
+
 QString getActivityDetailedDescription(Rules& r, int id); //Implemented in timeconstraint.cpp
 
 GroupActivitiesInInitialOrderItem::GroupActivitiesInInitialOrderItem()
@@ -314,6 +316,7 @@ void Activity::computeInternalStructure(Rules& r)
 	//teachers
 	//this->nTeachers=0;
 	this->iTeachersList.clear();
+	QSet<int> iTeachersSet;
 	for(QStringList::Iterator it=this->teachersNames.begin(); it!=this->teachersNames.end(); it++){
 		int tmp=r.teachersHash.value(*it, -1);
 		/*for(tmp=0; tmp<r.nInternalTeachers; tmp++){
@@ -323,7 +326,10 @@ void Activity::computeInternalStructure(Rules& r)
 		assert(tmp>=0 && tmp < r.nInternalTeachers);
 		//assert(this->nTeachers<MAX_TEACHERS_PER_ACTIVITY);
 		//this->teachers[this->nTeachers++]=tmp;
-		this->iTeachersList.append(tmp);
+		if(!iTeachersSet.contains(tmp)){
+			iTeachersSet.insert(tmp);
+			this->iTeachersList.append(tmp);
+		}
 	}
 
 	//subjects
@@ -343,6 +349,7 @@ void Activity::computeInternalStructure(Rules& r)
 	//students	
 	//this->nSubgroups=0;
 	this->iSubgroupsList.clear();
+	QSet<int> iSubgroupsSet;
 	for(QStringList::Iterator it=this->studentsNames.begin(); it!=this->studentsNames.end(); it++){
 		StudentsSet* ss=r.studentsHash.value(*it, NULL); //r.searchAugmentedStudentsSet(*it);
 		assert(ss);
@@ -357,7 +364,7 @@ void Activity::computeInternalStructure(Rules& r)
 			//assert(this->nSubgroups<MAX_SUBGROUPS_PER_ACTIVITY);
 			
 			bool duplicate=false;
-			if(this->iSubgroupsList.contains(tmp))
+			if(iSubgroupsSet.contains(tmp))
 			//for(int j=0; j<this->nSubgroups; j++)
 			//	if(this->subgroups[j]==tmp)
 					duplicate=true;
@@ -367,9 +374,11 @@ void Activity::computeInternalStructure(Rules& r)
 					.arg(this->id);
 				cout<<qPrintable(s)<<endl;*/
 			}
-			else
-				this->iSubgroupsList.append(tmp);
+			else{
 				//this->subgroups[this->nSubgroups++]=tmp;
+				iSubgroupsSet.insert(tmp);
+				this->iSubgroupsList.append(tmp);
+			}
 		}
 		else if(ss->type==STUDENTS_GROUP){
 			StudentsGroup* stg=(StudentsGroup*)ss;
@@ -385,7 +394,7 @@ void Activity::computeInternalStructure(Rules& r)
 				//assert(this->nSubgroups<MAX_SUBGROUPS_PER_ACTIVITY);
 
 				bool duplicate=false;
-				if(this->iSubgroupsList.contains(tmp))
+				if(iSubgroupsSet.contains(tmp))
 				//for(int j=0; j<this->nSubgroups; j++)
 				//	if(this->subgroups[j]==tmp)
 						duplicate=true;
@@ -395,9 +404,11 @@ void Activity::computeInternalStructure(Rules& r)
 						.arg(this->id);
 					cout<<qPrintable(s)<<endl;*/
 				}
-				else
+				else{
 					//this->subgroups[this->nSubgroups++]=tmp;
+					iSubgroupsSet.insert(tmp);
 					this->iSubgroupsList.append(tmp);
+				}
 			}
 		}
 		else if(ss->type==STUDENTS_YEAR){
@@ -416,7 +427,7 @@ void Activity::computeInternalStructure(Rules& r)
 					//assert(this->nSubgroups<MAX_SUBGROUPS_PER_ACTIVITY);
 
 					bool duplicate=false;
-					if(this->iSubgroupsList.contains(tmp))
+					if(iSubgroupsSet.contains(tmp))
 					//for(int j=0; j<this->nSubgroups; j++)
 					//	if(this->subgroups[j]==tmp)
 							duplicate=true;
@@ -428,6 +439,7 @@ void Activity::computeInternalStructure(Rules& r)
 					}
 					else{
 						//this->subgroups[this->nSubgroups++]=tmp;
+						iSubgroupsSet.insert(tmp);
 						this->iSubgroupsList.append(tmp);
 					}
 				}

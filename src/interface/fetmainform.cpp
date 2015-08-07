@@ -297,10 +297,14 @@ bool SHOW_SUBGROUPS_IN_ACTIVITY_PLANNING=true;
 
 bool SHOW_SHORTCUTS_ON_MAIN_WINDOW=true;
 
+bool SHOW_TOOLTIPS_FOR_CONSTRAINTS_WITH_TABLES=false;
+
 bool ENABLE_ACTIVITY_TAG_MAX_HOURS_DAILY=false;
 bool ENABLE_STUDENTS_MAX_GAPS_PER_DAY=false;
 
 bool SHOW_WARNING_FOR_NOT_PERFECT_CONSTRAINTS=true;
+
+bool SHOW_WARNING_FOR_SUBGROUPS_WITH_THE_SAME_ACTIVITIES=true;
 
 bool ENABLE_STUDENTS_MIN_HOURS_DAILY_WITH_ALLOW_EMPTY_DAYS=false;
 
@@ -547,6 +551,9 @@ FetMainForm::FetMainForm()
 	settingsShowShortcutsOnMainWindowAction->setCheckable(true);
 	settingsShowShortcutsOnMainWindowAction->setChecked(SHOW_SHORTCUTS_ON_MAIN_WINDOW);
 	
+	settingsShowToolTipsForConstraintsWithTablesAction->setCheckable(true);
+	settingsShowToolTipsForConstraintsWithTablesAction->setChecked(SHOW_TOOLTIPS_FOR_CONSTRAINTS_WITH_TABLES);
+	
 	checkForUpdatesAction->setCheckable(true);
 	checkForUpdatesAction->setChecked(checkForUpdates);
 	
@@ -641,6 +648,8 @@ FetMainForm::FetMainForm()
 	LockUnlock::computeLockedUnlockedActivitiesTimeSpace();
 	LockUnlock::increaseCommunicationSpinBox();
 	
+	showWarningForSubgroupsWithTheSameActivitiesAction->setCheckable(true);
+	
 	enableActivityTagMaxHoursDailyAction->setCheckable(true);
 	enableStudentsMaxGapsPerDayAction->setCheckable(true);
 	showWarningForNotPerfectConstraintsAction->setCheckable(true);
@@ -651,6 +660,8 @@ FetMainForm::FetMainForm()
 	enableGroupActivitiesInInitialOrderAction->setCheckable(true);
 	showWarningForGroupActivitiesInInitialOrderAction->setCheckable(true);
 	
+	showWarningForSubgroupsWithTheSameActivitiesAction->setChecked(SHOW_WARNING_FOR_SUBGROUPS_WITH_THE_SAME_ACTIVITIES);
+
 	enableActivityTagMaxHoursDailyAction->setChecked(ENABLE_ACTIVITY_TAG_MAX_HOURS_DAILY);
 	enableStudentsMaxGapsPerDayAction->setChecked(ENABLE_STUDENTS_MAX_GAPS_PER_DAY);
 	showWarningForNotPerfectConstraintsAction->setChecked(SHOW_WARNING_FOR_NOT_PERFECT_CONSTRAINTS);
@@ -661,6 +672,8 @@ FetMainForm::FetMainForm()
 	enableGroupActivitiesInInitialOrderAction->setChecked(ENABLE_GROUP_ACTIVITIES_IN_INITIAL_ORDER);
 	showWarningForGroupActivitiesInInitialOrderAction->setChecked(SHOW_WARNING_FOR_GROUP_ACTIVITIES_IN_INITIAL_ORDER);
 	
+	connect(showWarningForSubgroupsWithTheSameActivitiesAction, SIGNAL(toggled(bool)), this, SLOT(showWarningForSubgroupsWithTheSameActivitiesToggled(bool)));
+
 	connect(settingsShowSubgroupsInComboBoxesAction, SIGNAL(toggled(bool)), this, SLOT(showSubgroupsInComboBoxesToggled(bool)));
 	connect(settingsShowSubgroupsInActivityPlanningAction, SIGNAL(toggled(bool)), this, SLOT(showSubgroupsInActivityPlanningToggled(bool)));
 	
@@ -837,6 +850,11 @@ void FetMainForm::on_settingsShowShortcutsOnMainWindowAction_toggled()
 {
 	SHOW_SHORTCUTS_ON_MAIN_WINDOW=settingsShowShortcutsOnMainWindowAction->isChecked();
 	tabWidget->setVisible(SHOW_SHORTCUTS_ON_MAIN_WINDOW);
+}
+
+void FetMainForm::on_settingsShowToolTipsForConstraintsWithTablesAction_toggled()
+{
+	SHOW_TOOLTIPS_FOR_CONSTRAINTS_WITH_TABLES=settingsShowToolTipsForConstraintsWithTablesAction->isChecked();
 }
 
 void FetMainForm::on_settingsDivideTimetablesByDaysAction_toggled()
@@ -1362,17 +1380,22 @@ bool FetMainForm::fileSaveAs()
 		 QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
 		 	return false;
 			
-	INPUT_FILENAME_XML = s;
-	gt.rules.write(this, INPUT_FILENAME_XML);
+	bool t=gt.rules.write(this, s);
+	if(t){
+		INPUT_FILENAME_XML = s;
 	
-	gt.rules.modified=true; //force update of the modified flag of the main window
-	setRulesUnmodifiedAndOtherThings(&gt.rules);
+		gt.rules.modified=true; //force update of the modified flag of the main window
+		setRulesUnmodifiedAndOtherThings(&gt.rules);
 	
-	setCurrentFile(INPUT_FILENAME_XML);
+		setCurrentFile(INPUT_FILENAME_XML);
 	
-	statusBar()->showMessage(tr("File saved"), STATUS_BAR_MILLISECONDS);
-	
-	return true;
+		statusBar()->showMessage(tr("File saved"), STATUS_BAR_MILLISECONDS);
+		
+		return true;
+	}
+	else{
+		return false;
+	}
 }
 
 void FetMainForm::on_fileSaveAsAction_triggered()
@@ -1705,15 +1728,20 @@ bool FetMainForm::fileSave()
 	if(INPUT_FILENAME_XML.isEmpty())
 		return fileSaveAs();
 	else{
-		gt.rules.write(this, INPUT_FILENAME_XML);
-
-		gt.rules.modified=true; //force update of the modified flag of the main window
-		setRulesUnmodifiedAndOtherThings(&gt.rules);
+		bool t=gt.rules.write(this, INPUT_FILENAME_XML);
 		
-		setCurrentFile(INPUT_FILENAME_XML);
-
-		statusBar()->showMessage(tr("File saved"), STATUS_BAR_MILLISECONDS);
-		return true;
+		if(t){
+			gt.rules.modified=true; //force update of the modified flag of the main window
+			setRulesUnmodifiedAndOtherThings(&gt.rules);
+		
+			setCurrentFile(INPUT_FILENAME_XML);
+	
+			statusBar()->showMessage(tr("File saved"), STATUS_BAR_MILLISECONDS);
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 }
 
@@ -1974,6 +2002,10 @@ void FetMainForm::on_helpSettingsAction_triggered()
 	s+=tr("(Also the conflicts timetable might take long to write, if the file is large.)");
 	s+=" ";
 	s+=tr("After that, you can re-enable writing of the timetables and re-generate.");
+
+	s+="\n\n";
+	s+=tr("Show tool tips for constraints with tables: in the add/modify constraint dialogs which use tables, like the 'not available times' ones,"
+		" each table cell will have a tool tip to show the current day/hour (column/row name).");
 	
 	LongTextMessageBox::largeInformation(this, tr("FET information"), s);
 }
@@ -3983,6 +4015,10 @@ void FetMainForm::on_settingsRestoreDefaultsAction_triggered()
 	s+=tr("44")+QString(". ")+tr("Write on disk the %1 timetables will be %2", "%1 is a category of timetables, like XML or subgroups timetables, %2 is true or false")
 	 .arg(tr("activities")).arg(tr("true"));
 	s+="\n";
+	s+=tr("45")+QString(". ")+tr("Show tool tips for constraints with tables will be %1", "%1 is true or false").arg(tr("false"));
+	s+="\n";
+	s+=tr("46")+QString(". ")+tr("Show warning for subgroups with the same activities will be %1", "%1 is true or false").arg(tr("true"));
+	s+="\n";
 	
 	switch( LongTextMessageBox::largeConfirmation( this, tr("FET confirmation"), s,
 	 tr("&Yes"), tr("&No"), QString(), 0 , 1 ) ) {
@@ -4014,8 +4050,11 @@ void FetMainForm::on_settingsRestoreDefaultsAction_triggered()
 	SHOW_SHORTCUTS_ON_MAIN_WINDOW=true;
 	settingsShowShortcutsOnMainWindowAction->setChecked(SHOW_SHORTCUTS_ON_MAIN_WINDOW);
 	tabWidget->setVisible(SHOW_SHORTCUTS_ON_MAIN_WINDOW);
-	
+
 	tabWidget->setCurrentIndex(0);
+	
+	SHOW_TOOLTIPS_FOR_CONSTRAINTS_WITH_TABLES=false;
+	settingsShowToolTipsForConstraintsWithTablesAction->setChecked(SHOW_TOOLTIPS_FOR_CONSTRAINTS_WITH_TABLES);
 	
 	USE_GUI_COLORS=false;
 	settingsUseColorsAction->setChecked(USE_GUI_COLORS);
@@ -4077,6 +4116,9 @@ void FetMainForm::on_settingsRestoreDefaultsAction_triggered()
 	///////
 
 	///////////
+	SHOW_WARNING_FOR_SUBGROUPS_WITH_THE_SAME_ACTIVITIES=true;
+	showWarningForSubgroupsWithTheSameActivitiesAction->setChecked(SHOW_WARNING_FOR_SUBGROUPS_WITH_THE_SAME_ACTIVITIES);
+	
 	ENABLE_ACTIVITY_TAG_MAX_HOURS_DAILY=false;
 	enableActivityTagMaxHoursDailyAction->setChecked(ENABLE_ACTIVITY_TAG_MAX_HOURS_DAILY);
 
@@ -4425,6 +4467,28 @@ void FetMainForm::enableStudentsMaxGapsPerDayToggled(bool checked)
 	setEnabledIcon(dataTimeConstraintsStudentsMaxGapsPerDayAction, ENABLE_STUDENTS_MAX_GAPS_PER_DAY);
 }
 
+void FetMainForm::showWarningForSubgroupsWithTheSameActivitiesToggled(bool checked)
+{
+	if(checked==false){
+		QString s=tr("It is recommended to keep this warning active, but if you really want, you can disable it.");
+		s+="\n\n";
+		s+=tr("Disable it only if you know what you are doing.");
+		s+="\n\n";
+		s+=tr("Are you sure you want to disable it?");
+	
+		QMessageBox::StandardButton b=QMessageBox::warning(this, tr("FET warning"), s, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+	
+		if(b!=QMessageBox::Yes){
+			disconnect(showWarningForSubgroupsWithTheSameActivitiesAction, SIGNAL(toggled(bool)), this, SLOT(showWarningForSubgroupsWithTheSameActivitiesToggled(bool)));
+			showWarningForSubgroupsWithTheSameActivitiesAction->setChecked(true);
+			connect(showWarningForSubgroupsWithTheSameActivitiesAction, SIGNAL(toggled(bool)), this, SLOT(showWarningForSubgroupsWithTheSameActivitiesToggled(bool)));
+			return;
+		}
+	}
+	
+	SHOW_WARNING_FOR_SUBGROUPS_WITH_THE_SAME_ACTIVITIES=checked;
+}
+
 void FetMainForm::showWarningForNotPerfectConstraintsToggled(bool checked)
 {
 	if(checked==false){
@@ -4735,6 +4799,8 @@ void FetMainForm::on_shortcutSaveAsPushButton_clicked()
 }
 
 #else
+bool SHOW_WARNING_FOR_SUBGROUPS_WITH_THE_SAME_ACTIVITIES=true;
+
 bool SHOW_WARNING_FOR_NOT_PERFECT_CONSTRAINTS=true;
 bool SHOW_WARNING_FOR_STUDENTS_MIN_HOURS_DAILY_WITH_ALLOW_EMPTY_DAYS=true;
 bool SHOW_WARNING_FOR_GROUP_ACTIVITIES_IN_INITIAL_ORDER=true;

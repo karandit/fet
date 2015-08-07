@@ -1765,3 +1765,12 @@ Versions 5.26.0 - 5.26.v
 	- Leak and crash bug fixes (not usually met).
 	- Some minor strings improvements.
 	- Code cleanup.
+- Version 5.26.1
+	- Crash bug fix (probably never met, when using overlapping years) and improvements when removing students sets. Now you can completely remove a
+	subgroup/group from a single button.
+	- Added a test to report subgroups which have the same activities, so that the user can make generation faster by removing equivalent subgroups
+	(if the user checks that the subgroups also have the same constraints).
+	- Added a selectable option to show tool tips in the add/modify constraint dialogs which use tables (the tool tip is the day and the hour under
+	the current cursor position). Suggested by Bob Hairgrove.
+	- Updated the German translation, by Bob Hairgrove.
+	- Code cleanup.

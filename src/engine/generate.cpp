@@ -4058,7 +4058,7 @@ impossiblenotoverlapping:
 		
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-		//allowed from 2 activities consecutive
+		//allowed from two activities consecutive
 		oktwoactivitiesconsecutive=true;
 		
 		for(int i=0; i<constrTwoActivitiesConsecutiveActivities[ai].count(); i++){
@@ -4171,7 +4171,7 @@ impossibletwoactivitiesconsecutive:
 		
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-		//allowed from 2 activities grouped
+		//allowed from two activities grouped
 		oktwoactivitiesgrouped=true;
 		
 		for(int i=0; i<constrTwoActivitiesGroupedActivities[ai].count(); i++){
@@ -4247,7 +4247,7 @@ impossibletwoactivitiesgrouped:
 		
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-		//allowed from 3 activities grouped
+		//allowed from three activities grouped
 		okthreeactivitiesgrouped=true;
 		
 		for(int i=0; i<constrThreeActivitiesGroupedActivities[ai].count(); i++){
@@ -4645,7 +4645,7 @@ impossiblethreeactivitiesgrouped:
 		
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-		//allowed from 2 activities ordered
+		//allowed from two activities ordered
 		oktwoactivitiesordered=true;
 		
 		for(int i=0; i<constrTwoActivitiesOrderedActivities[ai].count(); i++){

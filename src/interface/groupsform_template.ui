@@ -79,50 +79,57 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout_4">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QPushButton" name="addGroupPushButton">
-         <property name="text">
-          <string>Add</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="removeGroupPushButton">
-         <property name="text">
-          <string>Remove</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="modifyGroupPushButton">
-         <property name="text">
-          <string>Modify</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="sortGroupsPushButton">
-         <property name="text">
-          <string>Sort</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QPushButton" name="activateStudentsPushButton">
+      <widget class="QPushButton" name="addGroupPushButton">
        <property name="text">
-        <string>Activate all activities for selected group</string>
+        <string>Add</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="deactivateStudentsPushButton">
+      <widget class="QPushButton" name="modifyGroupPushButton">
        <property name="text">
-        <string>Deactivate all activities for selected group</string>
+        <string>Modify</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="removeGroupPushButton">
+       <property name="text">
+        <string comment="It means &quot;Remove from here&quot; (but I want to keep the field shorter), remove the group only from the current year. Please keep the translation short.">Remove here</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="purgeGroupPushButton">
+       <property name="text">
+        <string comment="It means &quot;Remove from everywhere&quot; (but I want to keep the field shorter), remove the group from all the years in which it appears. Please keep the translation short.">Remove everywhere</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="activateStudentsPushButton">
+     <property name="text">
+      <string>Activate all activities for selected group</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="deactivateStudentsPushButton">
+     <property name="text">
+      <string>Deactivate all activities for selected group</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="sortGroupsPushButton">
+       <property name="text">
+        <string>Sort</string>
        </property>
       </widget>
      </item>

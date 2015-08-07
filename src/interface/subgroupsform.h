@@ -30,6 +30,7 @@ public:
 public slots:
 	void addSubgroup();
 	void removeSubgroup();
+	void purgeSubgroup();
 	void modifySubgroup();
 	void sortSubgroups();
 	void yearChanged(const QString &yearName);

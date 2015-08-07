@@ -85,6 +85,8 @@ ModifyConstraintBreakTimesForm::ModifyConstraintBreakTimesForm(QWidget* parent, 
 			QTableWidgetItem* item= new QTableWidgetItem();
 			item->setTextAlignment(Qt::AlignCenter);
 			item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+			if(SHOW_TOOLTIPS_FOR_CONSTRAINTS_WITH_TABLES)
+				item->setToolTip(gt.rules.daysOfTheWeek[j]+QString("\n")+gt.rules.hoursOfTheDay[i]);
 			notAllowedTimesTable->setItem(i, j, item);
 
 			if(!currentMatrix[i][j])

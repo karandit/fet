@@ -110,6 +110,8 @@ public:
 	static int mediumConfirmation(QWidget* parent, const QString& title, const QString& message,
 	 const QString& button0Text, const QString& button1Text, const QString& button2Text,
 	 int defaultButton, int escapeButton);
+
+	static void largeInformation(QWidget* parent, const QString& title, const QString& message);
 };
 
 class GeneratePreIrreconcilableMessage{

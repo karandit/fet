@@ -189,7 +189,7 @@ void usage(QTextStream* out, const QString& error)
 		"[--writetimetablesactivities=wt14] "
 		"[--printactivitytags=a] [--printnotavailable=u] [--printbreak=b] [--dividetimeaxisbydays=v] [--duplicateverticalheaders=e] "
 		"[--printsimultaneousactivities=w] [--randomseedx=rx --randomseedy=ry] [--warnifusingnotperfectconstraints=s] "
-		"[--warnifusingstudentsminhoursdailywithallowemptydays=p] [--warnifusinggroupactivitiesininitialorder=g] [--verbose=r]\",\n"
+		"[--warnifusingstudentsminhoursdailywithallowemptydays=p] [--warnifusinggroupactivitiesininitialorder=g] [--warnsubgroupswiththesameactivities=ssa] [--verbose=r]\",\n"
 		"where:\nx is the input file, for instance \"data.fet\"\n"
 		"d is the path to results directory, without trailing slash or backslash (default is current working path). "
 		"Make sure you have write permissions there.\n"
@@ -216,6 +216,8 @@ void usage(QTextStream* out, const QString& error)
 		"students min hours daily with allow empty days (default true).\n"
 		"g is either true or false, represents whether you want a message box to be shown, with a warning, if the input file contains nonstandard timetable "
 		"generation options to group activities in the initial order (default true).\n"
+		"ssa is either true or false, represents whether you want a message box to be show, with a warning, if your input file contains subgroups which have "
+		"the same activities (default true)."
 		"r is either true or false, represents whether you want additional generation messages and other messages to be shown on the command line (default false)."
 		"\n"
 		"Alternatively, you can run \"fet-cl --version [--outputdir=d]\" to get the current FET version. "
@@ -339,6 +341,7 @@ void readSimulationParameters()
 	ENABLE_ACTIVITY_TAG_MAX_HOURS_DAILY=newSettings.value("enable-activity-tag-max-hours-daily", "false").toBool();
 	ENABLE_STUDENTS_MAX_GAPS_PER_DAY=newSettings.value("enable-students-max-gaps-per-day", "false").toBool();
 	SHOW_WARNING_FOR_NOT_PERFECT_CONSTRAINTS=newSettings.value("warn-if-using-not-perfect-constraints", "true").toBool();
+	SHOW_WARNING_FOR_SUBGROUPS_WITH_THE_SAME_ACTIVITIES=newSettings.value("warn-subgroups-with-the-same-activities", "true").toBool();
 	ENABLE_STUDENTS_MIN_HOURS_DAILY_WITH_ALLOW_EMPTY_DAYS=newSettings.value("enable-students-min-hours-daily-with-allow-empty-days", "false").toBool();
 	SHOW_WARNING_FOR_STUDENTS_MIN_HOURS_DAILY_WITH_ALLOW_EMPTY_DAYS=newSettings.value("warn-if-using-students-min-hours-daily-with-allow-empty-days", "true").toBool();
 	
@@ -351,6 +354,8 @@ void readSimulationParameters()
 	//MAIN_FORM_SHORTCUTS_TAB_POSITION=newSettings.value("FetMainForm/shortcuts-tab-position", "0").toInt();
 	MAIN_FORM_SHORTCUTS_TAB_POSITION=0; //always restoring to the first page, as suggested by a user
 	SHOW_SHORTCUTS_ON_MAIN_WINDOW=newSettings.value("FetMainForm/show-shortcuts", "true").toBool();
+
+	SHOW_TOOLTIPS_FOR_CONSTRAINTS_WITH_TABLES=newSettings.value("FetMainForm/show-tooltips-for-constraints-with-tables", "false").toBool();
 	
 	if(VERBOSE){
 		cout<<"Settings read"<<endl;
@@ -407,6 +412,7 @@ void writeSimulationParameters()
 	settings.setValue("enable-activity-tag-max-hours-daily", ENABLE_ACTIVITY_TAG_MAX_HOURS_DAILY);
 	settings.setValue("enable-students-max-gaps-per-day", ENABLE_STUDENTS_MAX_GAPS_PER_DAY);
 	settings.setValue("warn-if-using-not-perfect-constraints", SHOW_WARNING_FOR_NOT_PERFECT_CONSTRAINTS);
+	settings.setValue("warn-subgroups-with-the-same-activities", SHOW_WARNING_FOR_SUBGROUPS_WITH_THE_SAME_ACTIVITIES);
 	settings.setValue("enable-students-min-hours-daily-with-allow-empty-days", ENABLE_STUDENTS_MIN_HOURS_DAILY_WITH_ALLOW_EMPTY_DAYS);
 	settings.setValue("warn-if-using-students-min-hours-daily-with-allow-empty-days", SHOW_WARNING_FOR_STUDENTS_MIN_HOURS_DAILY_WITH_ALLOW_EMPTY_DAYS);
 
@@ -418,6 +424,8 @@ void writeSimulationParameters()
 	//settings.setValue("FetMainForm/shortcuts-tab-position", MAIN_FORM_SHORTCUTS_TAB_POSITION);
 	//settings.setValue("FetMainForm/shortcuts-tab-position", 0); //always starting on the first page, as suggested by a user
 	settings.setValue("FetMainForm/show-shortcuts", SHOW_SHORTCUTS_ON_MAIN_WINDOW);
+
+	settings.setValue("FetMainForm/show-tooltips-for-constraints-with-tables", SHOW_TOOLTIPS_FOR_CONSTRAINTS_WITH_TABLES);
 }
 #endif
 
@@ -785,6 +793,8 @@ int main(int argc, char **argv)
 		
 		SHOW_WARNING_FOR_NOT_PERFECT_CONSTRAINTS=true;
 		
+		SHOW_WARNING_FOR_SUBGROUPS_WITH_THE_SAME_ACTIVITIES=true;
+		
 		SHOW_WARNING_FOR_STUDENTS_MIN_HOURS_DAILY_WITH_ALLOW_EMPTY_DAYS=true;
 		
 		SHOW_WARNING_FOR_GROUP_ACTIVITIES_IN_INITIAL_ORDER=true;
@@ -842,6 +852,10 @@ int main(int argc, char **argv)
 			else if(s.left(35)=="--warnifusingnotperfectconstraints="){
 				if(s.right(5)=="false")
 					SHOW_WARNING_FOR_NOT_PERFECT_CONSTRAINTS=false;
+			}
+			else if(s.left(37)=="--warnsubgroupswiththesameactivities="){
+				if(s.right(5)=="false")
+					SHOW_WARNING_FOR_SUBGROUPS_WITH_THE_SAME_ACTIVITIES=false;
 			}
 			else if(s.left(53)=="--warnifusingstudentsminhoursdailywithallowemptydays="){
 				if(s.right(5)=="false")

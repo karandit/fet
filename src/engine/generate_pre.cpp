@@ -404,6 +404,33 @@ static int nIncompatibleFromFather[MAX_ACTIVITIES];
 int fatherActivityInInitialOrder[MAX_ACTIVITIES];
 ////////////////////////////////////
 
+inline bool findEquivalentSubgroupsCompareFunction(int i1, int i2)
+{
+	const QList<int>& a1=gt.rules.internalSubgroupsList[i1]->activitiesForSubgroup;
+	const QList<int>& a2=gt.rules.internalSubgroupsList[i2]->activitiesForSubgroup;
+	
+	if(a1.count()<a2.count()){
+		return true;
+	}
+	else if(a1.count()>a2.count()){
+		return false;
+	}
+	else{
+		assert(a1.count()==a2.count());
+		for(int i=0; i<a1.count(); i++){
+			if(a1.at(i)<a2.at(i)){
+				return true;
+			}
+			else if(a1.at(i)>a2.at(i)){
+				return false;
+			}
+		}
+	}
+	return false;
+}
+
+////////////////////////////////////
+
 inline bool compareFunctionGeneratePre(int i, int j)
 {
 	if(nIncompatible[i]>nIncompatible[j] || (nIncompatible[i]==nIncompatible[j] && nMinDaysConstraintsBroken[i]>nMinDaysConstraintsBroken[j]))
@@ -427,6 +454,64 @@ inline bool compareFunctionGeneratePreWithGroupedActivities(int i, int j)
 bool processTimeSpaceConstraints(QWidget* parent, QTextStream* initialOrderStream)
 {
 	assert(gt.rules.internalStructureComputed);
+	
+	////////////Compute equivalent subgroups
+	if(SHOW_WARNING_FOR_SUBGROUPS_WITH_THE_SAME_ACTIVITIES){
+		QList<int> tmpSortedSubgroupsList;
+		Matrix1D<bool> isSignificantSubgroup;
+		
+		isSignificantSubgroup.resize(gt.rules.nInternalSubgroups);
+		
+		tmpSortedSubgroupsList.clear();
+		for(int i=0; i<gt.rules.nInternalSubgroups; i++)
+			tmpSortedSubgroupsList.append(i);
+		
+		std::stable_sort(tmpSortedSubgroupsList.begin(), tmpSortedSubgroupsList.end(), findEquivalentSubgroupsCompareFunction);
+		
+		QStringList s;
+		
+		isSignificantSubgroup[tmpSortedSubgroupsList.at(0)]=true;
+		for(int i=1; i<gt.rules.nInternalSubgroups; i++){
+			int s1=tmpSortedSubgroupsList.at(i-1);
+			int s2=tmpSortedSubgroupsList.at(i);
+			
+			isSignificantSubgroup[s2]=true;
+		
+			const QList<int>& l1=gt.rules.internalSubgroupsList[s1]->activitiesForSubgroup;
+			const QList<int>& l2=gt.rules.internalSubgroupsList[s2]->activitiesForSubgroup;
+			if(l1.count()==l2.count()){
+				int i;
+				for(i=0; i<l1.count(); i++)
+					if(l1.at(i)!=l2.at(i))
+						break;
+				if(i==l1.count()){
+					isSignificantSubgroup[s2]=false;
+					
+					s.append(GeneratePreTranslate::tr("Subgroup %1 has the same activities as subgroup %2.").arg(gt.rules.internalSubgroupsList[s2]->name).arg(gt.rules.internalSubgroupsList[s1]->name));
+				}
+			}
+		}
+		
+		int cnt=0;
+		for(int i=0; i<gt.rules.nInternalSubgroups; i++)
+			if(!isSignificantSubgroup[i])
+				cnt++;
+		
+		if(cnt>0){
+			QString s0=GeneratePreTranslate::tr("There are %1 subgroups (from the total of %2 subgroups) which have the same activities as other subgroups. They are listed below."
+				" If the constraints relating to these subgroups are also the same, you can make the generation (directly proportional) faster by removing the subgroups"
+				" which are equivalent to other subgroups (leaving only one representant for each equivalence set). (The generation algorithm will not remove the equivalent"
+				" subgroups automatically.)").arg(cnt).arg(gt.rules.nInternalSubgroups);
+			s0+="\n\n";
+			s0+=GeneratePreTranslate::tr("If you did not add all the activities yet or if the number of equivalent subgroups compared to the total number of subgroups"
+				" is small, probably you can safely ignore this message.");
+			s0+="\n\n";
+			s0+=GeneratePreTranslate::tr("You can deactivate this message from the 'Settings' menu.");
+			
+			GeneratePreReconcilableMessage::largeInformation(parent, GeneratePreTranslate::tr("FET warning"), s0+QString("\n\n")+s.join("\n"));
+		}
+	}
+	//////////////////////////////////
 
 	//////////////////begin resizing
 

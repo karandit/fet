@@ -88,6 +88,8 @@ AddConstraintActivitiesMaxSimultaneousInSelectedTimeSlotsForm::AddConstraintActi
 			item->setTextAlignment(Qt::AlignCenter);
 			item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 			colorItem(item);
+			if(SHOW_TOOLTIPS_FOR_CONSTRAINTS_WITH_TABLES)
+				item->setToolTip(gt.rules.daysOfTheWeek[j]+QString("\n")+gt.rules.hoursOfTheDay[i]);
 			selectedTimesTable->setItem(i, j, item);
 		}
 		
