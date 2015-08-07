@@ -38,6 +38,12 @@ AddConstraintActivitiesPreferredStartingTimesForm::AddConstraintActivitiesPrefer
 {
 	setupUi(this);
 
+	durationCheckBox->setChecked(false);
+	durationSpinBox->setEnabled(false);
+	durationSpinBox->setMinimum(1);
+	durationSpinBox->setMaximum(gt.rules.nHoursPerDay);
+	durationSpinBox->setValue(1);
+
 	addConstraintPushButton->setDefault(true);
 
 	connect(preferredTimesTable, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(itemClicked(QTableWidgetItem*)));
@@ -251,6 +257,12 @@ void AddConstraintActivitiesPreferredStartingTimesForm::addConstraint()
 {
 	TimeConstraint *ctr=NULL;
 
+	int duration=-1;
+	if(durationCheckBox->isChecked()){
+		assert(durationSpinBox->isEnabled());
+		duration=durationSpinBox->value();
+	}
+
 	double weight;
 	QString tmp=weightLineEdit->text();
 	weight_sscanf(tmp, "%lf", &weight);
@@ -280,7 +292,7 @@ void AddConstraintActivitiesPreferredStartingTimesForm::addConstraint()
 	if(activityTag!="")
 		assert(gt.rules.searchActivityTag(activityTag)>=0);
 		
-	if(teacher=="" && students=="" && subject=="" && activityTag==""){
+	if(duration==-1 && teacher=="" && students=="" && subject=="" && activityTag==""){
 		int t=QMessageBox::question(this, tr("FET question"),
 		 tr("You specified all the activities. This might be a small problem: if you specify"
 		  " a not allowed slot between two allowed slots, this not allowed slot will"
@@ -298,7 +310,7 @@ void AddConstraintActivitiesPreferredStartingTimesForm::addConstraint()
 				return;
 	}
 
-	if(teacher!="" && students=="" && subject=="" && activityTag==""){
+	if(duration==-1 && teacher!="" && students=="" && subject=="" && activityTag==""){
 		int t=QMessageBox::question(this, tr("FET question"),
 		 tr("You specified only the teacher. This might be a small problem: if you specify"
 		  " a not allowed slot between two allowed slots, this not allowed slot will"
@@ -314,7 +326,7 @@ void AddConstraintActivitiesPreferredStartingTimesForm::addConstraint()
 		if(t==QMessageBox::Cancel)
 				return;
 	}
-	if(teacher=="" && students!="" && subject=="" && activityTag==""){
+	if(duration==-1 && teacher=="" && students!="" && subject=="" && activityTag==""){
 		int t=QMessageBox::question(this, tr("FET question"),
 		 tr("You specified only the students set. This might be a small problem: if you specify"
 		  " a not allowed slot between two allowed slots (or a not allowed slot before allowed slots),"
@@ -365,7 +377,7 @@ void AddConstraintActivitiesPreferredStartingTimesForm::addConstraint()
 				return;
 	}
 
-	ctr=new ConstraintActivitiesPreferredStartingTimes(weight, /*compulsory,*/ teacher, students, subject, activityTag, n, days_L, hours_L);
+	ctr=new ConstraintActivitiesPreferredStartingTimes(weight, /*compulsory,*/ teacher, students, subject, activityTag, duration, n, days_L, hours_L);
 
 	bool tmp2=gt.rules.addTimeConstraint(ctr);
 	if(tmp2){
@@ -379,6 +391,11 @@ void AddConstraintActivitiesPreferredStartingTimesForm::addConstraint()
 			tr("Constraint NOT added - duplicate?"));
 		delete ctr;
 	}
+}
+
+void AddConstraintActivitiesPreferredStartingTimesForm::on_durationCheckBox_toggled()
+{
+	durationSpinBox->setEnabled(durationCheckBox->isChecked());
 }
 
 #undef YES

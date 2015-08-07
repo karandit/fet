@@ -12691,6 +12691,7 @@ TimeConstraint* Rules::readActivitiesPreferredTimes(QXmlStreamReader& xmlReader,
 TimeConstraint* Rules::readActivitiesPreferredTimeSlots(QXmlStreamReader& xmlReader, FakeString& xmlReadingLog){
 	assert(xmlReader.isStartElement() && xmlReader.name()=="ConstraintActivitiesPreferredTimeSlots");
 	ConstraintActivitiesPreferredTimeSlots* cn=new ConstraintActivitiesPreferredTimeSlots();
+	cn->duration=-1;
 	cn->p_nPreferredTimeSlots_L=0;
 	int i;
 	/*for(i=0; i<MAX_N_CONSTRAINT_ACTIVITIES_PREFERRED_TIME_SLOTS; i++){
@@ -12762,6 +12763,16 @@ TimeConstraint* Rules::readActivitiesPreferredTimeSlots(QXmlStreamReader& xmlRea
 			QString text=xmlReader.readElementText();
 			cn->p_activityTagName=text;
 			xmlReadingLog+="    Read activity tag name="+cn->p_activityTagName+"\n";
+		}
+		else if(xmlReader.name()=="Duration"){
+			QString text=xmlReader.readElementText();
+			if(!text.isEmpty()){
+				cn->duration=text.toInt();
+				xmlReadingLog+="    Read duration="+CustomFETString::number(cn->duration)+"\n";
+			}
+			else{
+				cn->duration=-1;
+			}
 		}
 		else if(xmlReader.name()=="Number_of_Preferred_Time_Slots"){
 			QString text=xmlReader.readElementText();
@@ -12861,6 +12872,7 @@ TimeConstraint* Rules::readActivitiesPreferredTimeSlots(QXmlStreamReader& xmlRea
 TimeConstraint* Rules::readActivitiesPreferredStartingTimes(QXmlStreamReader& xmlReader, FakeString& xmlReadingLog){
 	assert(xmlReader.isStartElement() && xmlReader.name()=="ConstraintActivitiesPreferredStartingTimes");
 	ConstraintActivitiesPreferredStartingTimes* cn=new ConstraintActivitiesPreferredStartingTimes();
+	cn->duration=-1;
 	cn->nPreferredStartingTimes_L=0;
 	int i;
 	/*for(i=0; i<MAX_N_CONSTRAINT_ACTIVITIES_PREFERRED_STARTING_TIMES; i++){
@@ -12932,6 +12944,16 @@ TimeConstraint* Rules::readActivitiesPreferredStartingTimes(QXmlStreamReader& xm
 			QString text=xmlReader.readElementText();
 			cn->activityTagName=text;
 			xmlReadingLog+="    Read activity tag name="+cn->activityTagName+"\n";
+		}
+		else if(xmlReader.name()=="Duration"){
+			QString text=xmlReader.readElementText();
+			if(!text.isEmpty()){
+				cn->duration=text.toInt();
+				xmlReadingLog+="    Read duration="+CustomFETString::number(cn->duration)+"\n";
+			}
+			else{
+				cn->duration=-1;
+			}
 		}
 		else if(xmlReader.name()=="Number_of_Preferred_Starting_Times"){
 			QString text=xmlReader.readElementText();

@@ -31,22 +31,6 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="textLabel1_2">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Choose the teacher (blank=all), students set, subject, activity tag.</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
     <layout class="QHBoxLayout" name="componentBoxLayout">
      <item>
       <widget class="QLabel" name="textLabel1">
@@ -83,7 +67,7 @@
      </item>
     </layout>
    </item>
-   <item row="3" column="0">
+   <item row="2" column="0">
     <layout class="QGridLayout" name="filterGridLayout">
      <item row="0" column="3">
       <widget class="QLabel" name="activityTagsTextLabel">
@@ -139,10 +123,10 @@
      </item>
     </layout>
    </item>
-   <item row="4" column="0">
+   <item row="3" column="0">
     <widget class="QTableWidget" name="preferredTimesTable"/>
    </item>
-   <item row="5" column="0">
+   <item row="4" column="0">
     <layout class="QHBoxLayout" name="weightBoxLayout">
      <item>
       <widget class="QLabel" name="weightTextLabel">
@@ -169,7 +153,7 @@
      </item>
     </layout>
    </item>
-   <item row="6" column="0">
+   <item row="5" column="0">
     <layout class="QGridLayout" name="buttonsGridLayout">
      <item row="0" column="0">
       <widget class="QPushButton" name="setAllAllowedPushButton">

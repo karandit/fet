@@ -2195,6 +2195,8 @@ public:
 	*/
 	QString p_activityTagName;
 
+	int duration; //if -1, neglected. Otherwise, >=1.
+
 	/**
 	The number of preferred times
 	*/
@@ -2231,7 +2233,7 @@ public:
 	//ConstraintActivitiesPreferredTimeSlots(double wp, QString te,
 	//	QString st, QString su, QString sut, int nPT, int d[], int h[]);
 	ConstraintActivitiesPreferredTimeSlots(double wp, QString te,
-		QString st, QString su, QString sut, int nPT_L, QList<int> d_L, QList<int> h_L);
+		QString st, QString su, QString sut, int dur, int nPT_L, QList<int> d_L, QList<int> h_L);
 
 	bool computeInternalStructure(QWidget* parent, Rules& r);
 
@@ -2375,6 +2377,8 @@ public:
 	*/
 	QString activityTagName;
 
+	int duration; //if -1, neglected. Otherwise, >=1.
+
 	/**
 	The number of preferred times
 	*/
@@ -2411,7 +2415,7 @@ public:
 	//ConstraintActivitiesPreferredStartingTimes(double wp, QString te,
 	//	QString st, QString su, QString sut, int nPT, int d[], int h[]);
 	ConstraintActivitiesPreferredStartingTimes(double wp, QString te,
-		QString st, QString su, QString sut, int nPT_L, QList<int> d_L, QList<int> h_L);
+		QString st, QString su, QString sut, int dur, int nPT_L, QList<int> d_L, QList<int> h_L);
 
 	bool computeInternalStructure(QWidget* parent, Rules& r);
 

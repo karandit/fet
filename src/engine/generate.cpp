@@ -4848,7 +4848,9 @@ impossibleactivityendsstudentsday:
 				//with activities which were moved forward and back again
 				//being put at the end.
 				//If you do not follow this, you'll get impossible timetables
-				//for italian sample or samples from South Africa, I am not sure which of these 2
+				//for the Italian example Italy/2007/difficult/highschool-Ancona.fet or the examples from
+				//South Africa: South-Africa/difficult/Collegiate_Junior_School2.fet or
+				//South-Africa/difficult/Insight_Learning_Centre2.fet, I am not sure which of these 3
 								
 				if(subgroupActivitiesOfTheDay(st,d2).count()>0 || d2==d)
 					_nOc++;
@@ -6924,7 +6926,9 @@ impossiblestudentsminhoursdaily:
 				//with activities which were moved forward and back again
 				//being put at the end.
 				//If you do not follow this, you'll get impossible timetables
-				//for italian sample or samples from South Africa, I am not sure which of these 2
+				//for the Italian example Italy/2007/difficult/highschool-Ancona.fet or the examples from
+				//South Africa: South-Africa/difficult/Collegiate_Junior_School2.fet or
+				//South-Africa/difficult/Insight_Learning_Centre2.fet, I am not sure which of these 3
 								
 				if(teacherActivitiesOfTheDay(tch,d2).count()>0 || d2==d)
 					_nOc++;

@@ -46,6 +46,8 @@ public slots:
 	void itemClicked(QTableWidgetItem* item);
 	void horizontalHeaderClicked(int col);
 	void verticalHeaderClicked(int row);
+
+	void on_durationCheckBox_toggled();
 };
 
 #endif

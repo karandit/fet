@@ -1790,3 +1790,6 @@ Versions 5.27.0 - 5.27.v
 	- Updated the German translation, by Bob Hairgrove.
 - Version 5.27.2
 	- Fixed a compilation error under CentOS 6 (reported by azaer).
+- Version 5.27.3
+	- Updated to Qt 5.4.2.
+	- Added the "duration" filter in activities preferred starting times and preferred time slots (suggested by Volker Dirr and jillali elghazoui).

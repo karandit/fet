@@ -1336,10 +1336,10 @@ or
 - team teachers,
 -..etc
 
-81---------------------------------------------------------
+81----------------------------DONE-------------------------
 From Chafik Graiguer (on forum):
 
-More statistics after generation:
+DONE --->  More statistics after generation:
 
 FET has a stastics menu
 What about adding statistics after generation accessible from statistics menu
@@ -1348,7 +1348,7 @@ What about adding statistics after generation accessible from statistics menu
 - Total working days
 - Total gaps
 
-Because the quality of a timetable depends on overall total of free days and gap
+Because the quality of a timetable depends on overall total of free days and gap  <--- DONE
 
 82---------------------------------------------------------
 From Valdo (on forum):
@@ -1576,13 +1576,13 @@ tag to the activity which defaults to the current display name (without the acti
 Another thing, for activities with same starting time, is it possible to have them in one column/row so that the number of rows/columns is fixed to the either the number
 of days or lessons (depending on the selected timetable)? This way it is easier to print.
 
-95---------------------------------------------------------
+95--------------------------DONE---------------------------
 From Volker Dirr:
 
-Activities preferred times constraints need also need "duration".
+DONE---> Activities preferred times constraints also need "duration".
 (because many schools allow activities with duration 2 only at special
 times. by this new feature it will be very easy to add (just one
-constraint - instead of adding a tag to every activity with duration 2).
+constraint - instead of adding a tag to every activity with duration 2). <---DONE
 
 96--------------------------DONE---------------------------
 From liquid (on forum):
@@ -3541,3 +3541,68 @@ so it would be fine to save and load them into a file. so a user can save
 settings for year 5-6 and save settings for year 7-10. i am not sure if
 into the fet file or into a separate file. it has different advantages and
 disadvantages. but i think into a new separate file is a bit better.
+
+219---------------------------------------------------------
+From chintu and Volker Dirr (on forum):
+
+chintu: I have 80 teachers in school, in an academic year if one teacher
+leaves the school the work load of the teacher is shared with 5 teachers
+and say about 15 teacher in overall is effected. but remaining 65 teachers
+time table is still the same. If i re generate the time table all 80 teachers
+time table will be effected, i want to retain the time table same for 65
+teachers and only change for 15 how can i achieve this?
+
+Liviu: You can generate the timetable, then view the timetable for teachers,
+and select all activities for a teacher and click "Toggle lock/unlock".
+
+Volker: Maybe we should make the unlocking possible without generating the
+timetable, as in the "Advanced lock/unlock" menus.
+
+Liviu: In this case, do it also for students?
+
+220---------------------------------------------------------
+From Volker Dirr (on forum):
+
+When the user clicks "Toggle lock/unlock" with zero selected cells in the
+"Timetable view" dialogs, maybe it would be better to inform more verbosely
+the user: "No activities were locked/unlocked, because no activities were
+selected".
+
+221---------------------------------------------------------
+From Volker Dirr:
+
+in years dialog should be an option: increase all years.
+
+now pseudo code: (mixing strings and int. so real code is a bit more
+complicated)
+
+foreach(year, yearsList){
+ if(year = int){
+    newYearsList<<year
+ } else {
+   warning = "unchanged"
+}
+
+sort newYearsList from high to low
+
+foreach(year, newYearsList){
+  newIntYear=year++;
+  search that year.
+  foreach(group, year){
+     foreach(subgroup, group){
+       if(subgroup.left(year){
+         subgroup.replace.left(newIntYear)
+       else
+         warning = "impossible to rename. maybe modified manualy?"
+      }
+     if(group.left(year){
+       group.replace.left(newIntYear)
+     else
+       warning = "impossible to rename. maybe modified manualy?"
+    }
+    if(year.left(year){
+       year.replace.left(newIntYear)
+     else
+       warning = "critical bug!"
+   }
+}
