@@ -653,6 +653,38 @@ void SomeQtTranslations()
 	Q_UNUSED(s7);
 	QString s8=QCoreApplication::translate("QDialogButtonBox", "N&o to All", "Accelerator key (letter after ampersand) for &OK, &Cancel, &Yes, Yes to &All, &No, N&o to All, must be different. Please keep the translation short.");
 	Q_UNUSED(s8);
+
+	QString s9=QCoreApplication::translate("QDialogButtonBox", "Help");
+	Q_UNUSED(s9);
+
+	//It seems that Qt 5 uses other context
+	QString s10=QCoreApplication::translate("QPlatformTheme", "&OK", "Accelerator key (letter after ampersand) for &OK, &Cancel, &Yes, Yes to &All, &No, N&o to All, must be different");
+	Q_UNUSED(s10);
+	QString s11=QCoreApplication::translate("QPlatformTheme", "OK");
+	Q_UNUSED(s11);
+	
+	QString s12=QCoreApplication::translate("QPlatformTheme", "&Cancel", "Accelerator key (letter after ampersand) for &OK, &Cancel, &Yes, Yes to &All, &No, N&o to All, must be different");
+	Q_UNUSED(s12);
+	QString s13=QCoreApplication::translate("QPlatformTheme", "Cancel");
+	Q_UNUSED(s13);
+	
+	QString s14=QCoreApplication::translate("QPlatformTheme", "&Yes", "Accelerator key (letter after ampersand) for &OK, &Cancel, &Yes, Yes to &All, &No, N&o to All, must be different");
+	Q_UNUSED(s14);
+	QString s15=QCoreApplication::translate("QPlatformTheme", "Yes to &All", "Accelerator key (letter after ampersand) for &OK, &Cancel, &Yes, Yes to &All, &No, N&o to All, must be different. Please keep the translation short.");
+	Q_UNUSED(s15);
+	QString s16=QCoreApplication::translate("QPlatformTheme", "&No", "Accelerator key (letter after ampersand) for &OK, &Cancel, &Yes, Yes to &All, &No, N&o to All, must be different");
+	Q_UNUSED(s16);
+	QString s17=QCoreApplication::translate("QPlatformTheme", "N&o to All", "Accelerator key (letter after ampersand) for &OK, &Cancel, &Yes, Yes to &All, &No, N&o to All, must be different. Please keep the translation short.");
+	Q_UNUSED(s17);
+
+	QString s18=QCoreApplication::translate("QPlatformTheme", "Help");
+	Q_UNUSED(s18);
+
+	QString s19=QCoreApplication::translate("QGnomeTheme", "&OK", "Accelerator key (letter after ampersand) for &OK, &Cancel, &Yes, Yes to &All, &No, N&o to All, must be different");
+	Q_UNUSED(s19);
+	QString s20=QCoreApplication::translate("QGnomeTheme", "&Cancel", "Accelerator key (letter after ampersand) for &OK, &Cancel, &Yes, Yes to &All, &No, N&o to All, must be different");
+	Q_UNUSED(s20);
+	
 }
 
 /**

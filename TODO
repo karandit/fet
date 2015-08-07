@@ -3606,3 +3606,109 @@ foreach(year, newYearsList){
        warning = "critical bug!"
    }
 }
+
+222---------------------------------------------------------
+From Mohamed NAJARI:
+
+1) Can you add a command to move the teachers, students, materials and activities during entry?
+2) Why not put weight as the 100% value by default instead of 95% during the addition of an activity?
+
+223---------------------------------------------------------
+From youssouf (on forum):
+
+My suggestion is : activating the partition button when modifying the teacher's task.
+because :
+1. We enter the teacher's tasks ( choice - subject - Partition - period - etc.)
+2. When we want to edit the task of a teacher , we find that the division button is not enabled and we will be forced to delete that task and we retype spot again.
+
+224---------------------------------------------------------
+From Volker Dirr:
+
+in modify/rename years form there should be a checkbox "Rename also groups
+and subgroups".
+
+Then add something like that (not ready yet, just an idea):
+
+void ModifyStudentsYearForm::renameAlsoGroupsAndSubgroups(){
+	QString warning;
+	foreach(StudentsYear* year, gt.rules.yearsList){
+		if(this->_initialYearName == year->name){
+			//TODO: rename year
+			foreach(StudentsGroup* group, year->groupsList){
+				if(group->name.left(this->_initialYearName.count())==this->_initialYearName){
+					//TODO rename: cut left old string and place the new one
+				} else {
+					warning+=tr("%1 in %2 not renamed.")+"\n";
+				}
+				foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+					if(subgroup->name.left(this->_initialYearName.count())==this->_initialYearName){
+						//TODO rename: cut left old string and place the new one
+					} else {
+						warning+=tr("%1 in %2 not renamed.")+"\n";
+					}
+				}
+			}
+		} else {
+			foreach(StudentsGroup* group, year->groupsList){
+				if(group->name.left(this->_initialYearName.count())==this->_initialYearName){
+					warning+=tr("Please check if %1 in %2 must be renamed.")+"\n"; 
+//It's correct for example if there is year "1" and year "10"
+				}
+				foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+					if(subgroup->name.left(this->_initialYearName.count())==this->_initialYearName){
+						warning+=tr("Please check if %1 in %2 must be renamed.")+"\n"; 
+//It's correct for example if there is year "1" and year "10"
+					}
+				}
+			}
+		}
+	}
+}
+
+225---------------------------------------------------------
+From jillali elghazoui (on forum):
+
+jillali:
+At the end of the production time table
+we sometimes want to change instead of an activity
+But if we follow the normal route of fet its currency fully all activities
+Is there is a way to change the place of this activity specifically
+Without major changes in the other activities
+
+Liviu:
+
+Either:
+
+1) Open from ~/fet-results/data_and_timetable.fet, then unlock a specific activity and regenerate;
+
+or
+
+2) After generating, select Advanced lock -> lock all activities of the current timetable. Then unlock a specific activity and regenerate.
+
+But you may obtain an impossible timetable.
+
+jillali:
+
+You're right, we can not get what we wanted
+Is it possible for this to work  a new property under the name:
+
+"a teacher's not available times with the current  timetable"
+
+as "not available times" are "the free hours withe the current  timetable"
+And it will save in "a teacher's not available times"
+And when we want to produce a new table we change a table for one teacher
+
+---
+
+We also ask you for a similar property in Students set
+It seems that these characteristics would be more effective
+You can set the blank time
+Although it is possible to move Activitys
+For a teacher or more
+Or for one Student set or for more
+
+226---------------------------------------------------------
+From AlexL (on forum):
+
+My proposal is to use transifex for translations: https://www.transifex.com
+It works fine with .ts files, has suggestions for translations, .etc.

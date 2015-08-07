@@ -106,16 +106,16 @@ void AdvancedLockUnlockForm::lockDay(QWidget* parent)
 	
 	////////
 	QGroupBox* selectorsGroupBox=new QGroupBox();
-	selectorsGroupBox->setTitle("Lock");
+	selectorsGroupBox->setTitle(tr("Lock"));
 	
 	QHBoxLayout* groupLayout=new QHBoxLayout(selectorsGroupBox);
 	
 	QCheckBox* timeCheckBox=new QCheckBox();
 	timeCheckBox->setChecked(true);
-	timeCheckBox->setText("Time");
+	timeCheckBox->setText(tr("Time"));
 	QCheckBox* spaceCheckBox=new QCheckBox();
 	spaceCheckBox->setChecked(true);
-	spaceCheckBox->setText("Space");
+	spaceCheckBox->setText(tr("Space"));
 
 	groupLayout->addWidget(timeCheckBox);
 	groupLayout->addWidget(spaceCheckBox);
@@ -390,16 +390,16 @@ void AdvancedLockUnlockForm::unlockDay(QWidget* parent)
 	
 	////////
 	QGroupBox* selectorsGroupBox=new QGroupBox();
-	selectorsGroupBox->setTitle("Unlock");
+	selectorsGroupBox->setTitle(tr("Unlock"));
 	
 	QHBoxLayout* groupLayout=new QHBoxLayout(selectorsGroupBox);
 	
 	QCheckBox* timeCheckBox=new QCheckBox();
 	timeCheckBox->setChecked(true);
-	timeCheckBox->setText("Time");
+	timeCheckBox->setText(tr("Time"));
 	QCheckBox* spaceCheckBox=new QCheckBox();
 	spaceCheckBox->setChecked(true);
-	spaceCheckBox->setText("Space");
+	spaceCheckBox->setText(tr("Space"));
 
 	groupLayout->addWidget(timeCheckBox);
 	groupLayout->addWidget(spaceCheckBox);
@@ -645,16 +645,16 @@ void AdvancedLockUnlockForm::lockEndStudentsDay(QWidget* parent)
 	
 	////////
 	QGroupBox* selectorsGroupBox=new QGroupBox();
-	selectorsGroupBox->setTitle("Lock");
+	selectorsGroupBox->setTitle(tr("Lock"));
 	
 	QHBoxLayout* groupLayout=new QHBoxLayout(selectorsGroupBox);
 	
 	QCheckBox* timeCheckBox=new QCheckBox();
 	timeCheckBox->setChecked(true);
-	timeCheckBox->setText("Time");
+	timeCheckBox->setText(tr("Time"));
 	QCheckBox* spaceCheckBox=new QCheckBox();
 	spaceCheckBox->setChecked(true);
-	spaceCheckBox->setText("Space");
+	spaceCheckBox->setText(tr("Space"));
 
 	groupLayout->addWidget(timeCheckBox);
 	groupLayout->addWidget(spaceCheckBox);
@@ -939,16 +939,16 @@ void AdvancedLockUnlockForm::unlockEndStudentsDay(QWidget* parent)
 	
 	////////
 	QGroupBox* selectorsGroupBox=new QGroupBox();
-	selectorsGroupBox->setTitle("Unlock");
+	selectorsGroupBox->setTitle(tr("Unlock"));
 	
 	QHBoxLayout* groupLayout=new QHBoxLayout(selectorsGroupBox);
 	
 	QCheckBox* timeCheckBox=new QCheckBox();
 	timeCheckBox->setChecked(true);
-	timeCheckBox->setText("Time");
+	timeCheckBox->setText(tr("Time"));
 	QCheckBox* spaceCheckBox=new QCheckBox();
 	spaceCheckBox->setChecked(true);
-	spaceCheckBox->setText("Space");
+	spaceCheckBox->setText(tr("Space"));
 
 	groupLayout->addWidget(timeCheckBox);
 	groupLayout->addWidget(spaceCheckBox);
@@ -1192,16 +1192,16 @@ void AdvancedLockUnlockForm::lockAll(QWidget* parent)
 	
 	////////
 	QGroupBox* selectorsGroupBox=new QGroupBox();
-	selectorsGroupBox->setTitle("Lock");
+	selectorsGroupBox->setTitle(tr("Lock"));
 	
 	QHBoxLayout* groupLayout=new QHBoxLayout(selectorsGroupBox);
 	
 	QCheckBox* timeCheckBox=new QCheckBox();
 	timeCheckBox->setChecked(true);
-	timeCheckBox->setText("Time");
+	timeCheckBox->setText(tr("Time"));
 	QCheckBox* spaceCheckBox=new QCheckBox();
 	spaceCheckBox->setChecked(true);
-	spaceCheckBox->setText("Space");
+	spaceCheckBox->setText(tr("Space"));
 
 	groupLayout->addWidget(timeCheckBox);
 	groupLayout->addWidget(spaceCheckBox);
@@ -1462,16 +1462,16 @@ void AdvancedLockUnlockForm::unlockAll(QWidget* parent)
 	
 	////////
 	QGroupBox* selectorsGroupBox=new QGroupBox();
-	selectorsGroupBox->setTitle("Unlock");
+	selectorsGroupBox->setTitle(tr("Unlock"));
 	
 	QHBoxLayout* groupLayout=new QHBoxLayout(selectorsGroupBox);
 	
 	QCheckBox* timeCheckBox=new QCheckBox();
 	timeCheckBox->setChecked(true);
-	timeCheckBox->setText("Time");
+	timeCheckBox->setText(tr("Time"));
 	QCheckBox* spaceCheckBox=new QCheckBox();
 	spaceCheckBox->setChecked(true);
-	spaceCheckBox->setText("Space");
+	spaceCheckBox->setText(tr("Space"));
 
 	groupLayout->addWidget(timeCheckBox);
 	groupLayout->addWidget(spaceCheckBox);
@@ -1704,16 +1704,16 @@ void AdvancedLockUnlockForm::unlockAllWithoutTimetable(QWidget* parent)
 	
 	////////
 	QGroupBox* selectorsGroupBox=new QGroupBox();
-	selectorsGroupBox->setTitle("Unlock");
+	selectorsGroupBox->setTitle(tr("Unlock"));
 	
 	QHBoxLayout* groupLayout=new QHBoxLayout(selectorsGroupBox);
 	
 	QCheckBox* timeCheckBox=new QCheckBox();
 	timeCheckBox->setChecked(true);
-	timeCheckBox->setText("Time");
+	timeCheckBox->setText(tr("Time"));
 	QCheckBox* spaceCheckBox=new QCheckBox();
 	spaceCheckBox->setChecked(true);
-	spaceCheckBox->setText("Space");
+	spaceCheckBox->setText(tr("Space"));
 
 	groupLayout->addWidget(timeCheckBox);
 	groupLayout->addWidget(spaceCheckBox);
@@ -1995,16 +1995,16 @@ void AdvancedLockUnlockForm::unlockDayWithoutTimetable(QWidget* parent)
 	
 	////////
 	QGroupBox* selectorsGroupBox=new QGroupBox();
-	selectorsGroupBox->setTitle("Unlock");
+	selectorsGroupBox->setTitle(tr("Unlock"));
 	
 	QHBoxLayout* groupLayout=new QHBoxLayout(selectorsGroupBox);
 	
 	QCheckBox* timeCheckBox=new QCheckBox();
 	timeCheckBox->setChecked(true);
-	timeCheckBox->setText("Time");
+	timeCheckBox->setText(tr("Time"));
 	QCheckBox* spaceCheckBox=new QCheckBox();
 	spaceCheckBox->setChecked(true);
-	spaceCheckBox->setText("Space");
+	spaceCheckBox->setText(tr("Space"));
 
 	groupLayout->addWidget(timeCheckBox);
 	groupLayout->addWidget(spaceCheckBox);

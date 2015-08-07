@@ -47,9 +47,11 @@ SpreadMinDaysConstraintsFiveDaysForm::SpreadMinDaysConstraintsFiveDaysForm(QWidg
 	centerWidgetOnScreen(this);
 	restoreFETDialogGeometry(this);
 	
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(wasAccepted()));
-	connect(buttonBox, SIGNAL(rejected()), this, SLOT(wasCanceled()));
-	connect(buttonBox, SIGNAL(helpRequested()), this, SLOT(help()));
+	okPushButton->setDefault(true);
+	
+	connect(okPushButton, SIGNAL(clicked()), this, SLOT(wasAccepted()));
+	connect(cancelPushButton, SIGNAL(clicked()), this, SLOT(wasCanceled()));
+	connect(helpPushButton, SIGNAL(clicked()), this, SLOT(help()));
 	
 	spread2CheckBox->setChecked(false);
 	spread3CheckBox->setChecked(false);

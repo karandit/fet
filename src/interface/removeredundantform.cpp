@@ -44,8 +44,10 @@ RemoveRedundantForm::RemoveRedundantForm(QWidget* parent): QDialog(parent)
 	centerWidgetOnScreen(this);
 	restoreFETDialogGeometry(this);
 	
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(wasAccepted()));
-	connect(buttonBox, SIGNAL(rejected()), this, SLOT(wasCanceled()));
+	okPushButton->setDefault(true);
+	
+	connect(okPushButton, SIGNAL(clicked()), this, SLOT(wasAccepted()));
+	connect(cancelPushButton, SIGNAL(clicked()), this, SLOT(wasCanceled()));
 }
 
 RemoveRedundantForm::~RemoveRedundantForm()

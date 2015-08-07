@@ -37,7 +37,7 @@ AddConstraintStudentsMinHoursDailyForm::AddConstraintStudentsMinHoursDailyForm(Q
 	if(ENABLE_STUDENTS_MIN_HOURS_DAILY_WITH_ALLOW_EMPTY_DAYS)
 		allowLabel->setText(tr("Advanced usage: enabled"));
 	else
-		allowLabel->setText(tr("Avdanced usage: not enabled"));
+		allowLabel->setText(tr("Advanced usage: not enabled"));
 	
 	minHoursSpinBox->setMinimum(1);
 	minHoursSpinBox->setMaximum(gt.rules.nHoursPerDay);

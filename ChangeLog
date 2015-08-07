@@ -1793,3 +1793,8 @@ Versions 5.27.0 - 5.27.v
 - Version 5.27.3
 	- Updated to Qt 5.4.2.
 	- Added the "duration" filter in activities preferred starting times and preferred time slots (suggested by Volker Dirr and jillali elghazoui).
+- Version 5.27.4
+	- Updated to Qt 5.5.0.
+	- Added a new complete French translation, by Pascal Cohen.
+	- Minor bug fixes: some buttons were not translated (reported by Pascal Cohen).
+	- Added a new example file, by Laid Messaoudi.
