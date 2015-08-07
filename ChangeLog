@@ -1800,3 +1800,6 @@ Versions 5.27.0 - 5.27.v
 	- Added a new example file from Algeria, by Laid Messaoudi.
 - Version 5.27.5
 	- Minor improvements.
+- Version 5.27.6
+	- Updated the sources to gcc-5.2.1 (but the Windows version still uses MinGW 4.9.2).
+	- Minor improvements for the timetable and the statistics printing, by Volker Dirr (improved the margins handling).

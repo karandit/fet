@@ -114,12 +114,6 @@ StatisticsPrintForm::StatisticsPrintForm(QWidget *parent): QDialog(parent){
 	
 	this->setWindowTitle(tr("Print statistics matrix dialog"));
 	
-	//maybe TODO: add this as preview. but it must be qtextbrowser or qtextedit then?! Problem: it is currently much to slow! Solution: preview only the first page?!
-	//            this could be done by updateHTMLprintString(bool updateAll).
-
-	textDocument = new QTextDocument();
-	textDocument->setUndoRedoEnabled(false);
-	
 	QHBoxLayout* wholeDialog=new QHBoxLayout(this);
 	
 	QVBoxLayout* leftDialog=new QVBoxLayout();
@@ -592,8 +586,6 @@ StatisticsPrintForm::~StatisticsPrintForm(){
 	settings.setValue(this->metaObject()->className()+topPageMarginState, topPageMargin->value());
 	settings.setValue(this->metaObject()->className()+rightPageMarginState, rightPageMargin->value());
 	settings.setValue(this->metaObject()->className()+bottomPageMarginState, bottomPageMargin->value());
-	
-	delete textDocument;
 }
 
 void StatisticsPrintForm::selectAll(){
@@ -636,7 +628,7 @@ void StatisticsPrintForm::updateNamesList(){
 	}	
 }
 
-void StatisticsPrintForm::updateHTMLprintString(bool printAll){
+QString StatisticsPrintForm::updateHTMLprintString(bool printAll){
 	QString saveTime=generationLocalizedTime;
 
 	QString tmp;
@@ -856,8 +848,7 @@ void StatisticsPrintForm::updateHTMLprintString(bool printAll){
 	
 	tmp+="  </body>\n";
 	tmp+="</html>\n\n";
-	textDocument->clear();
-	textDocument->setHtml(tmp);
+	return tmp;
 }
 
 /*void StatisticsPrintForm::updateCBDivideTimeAxisByDay()
@@ -870,7 +861,7 @@ void StatisticsPrintForm::print(){
 	QMessageBox::warning(this, tr("FET warning"), tr("FET is compiled without printer support "
 	 "- it is impossible to print from this dialog. Please export and open the HTML statistics from the results directory"));
 #else
-	QPrinter printer(QPrinter::HighResolution);	//TODO: why doesn't work this CBprinterMode->currentIndex()?
+	QPrinter printer(QPrinter::HighResolution);
 
 	assert(paperSizesMap.contains(CBpaperSize->currentText()));
 	printer.setPaperSize(paperSizesMap.value(CBpaperSize->currentText()));
@@ -880,14 +871,30 @@ void StatisticsPrintForm::print(){
 		case 1: printer.setOrientation(QPrinter::Landscape); break;
 		default: assert(0==1);
 	}
+#if QT_VERSION >= 0x050000
+	QMarginsF printerMargins;
+	printerMargins.setLeft(leftPageMargin->value());
+	printerMargins.setRight(rightPageMargin->value());
+	printerMargins.setBottom(bottomPageMargin->value());
+	printerMargins.setTop(topPageMargin->value());
+	if(!printer.setPageMargins(printerMargins, QPageLayout::Millimeter)){
+		printerMargins=printer.pageLayout().minimumMargins();
+		QMessageBox::warning(this, tr("FET warning"), tr("No margins set, because at least one value is too small. "
+		"You need to enter at least:\nLeft: %1\nRight: %2\nTop: %3\nBottom: %4")
+		.arg(printerMargins.left()).arg(printerMargins.right()).arg(printerMargins.top()).arg(printerMargins.bottom()));
+	}
+#else
 	printer.setPageMargins(leftPageMargin->value(), topPageMargin->value(), rightPageMargin->value(), bottomPageMargin->value(), QPrinter::Millimeter);
+#endif
 	//QPrintDialog *printDialog = new QPrintDialog(&printer, this);
 	QPrintDialog printDialog(&printer, this);
 	printDialog.setWindowTitle(tr("Print statistics"));
 	if (printDialog.exec() == QDialog::Accepted) {
-		updateHTMLprintString(true);
-		textDocument->print(&printer);
-		textDocument->clear();
+		QTextDocument textDocument;
+		textDocument.documentLayout()->setPaintDevice(&printer);
+		textDocument.setPageSize(QSizeF(printer.pageRect().size()));
+		textDocument.setHtml(updateHTMLprintString(true));
+		textDocument.print(&printer);
 	}
 	//delete printDialog;
 #endif
@@ -898,9 +905,7 @@ void StatisticsPrintForm::printPreviewFull(){
 	QMessageBox::warning(this, tr("FET warning"), tr("FET is compiled without printer support "
 	 "- it is impossible to print from this dialog. Please export and open the HTML statistics from the results directory"));
 #else
-	updateHTMLprintString(true);
-
-	QPrinter printer(QPrinter::HighResolution);	//TODO: why doesn't work this CBprinterMode->currentIndex()?
+	QPrinter printer(QPrinter::HighResolution);
 
 	assert(paperSizesMap.contains(CBpaperSize->currentText()));
 	printer.setPaperSize(paperSizesMap.value(CBpaperSize->currentText()));
@@ -910,11 +915,24 @@ void StatisticsPrintForm::printPreviewFull(){
 		case 1: printer.setOrientation(QPrinter::Landscape); break;
 		default: assert(0==1);
 	}
+#if QT_VERSION >= 0x050000
+	QMarginsF printerMargins;
+	printerMargins.setLeft(leftPageMargin->value());
+	printerMargins.setRight(rightPageMargin->value());
+	printerMargins.setBottom(bottomPageMargin->value());
+	printerMargins.setTop(topPageMargin->value());
+	if(!printer.setPageMargins(printerMargins, QPageLayout::Millimeter)){
+		printerMargins=printer.pageLayout().minimumMargins();
+		QMessageBox::warning(this, tr("FET warning"), tr("No margins set, because at least one value is too small. "
+		"You need to enter at least:\nLeft: %1\nRight: %2\nTop: %3\nBottom: %4")
+		.arg(printerMargins.left()).arg(printerMargins.right()).arg(printerMargins.top()).arg(printerMargins.bottom()));
+	}
+#else
 	printer.setPageMargins(leftPageMargin->value(), topPageMargin->value(), rightPageMargin->value(), bottomPageMargin->value(), QPrinter::Millimeter);
+#endif
 	QPrintPreviewDialog printPreviewFull(&printer, this);
 	connect(&printPreviewFull, SIGNAL(paintRequested(QPrinter*)), SLOT(updatePreviewFull(QPrinter*)));
 	printPreviewFull.exec();
-	textDocument->clear();
 #endif
 }
 
@@ -925,7 +943,11 @@ void StatisticsPrintForm::updatePreviewFull(QPrinter* printer){
 	QMessageBox::warning(this, tr("FET warning"), tr("FET is compiled without printer support "
 	 "- it is impossible to print from this dialog. Please export and open the HTML statistics from the results directory"));
 #else
-	textDocument->print(printer);
+	QTextDocument textDocument;
+	textDocument.documentLayout()->setPaintDevice(printer);
+	textDocument.setPageSize(QSizeF(printer->pageRect().size()));
+	textDocument.setHtml(updateHTMLprintString(true));
+	textDocument.print(printer);
 #endif
 }
 
@@ -934,9 +956,7 @@ void StatisticsPrintForm::printPreviewSmall(){
 	QMessageBox::warning(this, tr("FET warning"), tr("FET is compiled without printer support "
 	 "- it is impossible to print from this dialog. Please export and open the HTML statistics from the results directory"));
 #else
-	updateHTMLprintString(false);
-
-	QPrinter printer(QPrinter::HighResolution);	//TODO: why doesn't work this: CBprinterMode->currentIndex()?
+	QPrinter printer(QPrinter::HighResolution);
 
 	assert(paperSizesMap.contains(CBpaperSize->currentText()));
 	printer.setPaperSize(paperSizesMap.value(CBpaperSize->currentText()));
@@ -946,11 +966,24 @@ void StatisticsPrintForm::printPreviewSmall(){
 		case 1: printer.setOrientation(QPrinter::Landscape); break;
 		default: assert(0==1);
 	}
+#if QT_VERSION >= 0x050000
+	QMarginsF printerMargins;
+	printerMargins.setLeft(leftPageMargin->value());
+	printerMargins.setRight(rightPageMargin->value());
+	printerMargins.setBottom(bottomPageMargin->value());
+	printerMargins.setTop(topPageMargin->value());
+	if(!printer.setPageMargins(printerMargins, QPageLayout::Millimeter)){
+		printerMargins=printer.pageLayout().minimumMargins();
+		QMessageBox::warning(this, tr("FET warning"), tr("No margins set, because at least one value is too small. "
+		"You need to enter at least:\nLeft: %1\nRight: %2\nTop: %3\nBottom: %4")
+		.arg(printerMargins.left()).arg(printerMargins.right()).arg(printerMargins.top()).arg(printerMargins.bottom()));
+	}
+#else
 	printer.setPageMargins(leftPageMargin->value(), topPageMargin->value(), rightPageMargin->value(), bottomPageMargin->value(), QPrinter::Millimeter);
+#endif
 	QPrintPreviewDialog printPreviewSmall(&printer, this);
 	connect(&printPreviewSmall, SIGNAL(paintRequested(QPrinter*)), SLOT(updatePreviewSmall(QPrinter*)));
 	printPreviewSmall.exec();
-	textDocument->clear();
 #endif
 }
 
@@ -961,6 +994,10 @@ void StatisticsPrintForm::updatePreviewSmall(QPrinter* printer){
 	QMessageBox::warning(this, tr("FET warning"), tr("FET is compiled without printer support "
 	 "- it is impossible to print from this dialog. Please export and open the HTML statistics from the results directory"));
 #else
-	textDocument->print(printer);
+	QTextDocument textDocument;
+	textDocument.documentLayout()->setPaintDevice(printer);
+	textDocument.setPageSize(QSizeF(printer->pageRect().size()));
+	textDocument.setHtml(updateHTMLprintString(false));
+	textDocument.print(printer);
 #endif
 }

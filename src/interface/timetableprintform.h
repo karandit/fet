@@ -61,8 +61,6 @@ public:
 	~TimetablePrintForm();
 
 private:
-	QTextDocument *textDocument;
-
 	QComboBox* CBTables;
 	QListWidget* namesList;
 	QPushButton* pbSelectAll;
@@ -113,7 +111,7 @@ private slots:
 	void unselectAll();
 
 	void updateNamesList();
-	void updateHTMLprintString(bool printAll);
+	QString updateHTMLprintString(bool printAll);
 	
 	//void updateCBDivideTimeAxisByDay();
 
