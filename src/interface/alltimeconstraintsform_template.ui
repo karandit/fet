@@ -68,7 +68,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="modifyConstraintPushButton">
        <property name="text">
@@ -100,7 +100,7 @@
     </layout>
    </item>
    <item row="2" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QCheckBox" name="filterCheckBox">
        <property name="text">
@@ -109,16 +109,16 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="commentsPushButton">
+      <widget class="QCheckBox" name="sortedCheckBox">
        <property name="text">
-        <string>Comments</string>
+        <string comment="It refers to time constraints">Sorted</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="sortByCommentsPushButton">
+      <widget class="QPushButton" name="commentsPushButton">
        <property name="text">
-        <string>Sort</string>
+        <string>Comments</string>
        </property>
       </widget>
      </item>

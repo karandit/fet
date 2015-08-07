@@ -145,6 +145,9 @@ const int NOTREGEXP=3;
 AllTimeConstraintsForm::AllTimeConstraintsForm(QWidget* parent): QDialog(parent)
 {
 	setupUi(this);
+
+	filterCheckBox->setChecked(false);
+	sortedCheckBox->setChecked(false);
 	
 	currentConstraintTextEdit->setReadOnly(true);
 	
@@ -158,9 +161,10 @@ AllTimeConstraintsForm::AllTimeConstraintsForm(QWidget* parent): QDialog(parent)
 	connect(modifyConstraintPushButton, SIGNAL(clicked()), this, SLOT(modifyConstraint()));
 	connect(constraintsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(modifyConstraint()));
 	connect(filterCheckBox, SIGNAL(toggled(bool)), this, SLOT(filter(bool)));
+	connect(sortedCheckBox, SIGNAL(toggled(bool)), this, SLOT(sortedChanged(bool)));
 	connect(activatePushButton, SIGNAL(clicked()), this, SLOT(activateConstraint()));
 	connect(deactivatePushButton, SIGNAL(clicked()), this, SLOT(deactivateConstraint()));
-	connect(sortByCommentsPushButton, SIGNAL(clicked()), this, SLOT(sortConstraintsByComments()));
+	//connect(sortByCommentsPushButton, SIGNAL(clicked()), this, SLOT(sortConstraintsByComments()));
 	connect(commentsPushButton, SIGNAL(clicked()), this, SLOT(constraintComments()));
 
 	centerWidgetOnScreen(this);
@@ -194,6 +198,7 @@ AllTimeConstraintsForm::AllTimeConstraintsForm(QWidget* parent): QDialog(parent)
 	useFilter=false;
 	
 	assert(filterCheckBox->isChecked()==false);
+	assert(sortedCheckBox->isChecked()==false);
 	
 	filterChanged();
 }
@@ -285,23 +290,41 @@ bool AllTimeConstraintsForm::filterOk(TimeConstraint* ctr)
 	}
 }
 
+void AllTimeConstraintsForm::sortedChanged(bool checked)
+{
+	Q_UNUSED(checked);
+
+	filterChanged();
+}
+
+static int timeConstraintsAscendingByDescription(TimeConstraint* t1, TimeConstraint* t2)
+{
+	return t1->getDescription(gt.rules) < t2->getDescription(gt.rules);
+}
+
 void AllTimeConstraintsForm::filterChanged()
 {
 	visibleTimeConstraintsList.clear();
 	constraintsListWidget->clear();
 	int n_active=0;
 	foreach(TimeConstraint* ctr, gt.rules.timeConstraintsList)
-		if(filterOk(ctr)){
+		if(filterOk(ctr))
 			visibleTimeConstraintsList.append(ctr);
-			constraintsListWidget->addItem(ctr->getDescription(gt.rules));
-			
-			if(USE_GUI_COLORS && !ctr->active)
-				constraintsListWidget->item(constraintsListWidget->count()-1)->setBackground(constraintsListWidget->palette().alternateBase());
-				
-			if(ctr->active)
-				n_active++;
-		}
 		
+	if(sortedCheckBox->isChecked())
+		std::stable_sort(visibleTimeConstraintsList.begin(), visibleTimeConstraintsList.end(), timeConstraintsAscendingByDescription);
+
+	foreach(TimeConstraint* ctr, visibleTimeConstraintsList){
+		assert(filterOk(ctr));
+		constraintsListWidget->addItem(ctr->getDescription(gt.rules));
+			
+		if(USE_GUI_COLORS && !ctr->active)
+			constraintsListWidget->item(constraintsListWidget->count()-1)->setBackground(constraintsListWidget->palette().alternateBase());
+		
+		if(ctr->active)
+			n_active++;
+	}
+	
 	if(constraintsListWidget->count()<=0)
 		currentConstraintTextEdit->setPlainText("");
 	else
@@ -980,7 +1003,7 @@ void AllTimeConstraintsForm::deactivateConstraint()
 	}
 }
 
-static int timeConstraintsAscendingByComments(const TimeConstraint* t1, const TimeConstraint* t2)
+/*static int timeConstraintsAscendingByComments(const TimeConstraint* t1, const TimeConstraint* t2)
 {
 	return t1->comments < t2->comments;
 }
@@ -997,14 +1020,13 @@ void AllTimeConstraintsForm::sortConstraintsByComments()
 	if(t==QMessageBox::Cancel)
 		return;
 	
-	//qStableSort(gt.rules.timeConstraintsList.begin(), gt.rules.timeConstraintsList.end(), timeConstraintsAscendingByComments);
 	std::stable_sort(gt.rules.timeConstraintsList.begin(), gt.rules.timeConstraintsList.end(), timeConstraintsAscendingByComments);
 
 	gt.rules.internalStructureComputed=false;
 	setRulesModifiedAndOtherThings(&gt.rules);
 	
 	filterChanged();
-}
+}*/
 
 void AllTimeConstraintsForm::constraintComments()
 {

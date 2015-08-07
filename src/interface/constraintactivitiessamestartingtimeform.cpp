@@ -320,9 +320,16 @@ void ConstraintActivitiesSameStartingTimeForm::help()
 	QString s;
 
 	s+=tr("IMPORTANT: after adding such constraints, it is necessary (otherwise generation might be impossible) to remove redundant constraints"
-	" min days between activities. If you are sure that you don't have redundant constraints, you can skip this step, but it doesn't hurt to do it as a precaution."
-	" Also, you don't have to do that after each added constraint, but only once after adding more constraints of this type."
-	" Please read Help/Important tips - tip number 2 for details");
+	 " min days between activities. If you are sure that you don't have redundant constraints, you can skip this step, but it doesn't hurt to do it as a precaution."
+	 " Also, you don't have to do that after each added constraint, but only once after adding more constraints of this type."
+	 " Please read Help/Important tips - tip number 2 for details");
+	s+="\n\n";
+	s+=tr("If you divide the years by categories (the students have optional courses), you may not need this kind of constraint. If the year is for instance"
+	 " divided by language, English/French/German, sometimes people think that it is needed that these optional activities to have the same starting"
+	 " time. But solutions exist without adding same starting time constraints. Some people try to avoid students gaps by using this"
+	 " constraint, because they need to do it this way in other timetabling software. But it is not the best practice to do it with such a"
+	 " constraint. The correct way is to add a max 0 gaps per week constraint for students and maybe also an early max 0 beginnings at second"
+	 " hour constraint for students.");
 
 	LongTextMessageBox::largeInformation(this, tr("FET help"), s);
 }

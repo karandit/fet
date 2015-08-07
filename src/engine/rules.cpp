@@ -1719,7 +1719,8 @@ bool Rules::removeYear(const QString& yearName, bool removeAlsoThisYear)
 		}
 	
 	QSet<StudentsSet*> toBeRemoved;
-	toBeRemoved.insert(yearPointer);
+	if(removeAlsoThisYear)
+		toBeRemoved.insert(yearPointer);
 	foreach(StudentsGroup* group, yearPointer->groupsList){
 		assert(!toBeRemoved.contains(group));
 		if(!tmpSet.contains(group))
@@ -1730,9 +1731,6 @@ bool Rules::removeYear(const QString& yearName, bool removeAlsoThisYear)
 				toBeRemoved.insert(subgroup);
 		}
 	}
-	
-	if(!removeAlsoThisYear)
-		toBeRemoved.remove(yearPointer);
 	
 	updateActivitiesWhenRemovingStudents(toBeRemoved, false);
 	
@@ -1751,6 +1749,50 @@ bool Rules::removeYear(const QString& yearName, bool removeAlsoThisYear)
 		delete studentsSet;
 		
 	if(toBeRemoved.count()>0)
+		updateConstraintsAfterRemoval();
+	
+	this->internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(this);
+	return true;
+}
+
+bool Rules::removeYearPointerAfterSplit(StudentsYear* yearPointer)
+{
+	assert(yearPointer!=NULL);
+	
+	//names
+	QSet<QString> tmpSet;
+	foreach(StudentsYear* year, yearsList){
+		tmpSet.insert(year->name);
+		foreach(StudentsGroup* group, year->groupsList){
+			tmpSet.insert(group->name);
+			foreach(StudentsSubgroup* subgroup, group->subgroupsList)
+				tmpSet.insert(subgroup->name);
+		}
+	}
+	
+	QSet<StudentsSet*> toBeRemoved;
+	//Not here, because there exists another pointer with the same name (to the new year),
+	//and I don't want to remove the activities with this year name
+	//toBeRemoved.insert(yearPointer);
+	foreach(StudentsGroup* group, yearPointer->groupsList){
+		assert(!toBeRemoved.contains(group));
+		if(!tmpSet.contains(group->name))
+			toBeRemoved.insert(group);
+		foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+			//assert(!toBeRemoved.contains(subgroup));
+			if(!tmpSet.contains(subgroup->name) && !toBeRemoved.contains(subgroup))
+				toBeRemoved.insert(subgroup);
+		}
+	}
+	
+	updateActivitiesWhenRemovingStudents(toBeRemoved, false);
+	
+	toBeRemoved.insert(yearPointer);
+	foreach(StudentsSet* studentsSet, toBeRemoved)
+		delete studentsSet;
+		
+	if(toBeRemoved.count()>1)
 		updateConstraintsAfterRemoval();
 	
 	this->internalStructureComputed=false;
@@ -2386,12 +2428,12 @@ bool Rules::addSplitActivity(
 	return true;
 }
 
-void Rules::removeActivity(int _id)
+/*void Rules::removeActivity(int _id)
 {
 	QList<int> tmpList;
 	tmpList.append(_id);
 	removeActivities(tmpList, true);
-}
+}*/
 
 void Rules::removeActivity(int _id, int _activityGroupId)
 {
@@ -2407,14 +2449,22 @@ void Rules::removeActivities(const QList<int>& _idsList, bool updateConstraints)
 	if(_idsList.count()==0)
 		return;
 
-	QSet<int> _idsSet=_idsList.toSet();
+	QSet<int> _removedIdsSet=_idsList.toSet();
+	
+	QSet<int> _groupIdsSet;
+	foreach(Activity* act, activitiesList)
+		if(act->activityGroupId>0 && _removedIdsSet.contains(act->id))
+			_groupIdsSet.insert(act->activityGroupId);
+	foreach(Activity* act, activitiesList)
+		if(act->activityGroupId>0 && _groupIdsSet.contains(act->activityGroupId))
+			_removedIdsSet.insert(act->id);
 	
 	ActivitiesList newActivitiesList;
 	ActivitiesList toBeRemoved;
 	
 	for(int i=0; i<activitiesList.count(); i++){
 		int id=activitiesList.at(i)->id;
-		if(!_idsSet.contains(id)){
+		if(!_removedIdsSet.contains(id)){
 			newActivitiesList.append(activitiesList[i]);
 		}
 		else{

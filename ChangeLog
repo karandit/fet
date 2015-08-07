@@ -1726,7 +1726,7 @@ Versions 5.23.0 - 5.23.4
 	- Added a partial Chinese Simplified (zh_CN) translation, by orange.
 	- Added two example files from Vietnam, by Nguyen Huu Tuyen.
 ---------------------------------------------------------------------------------
-Versions 5.24.0 - 5.24.x
+Version 5.24.0
 - Version 5.24.0
 	- Updated to Qt 5.4.0.
 	- Significant speed improvements when using many students sets (suggested by Volker Dirr).
@@ -1746,3 +1746,12 @@ Versions 5.24.0 - 5.24.x
 	- Added a new example file from Vietnam, by nguyenhuuduyet.
 	- Added a new example file from Namibia, by Bobby Wise.
 	- Added two anonymous example files.
+---------------------------------------------------------------------------------
+Versions 5.25.0 - 5.25.x
+- Version 5.25.0
+	- Improved the split year dialog: groups and subgroups which will exist in this year after the division will retain their activities and constraints.
+	- Sort (temporarily) the constraints by description in the all time/space constraints dialogs. Also, removed the 'Sort by comments' button,
+	which is probably useless.
+	- Fixed a bug introduced in version 5.24.0: when having individually modified activities, removing teachers, subjects, activity tags,
+	or students sets could remove only some components of the large split activity.
+	- Some minor strings improvements.

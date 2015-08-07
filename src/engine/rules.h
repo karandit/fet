@@ -399,6 +399,8 @@ public:
 	bool emptyYear(const QString& yearName);
 	bool removeYear(const QString& yearName);
 	bool removeYear(const QString& yearName, bool removeAlsoThisYear);
+	
+	bool removeYearPointerAfterSplit(StudentsYear* yearPointer);
 
 	/**
 	Returns -1 if not found or the index of this year in the years list
@@ -534,7 +536,7 @@ public:
 	/**
 	Removes only the activity with this id.
 	*/
-	void removeActivity(int _id);
+	//void removeActivity(int _id);
 
 	/**
 	If _activityGroupId==0, then this is a non-split activity

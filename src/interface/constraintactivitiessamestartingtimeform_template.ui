@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>580</height>
+    <width>740</width>
+    <height>643</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string extracomment="This is the title of the dialog to see the list of all constraints of this type">Constraints activities same starting time</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="0" column="0" colspan="4">
+   <item row="0" column="0" colspan="2">
     <widget class="QLabel" name="constraintsTextLabel_2">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -29,7 +29,7 @@
       <enum>QFrame::Plain</enum>
      </property>
      <property name="text">
-      <string>Please try to read Help/Important tips, advice 2). It is IMPORTANT to remove redundant min days constraints after adding constraints same starting time. Please also click Help button here for information.</string>
+      <string>Please read Help/Important tips, advice 2). It is IMPORTANT to remove redundant min days constraints after adding constraints same starting time. Click the Help button!</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -37,6 +37,28 @@
     </widget>
    </item>
    <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="constraintsTextLabel_3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>NOTE: You might not need this constraint. Press Help!</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QLabel" name="constraintsTextLabel">
@@ -59,7 +81,7 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="2" colspan="2">
+   <item row="2" column="1">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QLabel" name="currentConstraintTextLabel">
@@ -137,40 +159,48 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="addConstraintPushButton">
-     <property name="text">
-      <string>Add</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1" colspan="2">
-    <widget class="QPushButton" name="modifyConstraintPushButton">
-     <property name="text">
-      <string>Modify</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <widget class="QPushButton" name="removeConstraintPushButton">
-     <property name="text">
-      <string>Remove</string>
-     </property>
-    </widget>
-   </item>
    <item row="3" column="0" colspan="2">
-    <widget class="QPushButton" name="helpPushButton">
-     <property name="text">
-      <string>Help</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="addConstraintPushButton">
+       <property name="text">
+        <string>Add</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="modifyConstraintPushButton">
+       <property name="text">
+        <string>Modify</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="removeConstraintPushButton">
+       <property name="text">
+        <string>Remove</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item row="3" column="2" colspan="2">
-    <widget class="QPushButton" name="closePushButton">
-     <property name="text">
-      <string>Close</string>
-     </property>
-    </widget>
+   <item row="4" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="helpPushButton">
+       <property name="text">
+        <string>Help</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closePushButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

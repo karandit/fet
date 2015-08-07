@@ -35,10 +35,14 @@
 #include <QInputDialog>
 
 #include <QSet>
+#include <QHash>
+#include <QMap>
 
 #include <QSignalMapper>
 
 #include "centerwidgetonscreen.h"
+
+#include "longtextmessagebox.h"
 
 extern const QString COMPANY;
 extern const QString PROGRAM;
@@ -284,7 +288,8 @@ void SplitYearForm::ok()
 	if(categoriesSpinBox->value()>4){
 		QMessageBox::StandardButton ret=QMessageBox::warning(this, tr("FET warning"),
 		 tr("You want to divide the year by %1 categories. The recommended number of categories"
-		 " is 2, 3 or maximum 4. Are you sure?").arg(categoriesSpinBox->value()),
+		 " is 2, 3 or maximum 4 (to ensure the timetable generation speed and feasibility). Are you sure?")
+		 .arg(categoriesSpinBox->value()),
 		 QMessageBox::Yes|QMessageBox::Cancel);
 		if(ret==QMessageBox::Cancel)
 			return;
@@ -342,8 +347,7 @@ void SplitYearForm::ok()
 	
 	QString separator=separatorLineEdit->text();
 	
-	//StudentsYear* y=(StudentsYear*)gt.rules.searchStudentsSet(year);
-	StudentsYear* y=NULL;
+/*	StudentsYear* y=NULL;
 	foreach(StudentsYear* ty, gt.rules.yearsList)
 		if(ty->name==year){
 			y=ty;
@@ -372,11 +376,7 @@ void SplitYearForm::ok()
 			return;
 			
 		gt.rules.emptyYear(year);
-		/*while(y->groupsList.count()>0){
-			QString group=y->groupsList.at(0)->name;
-			gt.rules.removeGroup(year, group);
-		}*/
-	}
+	}*/
 	
 	QSet<QString> tmp;
 	for(int i=0; i<categoriesSpinBox->value(); i++)
@@ -386,31 +386,39 @@ void SplitYearForm::ok()
 				QMessageBox::information(this, tr("FET information"), tr("Duplicate names not allowed"));
 				return;
 			}
+			else if(ts.isEmpty()){
+				QMessageBox::information(this, tr("FET information"), tr("Empty names not allowed"));
+				return;
+			}
 			tmp.insert(ts);
 		}
 		
 	QSet<QString> existingNames;
-	foreach(StudentsYear* year, gt.rules.yearsList){
-		assert(!existingNames.contains(year->name));
-		existingNames.insert(year->name);
-		foreach(StudentsGroup* group, year->groupsList){
-			if(!existingNames.contains(group->name))
-				existingNames.insert(group->name);
-			foreach(StudentsSubgroup* subgroup, group->subgroupsList){
-				if(!existingNames.contains(subgroup->name))
-					existingNames.insert(subgroup->name);
+	foreach(StudentsYear* sty, gt.rules.yearsList){
+		assert(!existingNames.contains(sty->name));
+		existingNames.insert(sty->name);
+		if(sty->name!=year){
+			foreach(StudentsGroup* group, sty->groupsList){
+				if(!existingNames.contains(group->name))
+					existingNames.insert(group->name);
+				foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+					if(!existingNames.contains(subgroup->name))
+						existingNames.insert(subgroup->name);
+				}
 			}
 		}
 	}
 
+	QSet<QString> newStudentsSets;
 	for(int i=0; i<categoriesSpinBox->value(); i++)
 		for(int j=0; j<listWidgets[i]->count(); j++){
 			QString ts=year+separator+listWidgets[i]->item(j)->text();
 			if(existingNames.contains(ts)){
-				QMessageBox::information(this, tr("FET information"), tr("Cannot add group %1, because a set with the same name exists. "
-				 "Please choose another name or remove the old set").arg(ts));
+				QMessageBox::information(this, tr("FET information"), tr("Cannot add group %1, because a set with the same name exists."
+				 " Please choose another name or remove the old set").arg(ts));
 				return;
 			}
+			newStudentsSets.insert(ts);
 		}
 		
 	//As in Knuth TAOCP vol 4A, generate all tuples
@@ -430,6 +438,7 @@ void SplitYearForm::ok()
 				 "Please choose another name or remove the old set").arg(sb));
 				return;
 			}
+			newStudentsSets.insert(sb);
 			ii=categoriesSpinBox->value()-1;
 again_here_1:
 			if(b[ii]>=listWidgets[ii]->count()-1){
@@ -456,13 +465,108 @@ again_here_1:
 		}
 	assert(yearPointer!=NULL);
 	
+	QSet<QString> notExistingGroupsSet;
+	QSet<QString> notExistingSubgroupsSet;
+	QStringList notExistingGroupsList;
+	QStringList notExistingSubgroupsList;
+	foreach(StudentsGroup* group, yearPointer->groupsList){
+		if(!existingNames.contains(group->name) && !newStudentsSets.contains(group->name) && !notExistingGroupsSet.contains(group->name)){
+			notExistingGroupsSet.insert(group->name);
+			notExistingGroupsList.append(group->name);
+		}
+		foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+			if(!existingNames.contains(subgroup->name) && !newStudentsSets.contains(subgroup->name) && !notExistingSubgroupsSet.contains(subgroup->name)){
+				notExistingSubgroupsSet.insert(subgroup->name);
+				notExistingSubgroupsList.append(subgroup->name);
+			}
+		}
+	}
+	
+	bool removeGroupsOrSubgroups = notExistingGroupsList.count()>0 || notExistingSubgroupsList.count()>0;
+	
+	QString description=QString("");
+	if(notExistingGroupsList.count()>0 && notExistingSubgroupsList.count()>0)
+		description+=tr("WARNING: There are groups and subgroups which will no longer be available and which will be removed, along with the associated"
+		 " activities and constraints. Are you sure? See the list below.");
+	else if(notExistingGroupsList.count()>0 && notExistingSubgroupsList.count()==0)
+		description+=tr("WARNING: There are groups which will no longer be available and which will be removed, along with the associated"
+		 " activities and constraints. Are you sure? See the list below.");
+	else if(notExistingGroupsList.count()==0 && notExistingSubgroupsList.count()>0)
+		description+=tr("WARNING: There are subgroups which will no longer be available and which will be removed, along with the associated"
+		 " activities and constraints. Are you sure? See the list below.");
+
+	if(notExistingGroupsList.count()>0 || notExistingSubgroupsList.count()>0){
+		description+=" (";
+		if(notExistingGroupsList.count()>0 && notExistingSubgroupsList.count()>0)
+			description+=tr("Notes:");
+		else
+			description+=tr("Note:");
+		description+=" ";
+		if(notExistingGroupsList.count()>0){
+			description+=tr("To keep a group, you need to keep the corresponding division name and use the same separator(s) character(s).");
+			description+=" ";
+		}
+		if(notExistingSubgroupsList.count()>0){
+			description+=tr("Probably you can safely ignore the warning about the removal of the subgroups.");
+			description+=" ";
+		}
+		description+=tr("Read the divide year dialog Help for details.");
+		description+=")";
+	}
+	
+	if(!description.isEmpty())
+		description+="\n\n";
+	
+	if(notExistingGroupsList.count()>0){
+		description+=tr("The following groups will no longer be available:");
+		description+="\n\n";
+		description+=notExistingGroupsList.join("\n");
+	}
+	if(notExistingSubgroupsList.count()>0){
+		if(notExistingGroupsList.count()>0)
+			description+="\n\n";
+	
+		description+=tr("The following subgroups will no longer be available:");
+		description+="\n\n";
+		description+=notExistingSubgroupsList.join("\n");
+	}
+	
+	if(!description.isEmpty()){
+		int lres=LongTextMessageBox::largeConfirmation(this, tr("FET confirmation"),
+		 description, tr("Yes"), tr("No"), 0, 0, 1);
+		if(lres!=0){
+			return;
+		}
+		
+		QMessageBox::StandardButton t=QMessageBox::warning(this, tr("FET warning"), tr("Year %1 will be split again."
+		 " All groups and subgroups of this year which will no longer exist (listed before) and the associated activities and constraints"
+		 " will be removed. Are you absolutely sure?").arg(year), QMessageBox::Yes|QMessageBox::Cancel);
+		
+		if(t==QMessageBox::Cancel)
+			return;
+	}
+	
+	StudentsYear* newYear=new StudentsYear;
+	newYear->name=yearPointer->name;
+	newYear->numberOfStudents=yearPointer->numberOfStudents;
+	newYear->indexInAugmentedYearsList=yearPointer->indexInAugmentedYearsList;
+	
+	QHash<QString, int> numberOfStudents;
+	foreach(StudentsGroup* group, yearPointer->groupsList){
+		numberOfStudents.insert(group->name, group->numberOfStudents);
+		foreach(StudentsSubgroup* subgroup, group->subgroupsList)
+			numberOfStudents.insert(subgroup->name, subgroup->numberOfStudents);
+	}
+	
 	//add groups and subgroups
 	for(int i=0; i<categoriesSpinBox->value(); i++)
 		for(int j=0; j<listWidgets[i]->count(); j++){
 			QString ts=year+separator+listWidgets[i]->item(j)->text();
 			StudentsGroup* gr=new StudentsGroup;
 			gr->name=ts;
-			bool t=gt.rules.addGroupFast(yearPointer, gr);
+			if(numberOfStudents.contains(gr->name))
+				gr->numberOfStudents=numberOfStudents.value(gr->name);
+			bool t=gt.rules.addGroupFast(newYear, gr);
 			
 			assert(t);
 			
@@ -485,10 +589,12 @@ again_here_1:
 				
 			StudentsSubgroup* sb=new StudentsSubgroup;
 			sb->name=sbn;
+			if(numberOfStudents.contains(sb->name))
+				sb->numberOfStudents=numberOfStudents.value(sb->name);
 
 			for(int i=0; i<categoriesSpinBox->value(); i++){
 				assert(groupsHash.contains(groups.at(i)));
-				bool t=gt.rules.addSubgroupFast(yearPointer, groupsHash.value(groups.at(i)), sb);
+				bool t=gt.rules.addSubgroupFast(newYear, groupsHash.value(groups.at(i)), sb);
 				assert(t);
 			}
 
@@ -508,8 +614,46 @@ again_here_2:
 		}
 	}
 	
-	QMessageBox::information(this, tr("FET information"), tr("Split of year complete, please check the groups and subgroups"
-	 " of year to make sure everything is OK"));
+	for(int i=0; i<gt.rules.yearsList.count(); i++)
+		if(gt.rules.yearsList[i]==yearPointer){
+			gt.rules.yearsList[i]=newYear;
+			break;
+		}
+	
+	QString s=QString("");
+	
+	int nActivitiesBefore=gt.rules.activitiesList.count();
+	int nTimeConstraintsBefore=gt.rules.timeConstraintsList.count();
+	int nSpaceConstraintsBefore=gt.rules.spaceConstraintsList.count();
+	int nGroupActivitiesInInitialOrderItemsBefore=gt.rules.groupActivitiesInInitialOrderList.count();
+	
+	gt.rules.removeYearPointerAfterSplit(yearPointer);
+
+	int nActivitiesAfter=gt.rules.activitiesList.count();
+	int nTimeConstraintsAfter=gt.rules.timeConstraintsList.count();
+	int nSpaceConstraintsAfter=gt.rules.spaceConstraintsList.count();
+	int nGroupActivitiesInInitialOrderItemsAfter=gt.rules.groupActivitiesInInitialOrderList.count();
+	
+	if(removeGroupsOrSubgroups){
+		s+="\n\n";
+		s+=tr("There were removed %1 activities, %2 time constraints and %3 space constraints.")
+		 .arg(nActivitiesBefore-nActivitiesAfter)
+		 .arg(nTimeConstraintsBefore-nTimeConstraintsAfter)
+		 .arg(nSpaceConstraintsBefore-nSpaceConstraintsAfter);
+	
+		if(nGroupActivitiesInInitialOrderItemsBefore!=nGroupActivitiesInInitialOrderItemsAfter)
+			s+=QString(" ")+tr("There were removed %1 'group activities in the initial order' items.")
+			 .arg(nGroupActivitiesInInitialOrderItemsBefore-nGroupActivitiesInInitialOrderItemsAfter);
+	}
+	else{
+		assert(nActivitiesBefore==nActivitiesAfter);
+		assert(nTimeConstraintsBefore==nTimeConstraintsAfter);
+		assert(nSpaceConstraintsBefore==nSpaceConstraintsAfter);
+		assert(nGroupActivitiesInInitialOrderItemsBefore==nGroupActivitiesInInitialOrderItemsAfter);
+	}
+	
+	QMessageBox::information(this, tr("FET information"), tr("Split of the year complete, please check the groups and subgroups"
+	 " of the year to make sure that everything is OK.")+s);
 	
 	//saving page
 	_sep=separatorLineEdit->text();
@@ -545,13 +689,13 @@ void SplitYearForm::help()
 
 	s+="\n\n";
 
-	s+=tr("Please input from the beginning the correct divisions. After you inputted activities and constraints"
+	/*s+=tr("Please input from the beginning the correct divisions. After you inputted activities and constraints"
 	 " for this year's groups and subgroups, dividing it again will remove the activities and constraints referring"
 	 " to these groups/subgroups. I know this is not elegant, I hope I'll solve that in the future."
 	 " You might want to use the alternative of manually adding/editing/removing groups/subgroups"
 	 " in the groups/subgroups menu, though removing a group/subgroup will also remove the activities");
 	
-	s+="\n\n";
+	s+="\n\n";*/
 
 	s+=tr("If your number of subgroups is reasonable, probably you need not worry about empty subgroups (regarding speed of generation)."
 		" But more tests need to be done. You just need to know that for the moment the maximum total number of subgroups is %1 (which can be changed,"
@@ -559,9 +703,19 @@ void SplitYearForm::help()
 
 	s+="\n\n";
 
-	s+=tr("Please note that the dialog here will keep the last configuration of the last "
-		 "divided year, it will not remember the values for a specific year you need to modify.");
+	s+=tr("Please note that the dialog here will keep the last configuration of the last"
+		" divided year, it will not remember the values for a specific year you need to modify.");
+	s+=" ";
+	s+=tr("If you intend to divide again a year by categories and you want to keep (the majority of) the existing groups in this year,"
+		" you will need to use the exact same separator character(s) for dividing this year as you used when previously dividing this year,"
+		" and the same division names (any old division which is no longer entered means a group which will be removed from this year).");
 		
+	s+="\n\n";
+	
+	s+=tr("When dividing again a year, you might get a warning about subgroups which will be removed. If you didn't explicitely use"
+		" (these) subgroups in your activities or constraints, probably you can safely ignore this warning. Generally, if you use years' division"
+		" by categories, it is groups that matter.");
+	
 	s+="\n\n";
 
 	s+=tr("Separator character(s) is of your choice (default is space)");

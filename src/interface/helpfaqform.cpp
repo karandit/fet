@@ -168,12 +168,12 @@ void HelpFaqForm::setText()
 		"activities. All the subgroups are independent. If you have a subgroup with only 2 hours per week and constraint early, "
 		"then these 2 activities must be placed in the first hours of the day, which is probably much too hard (wrong).");
 	s+="\n\n";
-	s+=tr("Important note: please do the correct division of a year from the beginning. Each time you divide a year, the "
+	/*s+=tr("Important note: please do the correct division of a year from the beginning. Each time you divide a year, the "
 		"corresponding activities and constraints referring to year's groups and subgroups will be removed, along with groups "
 		"and subgroups. This is not elegant, I know, I will try to find a better solution in the future. If you already inputted "
 		"a lot of constraints and activities referring to a year's groups/subgroups, you might want to manually change the division of "
 		"a year by the groups/subgroups menus.");
-	s+="\n\n";
+	s+="\n\n";*/
 	s+=tr("Another possibility: you can see that each activity has allowed more teachers/students sets. If you need to split year Y "
 		"according to Language1 (with teachers T1 and T2), you might not split Y and add an activity with Y and teachers T1 and "
 		"T2 and subject 'Language1'. This is a small trick, which might be easier to use than to divide a year.");

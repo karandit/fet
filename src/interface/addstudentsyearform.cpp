@@ -99,10 +99,12 @@ void AddStudentsYearForm::addStudentsYear()
 
 		QMessageBox::information(this, tr("Year insertion dialog"),
 			tr("Year added. You might want to divide it into sections - this is done in the years "
-			"dialog - button 'Divide year ...', or by manually adding groups and subgroups in the groups or subgroups menus\n\n"
-			" Important note: if you plan to use option 'divide', please try to use it only once for each year at the beginning, because"
+			"dialog - button 'Divide year ...', or by manually adding groups and subgroups in the groups or subgroups menus."
+			/*
+			"\n\nImportant note: if you plan to use option 'divide', please try to use it only once for each year at the beginning, because"
 			" a second use of option 'divide' for the same year will remove all activities and constraints referring to old groups and subgroups"
 			" from this year."
+			*/
 			));
 	}
 

@@ -1,4 +1,4 @@
-This is FET version 5.24.0
+This is FET version 5.25.0
 
 
 Program description:
@@ -16,7 +16,7 @@ Requirements:
 
 	FET is created in the following environment: openSUSE 13.2 GNU/Linux distribution, Linux 3.16.7, Xfce 4.10,
 	Midnight Commander 4.8.13, KDiff3 0.9.97, Qt 5.4.0, gcc 4.8.3, g++ 4.8.3, make 4.0, sed 4.2.2,
-	Valgrind 3.10.0, Coverity Scan 7.5.0, Cppcheck 1.67, other great free tools.
+	Valgrind 3.10.0, Coverity Scan 7.5.0, Cppcheck 1.68, other great free tools.
 	FET can be run on any platform supported by the free software Qt (GNU/Linux, Windows, Mac OS X).
 
 	GNU/Linux, Mac OS X:
@@ -362,4 +362,4 @@ Feed-back / help:
 	for inclusion into examples, and also to report possible bugs and suggestions. See the FET homepage for contact information.
 
 
-Copyright (C) 2002-2014 Liviu Lalescu, Volker Dirr.
+Copyright (C) 2002-2015 Liviu Lalescu, Volker Dirr.
