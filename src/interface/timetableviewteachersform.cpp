@@ -274,11 +274,15 @@ void TimetableViewTeachersForm::updateTeachersTimetableTable(){
 				assert(act!=NULL);
 				
 				if(act->teachersNames.count()==1){
-					assert(act->teachersNames.at(0)==teachername);
+					//Don't do the assert below, because it crashes if you change the teacher's name and view the teachers' timetable,
+					//without generating again (as reported by Yush Yuen).
+					//assert(act->teachersNames.at(0)==teachername);
 				}
 				else{
 					assert(act->teachersNames.count()>=2);
-					assert(act->teachersNames.contains(teachername));
+					//Don't do the assert below, because it crashes if you change the teacher's name and view the teachers' timetable,
+					//without generating again (as reported by Yush Yuen).
+					//assert(act->teachersNames.contains(teachername));
 					s+=act->teachersNames.join(", ");
 					s+="\n";
 				}

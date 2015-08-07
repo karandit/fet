@@ -1784,3 +1784,7 @@ Versions 5.27.0 - 5.27.v
 - Version 5.27.0
 	- Writing the statistics of the generated timetable (gaps, min/max hours, free days), implemented by Volker Dirr.
 	- Updated the Chinese Traditional translation, by James.
+- Version 5.27.1
+	- Crash bug fix, when modifying a teacher after generating, and then viewing the timetable for that teacher without generating again.
+	Reported by Yush Yuen.
+	- Updated the German translation, by Bob Hairgrove.

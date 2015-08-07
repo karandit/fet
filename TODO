@@ -3528,3 +3528,16 @@ Liviu:
 :-) Yes, sure, I thought of this, but some people might really want to
 translate in a hypothetical situation. All strings in FET should be
 translatable, I think (I am not sure, though).
+
+218---------------------------------------------------------
+From Volker Dirr:
+
+since FET is able to change split year automatically without losing
+activities, it is useful to load and save the settings.
+i don't talk about qsettings. it it already stored there and that is fine.
+but the settings are different a bit. so year 5 and 6 have very similar
+categories and divisions, but year 7-10 have got a bit different.
+so it would be fine to save and load them into a file. so a user can save
+settings for year 5-6 and save settings for year 7-10. i am not sure if
+into the fet file or into a separate file. it has different advantages and
+disadvantages. but i think into a new separate file is a bit better.
