@@ -1294,7 +1294,8 @@ TRANSLATIONS += \
 	../translations/fet_untranslated.ts \
 	../translations/fet_uz.ts \
 	../translations/fet_vi.ts \
-	../translations/fet_zh_CN.ts
+	../translations/fet_zh_CN.ts \
+	../translations/fet_zh_TW.ts
 
 TEMPLATE = app
 

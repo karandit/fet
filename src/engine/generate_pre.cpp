@@ -470,7 +470,8 @@ bool processTimeSpaceConstraints(QWidget* parent, QTextStream* initialOrderStrea
 		
 		QStringList s;
 		
-		isSignificantSubgroup[tmpSortedSubgroupsList.at(0)]=true;
+		if(gt.rules.nInternalSubgroups>0)
+			isSignificantSubgroup[tmpSortedSubgroupsList.at(0)]=true;
 		for(int i=1; i<gt.rules.nInternalSubgroups; i++){
 			int s1=tmpSortedSubgroupsList.at(i-1);
 			int s2=tmpSortedSubgroupsList.at(i);
@@ -498,9 +499,11 @@ bool processTimeSpaceConstraints(QWidget* parent, QTextStream* initialOrderStrea
 				cnt++;
 		
 		if(cnt>0){
-			QString s0=GeneratePreTranslate::tr("There are %1 subgroups (from the total of %2 subgroups) which have the same activities as other subgroups. They are listed below."
-				" If the constraints relating to these subgroups are also the same, you can make the generation (directly proportional) faster by removing the subgroups"
-				" which are equivalent to other subgroups (leaving only one representant for each equivalence set). (The generation algorithm will not remove the equivalent"
+			QString s0=GeneratePreTranslate::tr("Optimization tip:");
+			s0+=" ";
+			s0+=GeneratePreTranslate::tr("There are %1 subgroups (from the total of %2 subgroups) which have the same activities as other subgroups. They are listed below."
+				" If the constraints relating to these subgroups are also the same, you can make the generation (directly proportional) faster by completely removing the subgroups"
+				" which are equivalent to other subgroups (leaving only one representant for each equivalence set). (The generation algorithm will not completely remove the equivalent"
 				" subgroups automatically.)").arg(cnt).arg(gt.rules.nInternalSubgroups);
 			s0+="\n\n";
 			s0+=GeneratePreTranslate::tr("If you did not add all the activities yet or if the number of equivalent subgroups compared to the total number of subgroups"

@@ -1,4 +1,4 @@
-This is FET version 5.26.1
+This is FET version 5.26.2
 
 
 Program description:
@@ -15,7 +15,7 @@ Program description:
 Requirements:
 
 	FET is created in the following environment: openSUSE 13.2 GNU/Linux distribution, Linux 3.16.7, Xfce 4.10,
-	Midnight Commander 4.8.13, KDiff3 0.9.97, Qt 5.4.0, gcc 4.8.3, g++ 4.8.3, make 4.0, sed 4.2.2,
+	Midnight Commander 4.8.13, KDiff3 0.9.97, Qt 5.4.1, gcc 4.8.3, g++ 4.8.3, make 4.0, sed 4.2.2,
 	Valgrind 3.10.0, Coverity Scan 7.6.0, Cppcheck 1.68, other great free tools.
 	FET can be run on any platform supported by the free software Qt (GNU/Linux, Windows, Mac OS X).
 
@@ -24,7 +24,7 @@ Requirements:
 		make 4.0 or similar (GNU Make)
 		gcc 4.8.3 or similar
 		g++ 4.8.3 or similar (or gcc-g++, or gcc-c++, the name may vary. This program may be included in the gcc package)
-		Qt 5.4.0 or compatible (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
+		Qt 5.4.1 or compatible (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
 
 	Windows:
 	For running, you need only the archive of FET compiled for Windows (which contains the MinGW and Qt dlls).
@@ -53,7 +53,7 @@ Getting - compiling - installing Qt:
 
 	Qt homepage: http://www.qt.io/
 
-	You will need Qt 5.4.0 or compatible to compile FET (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
+	You will need Qt 5.4.1 or compatible to compile FET (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
 	You can get the corresponding version of Qt with your package manager or from the Qt homepage.
 	Qt can be used with the LGPL or commercial license.
 
@@ -70,7 +70,7 @@ Getting - compiling - installing Qt:
 	Note about the Qt "QMAKESPEC" variable: advanced topic, read this if you get Qt errors about the environment not being set, or environment
 	variable QMAKESPEC not being set, or if the Qt environment is not set correctly: Qt needs to know the environment you are using. It is usually
 	something like: linux-g++, macx-g++ or win32-g++ (platform-compiler). You can find all the supported platforms in the directory "mkspecs" of Qt
-	(some usual locations are /usr/share/qt5/mkspecs or /usr/lib/qt5/mkspecs on GNU/Linux or C:\Qt\5.4.0\mkspecs on Windows).
+	(some usual locations are /usr/share/qt5/mkspecs or /usr/lib/qt5/mkspecs on GNU/Linux or C:\Qt\5.4.1\mkspecs on Windows).
 	It seems that Qt automatically finds the platform (there is a default configuration in the "default" subdirectory of the "mkspecs" directory,
 	which is created automatically when you install Qt). If the default configuration is not working or is wrong, you may need to set the
 	correct QMAKESPEC variable for your platform. Under Windows, you can create an environment variable QMAKESPEC equal to win32-g++
@@ -123,7 +123,7 @@ Compiling FET:
 	to keep a core free for other tasks, write "make -j 3"). This is proven to work under GNU/Linux and Mac OS X. Under Windows it depends on the C++ compiler (you
 	may try it to see if it works).
 
-	Currently FET can be compiled with a C++ compiler, using Qt version 5.4.0 or compatible.
+	Currently FET can be compiled with a C++ compiler, using Qt version 5.4.1 or compatible.
 
 	Note NUseSystemLocale: If you want FET to autodetect the system locale language, type <<qmake fet.pro "DEFINES+=USE_SYSTEM_LOCALE">>
 	or simply <<qmake "DEFINES+=USE_SYSTEM_LOCALE">>. This will work if you recompile from the beginning all the FET package (remove
@@ -144,7 +144,7 @@ Compiling FET:
 
 
 	GNU/Linux:
-	- You will need Qt 5.4.0 or compatible to compile this program.
+	- You will need Qt 5.4.1 or compatible to compile this program.
 	- type "qmake fet.pro" or simply "qmake". You have to use qmake from Qt 5 series, which on some systems
 	might be named qmake-qt5 (this command is executed very fast, so don't worry if you get immediate return from it)
 	See also notes NUseSystemLocale and Note4 above.
@@ -156,7 +156,7 @@ Compiling FET:
 	2 Variants:
 
 	1. First variant, if you use gcc compiler:
-	- You will need Qt 5.4.0 or compatible to compile this program.
+	- You will need Qt 5.4.1 or compatible to compile this program.
 	- type "qmake fet.pro" or simply "qmake". You have to use qmake from Qt 5 series.
 	(this command is executed very fast, so don't worry if you get immediate return from it)
 	- IMPORTANT: you might need to write: "qmake -spec macx-g++ fet.pro", if "qmake fet.pro"
@@ -173,7 +173,7 @@ Compiling FET:
 	http://lists.trolltech.com/qt-interest/2007-04/thread01126-0.html
 
 
-	Windows: MinGW C++ compiler: you need Qt 5.4.0 or compatible, and MinGW.
+	Windows: MinGW C++ compiler: you need Qt 5.4.1 or compatible, and MinGW.
 	You might use other compilers if you want, please see the Qt homepage.
 	for other variants. Any C++ compiler that supports Qt should be good.
 	You need to run "qmake fet.pro" or "qmake" (this command is executed very fast, so don't worry if you get
@@ -232,7 +232,8 @@ Running FET:
 			y is integer (seconds) (default 2000000000, which is practically infinite).
 			z is integer from 0 to 6 and represents the detail level for the generated HTML timetables
 				(default 2, larger values have more details/facilities and larger file sizes).
-			t is one of en_US, ar, ca, da, de, el, es, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk, uz, vi, zh_CN (default en_US).
+			t is one of en_US, ar, ca, da, de, el, es, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk, uz, vi,
+				zh_CN, zh_TW (default en_US).
 			wt1 to wt14 are either true or false and represent whether you want the corresponding timetables to be written on the disk (default true).
 			a is either true or false and represets if you want activity tags to be present in the final HTML timetables (default true).
 			u is either "true" or "false" and represents if you want -x- (for true) or --- (for false) in the generated timetables for the

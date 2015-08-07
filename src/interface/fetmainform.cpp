@@ -754,6 +754,7 @@ void FetMainForm::populateLanguagesMap(QMap<QString, QString>& languagesMap)
 	languagesMap.insert("uz", tr("Uzbek"));
 	languagesMap.insert("sq", tr("Albanian"));
 	languagesMap.insert("zh_CN", tr("Chinese Simplified"));
+	languagesMap.insert("zh_TW", tr("Chinese Traditional"));
 }
 
 

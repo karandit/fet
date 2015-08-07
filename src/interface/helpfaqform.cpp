@@ -341,14 +341,36 @@ void HelpFaqForm::setText()
 	s+=tr("Q: Is it possible to work with 0 hour?\n\n"
 		"A: A bit difficult. You have to choose a day for this 0 hour. Then add breaks or not available to "
 		"prevent other activities in other days at hour 0, then add students set not available to prevent other "
-		"students set from having hours at this hour 0. Or variants of this.\n\n"
-		"Mr. Zsolt Udvari used another trick: considered the last hour to be hour 0. But this is not always applicable.");
+		"students sets from having hours at this hour 0. Or variants of this.\n\n"
+		"Zsolt Udvari used another trick: considered the last hour to be hour 0. But this is not always applicable.");
 
 	s+="\n\n";
 	s+="--------------------";
 	s+="\n\n";
 
-	s+=tr("Q: How does FET care about weights. What do they mean?\n\n"
+	s+=tr("Q: How does FET care about weights? What do they mean?\n\n"
+		"A: The weights under 100% are subjective, because FET can skip them if "
+		"necessary.\n\n"
+		"Volker Dirr tried to express how FET considers under 100% weights:\n\n"
+		"weight = 50% means: In average FET retries two times to place an "
+		"activity without a conflict. If it isn't able to place the activity "
+		"without a conflict after average 2 times it keeps the conflict and tries "
+		"to place the next activity.\n"
+		"weight = 75% means: In average FET retries four times to place an "
+		"activity without a conflict. If it isn't able to place the activity "
+		"without a conflict after average 4 times it keeps the conflict and tries "
+		"to place the next activity.\n"
+		"weight = 99% means: In average FET retries 100 times to place an "
+		"activity without a conflict. If it isn't able to place the activity "
+		"without a conflict after average 100 times it keeps the conflict and "
+		"tries to place the next activity.\n"
+		"weight = 99.99% means: In average FET retries 10000 times to place an "
+		"activity without a conflict. If it isn't able to place the activity "
+		"without a conflict after average 10000 times it keeps the conflict and "
+		"tries to place the next activity.\n\n"
+		"Also, activities might get unallocated, and the cycle would be opened.");
+
+	/*s+=tr("Q: How does FET care about weights. What do they mean?\n\n"
 		"A: The weights under 100% are subjective, because FET can skip them if necessary.\n\n"
 		"Volker Dirr tried to express how FET considers under 100% weights, but his words are not completely reflecting the fact:\n\n"
 		"Here is a comment from Volker Dirr:\n\n"
@@ -360,7 +382,7 @@ void HelpFaqForm::setText()
 		"If it isn't able to place the activity without a conflict after average 100 times it keeps the conflict and tries to place the next activity.\n"
 		"weight = 99.99% means: In average FET retries 10000 times to place an activity without a conflict."
 		" If it isn't able to place the activity without a conflict after average 10000 times it keeps the conflict and tries to place the next activity.\n\n"
-		"This is not 100% correct. Activities might get unallocated, and cycle reopened.");
+		"This is not 100% correct. Activities might get unallocated, and cycle reopened.");*/
 
 	s+="\n\n";
 	s+="--------------------";
@@ -603,6 +625,9 @@ void HelpFaqForm::setText()
 		"Hour 11:00 Break\n"
 		"Hour 12:00 Math (second hour of act. 100)?\n\n"
 		"A: No, the activity must respect the break, so it is before or after the break with all the hours of it.");
+	s+=" ";
+	s+=tr("Alternative solutions: either you can split that activity into two subactivities with duration 1 (without a min days constraint "
+		"between them), and add a two activities consecutive constraint, or you can choose to not add the break constraint in your file.");
 
 	s+="\n\n";
 	s+="--------------------";
@@ -895,7 +920,7 @@ void HelpFaqForm::setText()
 	s+=tr("A: You can activate/deactivate a constraint by clicking the 'Activate'/'Deactivate' buttons in the all time/space"
 	 " constraints dialogs.");
 
-	s+="\n\n";
+	/*s+="\n\n";
 	s+="--------------------";
 	s+="\n\n";
 
@@ -903,7 +928,7 @@ void HelpFaqForm::setText()
 	s+="\n\n";
 	s+=tr("A: You can sort the constraints in the all time/space constraints dialogs. Sorting is done ascending, according to each"
 	 " constraints' comments. You can add suitable comments to obtain a desired order, like: 'rank #1 ... other comments' and"
-	 " 'rank #2 ... other different comments'.");
+	 " 'rank #2 ... other different comments'.");*/
 
 	s+="\n\n";
 	s+="--------------------";

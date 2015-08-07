@@ -3427,3 +3427,45 @@ From Volker Dirr:
 
 if a user removes a subgroup FET should also ask if this subgroup should
 be removed everywhere.
+
+214---------------------------------------------------------
+From Khalilullah Yosufi:
+
+... we expect from software to generate a timetable that we could separate some border or jointed gaps for some teachers
+but there is no any place to define/plan to the software about separating the jointed gaps during a day. Hopefully
+someday we would receive an update version of the FET software that has ability to separate joint gaps we want maybe
+by the name of continuously gaps per day for a teacher. ...
+
+---
+
+Further clarification:
+
+... Hope one day we could plan or tell to the FET software to add Maximum continuously gaps per day for a teacher = 01 ...
+
+---
+
+Further clarification:
+
+I need a gap to be maximum 1 hour continuously.
+
+215---------------------------------------------------------
+From mercurialuser (on forum):
+
+To better study the code I'd like to clean generate.cpp:
+- removing all the commented code
+- adding comments to illustrate the algo
+- check to see if I can use some macros for code
+- in randomswap try to remove all that ok* variables that can be reduced to a couple (since they are not used outside their block)
+- remove the #if 1/#endif and if(1) { ... }  blocks
+
+216---------------------------------------------------------
+From mercurialuser (on forum):
+
+I'd just like to report some thing that may give a little speedup to the code and to avoid duplicates.
+
+For example in ::generate several matrixes are reset first and then assigned. The exact same code is used for loading teachersTimetable and newTeachersTimetable but they could be compacted in one loop. There may be probably less cache hits for accessing these 2 matrixes but I think that the multiple loops and retrieving act variable multiple times are more cpu expensive anyway.
+
+For assigning these matrixes and some others the code loops (there are 2 variants with different variable names):
+for(int j=0; j<gt.rules.nInternalActivities/*added_act*/; j++){
+
+The code in the loop does some checks that are replicated in several other loops but they check on data that, as far as I understand, can't change between consecutive checks. So it seems to me that they are redundant.

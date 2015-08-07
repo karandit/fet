@@ -6284,7 +6284,7 @@ QString ConstraintStudentsEarlyMaxBeginningsAtSecondHour::getDetailedDescription
 	Q_UNUSED(r);
 
 	QString s=tr("Time constraint");s+="\n";
-	s+=tr("All students must begin their courses early, respecting maximum %1 later arrivals, at second hour")
+	s+=tr("All students must begin their activities early, respecting maximum %1 later arrivals, at second hour")
 	 .arg(this->maxBeginningsAtSecondHour);s+="\n";
 	s+=tr("(breaks and students set not available not counted)");s+="\n";
 	s+=tr("Weight (percentage)=%1%").arg(CustomFETString::number(this->weightPercentage));s+="\n";
@@ -6578,7 +6578,7 @@ QString ConstraintStudentsSetEarlyMaxBeginningsAtSecondHour::getDetailedDescript
 
 	QString s=tr("Time constraint");s+="\n";
 
-	s+=tr("A students set must begin its courses early, respecting a maximum number of later arrivals, at second hour"); s+="\n";
+	s+=tr("A students set must begin its activities early, respecting a maximum number of later arrivals, at second hour"); s+="\n";
 	s+=tr("(breaks and students set not available not counted)");s+="\n";
 	s+=tr("Weight (percentage)=%1%").arg(CustomFETString::number(this->weightPercentage));s+="\n";
 	s+=tr("Students set=%1").arg(this->students); s+="\n";

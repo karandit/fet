@@ -1774,3 +1774,8 @@ Versions 5.26.0 - 5.26.v
 	the current cursor position). Suggested by Bob Hairgrove.
 	- Updated the German translation, by Bob Hairgrove.
 	- Code cleanup.
+- Version 5.26.2
+	- Updated to Qt 5.4.1.
+	- Crash bug fix when generating with zero students sets (introduced in FET-5.26.0).
+	- Added a partial Chinese Traditional (zh_TW) translation, by James.
+	- Updated the German translation, by Bob Hairgrove.
