@@ -1,5 +1,5 @@
 /***************************************************************************
-                          modifyconstraintteachersmingapsbetweebuildingchangesform.cpp  -  description
+                          modifyconstraintteachersmingapsbetweenbuildingchangesform.cpp  -  description
                              -------------------
     begin                : Feb 10, 2005
     copyright            : (C) 2005 by Lalescu Liviu

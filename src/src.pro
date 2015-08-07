@@ -1293,7 +1293,8 @@ TRANSLATIONS += \
 	../translations/fet_uk.ts \
 	../translations/fet_untranslated.ts \
 	../translations/fet_uz.ts \
-	../translations/fet_vi.ts
+	../translations/fet_vi.ts \
+	../translations/fet_zh_CN.ts
 
 TEMPLATE = app
 

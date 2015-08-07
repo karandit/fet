@@ -1722,3 +1722,6 @@ Versions 5.23.0 - 5.23.v
 	- Added a "make install" option (suggested by Alexey Loginov and other users, done by Zsolt Udvari and Liviu Lalescu).
 	- Added an icon (suggested by Alexey Loginov and other users).
 	- Added an option at compilation time so that FET automatically detects the system locale (suggested by Alexey Loginov and other users).
+- Version 5.23.4
+	- Added a partial Chinese Simplified (zh_CN) translation, by orange.
+	- Added two example files from Vietnam, by Nguyen Huu Tuyen.

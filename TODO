@@ -3101,3 +3101,127 @@ Maybe better "Teacher works in a days group from a set of days groups".
 From russell:
 
 Maybe adding a Pause/Resume to "Generate new timetable" window (changing Start button after press to Pause).
+
+197---------------------------------------------------------
+From nouvakis (on forum):
+
+If I set
+min_hours = 3 and
+max hours = 5
+and a teacher should work 21 hours per week we could have combination: 5 + 5 + 5 + 3 + 3
+but a better one should be: 5 + 5 + 4 + 4 + 3
+
+So, I recommend a new constraint like "frequency of max hours per day"
+For my example this new parameter would be 2 (5+5)
+
+---
+
+Liviu:
+
+I am thinking of making it a separate constraint. And put it before max hours daily in the menu, because it might be better than the old existing constraint. Only 100% weight percentage allowed. How to name it? "Teacher(s)/Students (set) max hours daily max occurences per week"?
+
+---
+
+Liviu:
+
+I thought about this. I looked over the present code (official FET-5.23.3, src/engine/generate.cpp).
+
+1) The changes are very difficult in generate.cpp. There are many possibilities to consider, and maybe a perfect treatment is impossible.
+
+See for instance generate.cpp, lines 7543-7572. These are for a unique limit per day. But if you want two possible limits (5 two times per week, the rest maximum 4), the things become much more difficult.
+
+(I care in these lines above about the gaps.)
+
+2) The changes are critical in generate.cpp. New timetables might become impossible.
+
+Anyway, I'll keep this suggestion in my mind. But for now I do not have the courage/possibility to do it.
+
+I hope that by using some tricks you can overcome the problems.
+
+See also fet-v.v.v/doc/algorithm/improve-todo-item-197.txt.
+
+198---------------------------------------------------------
+From Volker Dirr:
+
+new useful constraint:
+time constraints -> teachers -> max total sum of teachers gaps per week
+
+199---------------------------------------------------------
+From liquid (on forum):
+
+I think it would be useful to introduce aliases for years, groups and subgroups. Their names sound kind of technical, particularly when one lets FET automatic year divide. It's OK when you work with schedule but it would be more readable when aliases were shown (of course if present) on the timetable.
+
+Volker:
+
+Maybe i missunderstood, but it sound to me like you are talking about the names that are generated automatilcy. You can simply rename them (by "modify") if you want (no problems with years and groups. be carefull with subgroups, because you must do it several times!)
+
+liquid:
+
+I exactly thought about what Volker had understood. E.g. if you had groups and subgroups automatically generated the name for resulting subgroup would come from names of groups and a year. It would be desirably sometimes to give the generated subgroup a more descriptive name. As the example:
+year - 1
+group division: 1. by a and b 2. by i1 and i2 (i for computer science)
+you will get the following groups: 1 a, 1 b, 1 i1, 1 i2
+and subgroups: 1 a i1, 1 a i2, 1 b i1, 1 b i2
+For generation purposes it's OK thanks short names but if you wanted to make a timetable for all the students and teachers they would like maybe 1a comp.sci. group 1. That's what I think about.
+
+Liviu:
+
+But why not simply divide by a,b then comp.sci. group 1,comp.sci group 2?
+
+liquid:
+
+...just for simplicity's sake. Aliases almost always serve as more descriptive names. If I tried to give more descriptive names for groups they might not fit into boxes at activity setting window or elsewhere. Particularly when group division is not trivial. Short names are good while designing a schedule.
+
+Volker:
+
+I can recommend using short names. I use everywhere shortcuts (subjects has only 1-2 characters. Teacher names 3 chacaters. Students only around 1 to 4 characters.)
+Of course new students "wonder" the first day about that shortcuts, but they are clever enough to understand it very fast.
+
+liquid:
+
+Oh, maybe that's the right way. I was afraid that schedule could be misunderstood with many short and cryptic names but your experience tells the opposite. OK then, thanks for suggestions.
+
+---
+
+liquid suggests also aliases for rooms.
+
+200---------------------------------------------------------
+(Added on 2014-10-12)
+From fromturkey (on forum):
+
+I think the program should be able to use multiple CPUs/cores. Especially when trying to generate difficult timetables it takes a lot of time processing. If the program could use multiple CPUs, it would take much more shorter.
+Is it possible with the current algorithm?
+
+Liviu:
+
+Unfortunately, I cannot think of how to adapt the FET algorithm to multiple cores.
+
+201---------------------------------------------------------
+From liquid (on forum):
+
+Generally, constraints have the two forms:
+item has preferred other item
+item has preferred set of other items
+
+I experience that during data preparation for a timetable the things are often changing or are caused by planning progress in the way it's necessary to add to a constraint of first form some other item, making the constraint of the second form. In this case, I must delete the former constraint and create a new one, to respect a set of other items. It would be simpler to just add other item to previously set up one, making therefore a set of preferred other items automatically. I'm not sure if the set of preferred other items is equivalent to many constraints of the first form (with one other item). If it were I think it would be possible to abandon this distinction in a future "big" update of FET program.
+I wonder whether the reason for this rather technical (a matter of development) and difficult to change or may be not so difficult.
+
+Liviu:
+
+Are you referring to preferred times?
+
+An -X- means rejected with the corresponding weight. If there are more constraints, the maximum weight wins. This constraint applies as rejecting a (some) slot(s) (rather than accepting some).
+
+Preferred starting time is a locking constraint, you can play with it in the generated timetable.
+
+liquid:
+
+Thanks for your answer. I'll try to be more specific below.
+I used to work with schedules incrementally. This means for example that I don't specify at the beginning all existing rooms suitable for a subject as a set of preferred rooms. Only one at the beginning and then by the next group I'd like to add one or more rooms for the subject. I have two ways:
+Add the second constraint that assigns a subject for the new room
+Remove previously set constraint "one room for one subject" and introduce a new one "set of rooms for one subject"
+That's what I meant starting this thread. I'm sorry if the first post was misunderstood. I guess it would be more convenient to simply add the second room to previously set constraint rather than use of two described ways above. It would be, however, possible if I could add a constraint of form "set of rooms for one subject" with only one room at the beginning, predicting that in the future I'll add some more rooms to that. FET disables this though.
+
+Liviu:
+
+Variant 1 is wrong. You should use 2. Yes, I'll add this in the TODO.

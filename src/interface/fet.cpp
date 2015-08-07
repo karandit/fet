@@ -182,7 +182,7 @@ void usage(QTextStream* out, const QString& error)
 		"y is integer (seconds) (default 2000000000, which is practically infinite).\n"
 		"z is integer from 0 to 6 and represents the detail level for the generated HTML timetables "
 		"(default 2, larger values have more details/facilities and larger file sizes).\n"
-		"t is one of en_US, ar, ca, da, de, el, es, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk, uz, vi (default en_US).\n"
+		"t is one of en_US, ar, ca, da, de, el, es, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk, uz, vi, zh_CN (default en_US).\n"
 		"a is either true or false and represets if you want activity tags to be present in the final HTML timetables (default true).\n"
 		"u is either true or false and represents if you want -x- (for true) or --- (for false) in the generated timetables for the "
 		"not available slots (default true).\n"
@@ -400,6 +400,7 @@ void initLanguagesSet()
 	languagesSet.insert("vi");
 	languagesSet.insert("uz");
 	languagesSet.insert("sq");
+	languagesSet.insert("zh_CN");
 }
 
 #ifndef FET_COMMAND_LINE
@@ -422,15 +423,6 @@ void setLanguage(QCoreApplication& qapplication, QWidget* parent)
 	
 	bool translation_loaded=false;
 	
-	//this is one place (out of 2) in which you need to add a new language - DEPRECATED COMMENT
-/*	if(FET_LANGUAGE=="ar" || FET_LANGUAGE=="ca" || FET_LANGUAGE=="de" || FET_LANGUAGE=="es"
-	 || FET_LANGUAGE=="el" || FET_LANGUAGE=="fr" || FET_LANGUAGE=="hu" || FET_LANGUAGE=="mk"
-	 || FET_LANGUAGE=="ms" || FET_LANGUAGE=="nl" || FET_LANGUAGE=="pl" || FET_LANGUAGE=="ro"
-	 || FET_LANGUAGE=="tr" || FET_LANGUAGE=="id" || FET_LANGUAGE=="it" || FET_LANGUAGE=="lt"
-	 || FET_LANGUAGE=="ru" || FET_LANGUAGE=="fa" || FET_LANGUAGE=="uk" || FET_LANGUAGE=="pt_BR"
-	 || FET_LANGUAGE=="da" || FET_LANGUAGE=="si" || FET_LANGUAGE=="sk" || FET_LANGUAGE=="he"
-	 || FET_LANGUAGE=="sr" || FET_LANGUAGE=="gl" || FET_LANGUAGE=="vi" || FET_LANGUAGE=="uz"
-	 || FET_LANGUAGE=="sq"){*/
 	if(FET_LANGUAGE!="en_US" && languagesSet.contains(FET_LANGUAGE)){
 		translation_loaded=translator.load("fet_"+FET_LANGUAGE, qapplication.applicationDirPath());
 		if(!translation_loaded){

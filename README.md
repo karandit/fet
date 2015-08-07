@@ -1,4 +1,4 @@
-This is FET version 5.23.3
+This is FET version 5.23.4
 
 
 Program description:
@@ -14,15 +14,15 @@ Program description:
 
 Requirements:
 
-	FET is created in the following environment: openSUSE 13.1 GNU/Linux distribution, Linux 3.11.10, Xfce 4.10,
-	Midnight Commander 4.8.10, KDiff3 0.9.97, Qt 5.3.2, gcc 4.8.1, g++ 4.8.1, make 3.82, Valgrind 3.8.1, other great free tools.
+	FET is created in the following environment: openSUSE 13.2 GNU/Linux distribution, Linux 3.16.6, Xfce 4.10,
+	Midnight Commander 4.8.13, KDiff3 0.9.97, Qt 5.3.2, gcc 4.8.3, g++ 4.8.3, make 4.0, Valgrind 3.10.0, other great free tools.
 	FET can be run on any platform supported by the free software Qt (GNU/Linux, Windows, Mac OS X).
 
 	GNU/Linux, Mac OS X:
 	Software:
-		make 3.82 or similar (GNU Make)
-		gcc 4.8.1 or similar
-		g++ 4.8.1 or similar (or gcc-g++, or gcc-c++, the name may vary. This program may be included in the gcc package)
+		make 4.0 or similar (GNU Make)
+		gcc 4.8.3 or similar
+		g++ 4.8.3 or similar (or gcc-g++, or gcc-c++, the name may vary. This program may be included in the gcc package)
 		Qt 5.3.2 or compatible (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
 
 	Windows:
@@ -117,13 +117,25 @@ Compiling FET:
 	or simply <<qmake "DEFINES+=USE_SYSTEM_LOCALE">>. This will work if you recompile from the beginning all the FET package (remove
 	all the intermediary files and recompile), and also if you did not use FET on this machine or if you remove the settings file/registry entry for FET
 	(otherwise FET will retain the language which was already saved in its settings).
+	
+	Note3: If you get the error:
+	In file included from ../../Qt5.3.2/5.3/gcc_64/include/QtGui/qopenglcontext.h:62:0,
+		from ../../Qt5.3.2/5.3/gcc_64/include/QtGui/QtGui:32,
+		from ../../Qt5.3.2/5.3/gcc_64/include/QtWidgets/QtWidgetsDepends:3,
+		from ../../Qt5.3.2/5.3/gcc_64/include/QtWidgets/QtWidgets:3,
+		from engine/import.cpp:35:
+	../../Qt5.3.2/5.3/gcc_64/include/QtGui/qopengl.h:110:21: fatal error: GL/gl.h: No such file or directory
+	 #  include <GL/gl.h>
+					^
+	compilation terminated.
+	you may need to install additional packages before compiling FET. For instance, under my GNU/Linux openSuse I need to install Mesa-devel.
 
 
 	GNU/Linux:
 	- You will need Qt 5.3.2 or compatible to compile this program.
 	- type "qmake fet.pro" or simply "qmake". You have to use qmake from Qt 5 series, which on some systems
 	might be named qmake-qt5 (this command is executed very fast, so don't worry if you get immediate return from it)
-	See also note NUseSystemLocale above.
+	See also notes NUseSystemLocale and Note3 above.
 	- type "make" (this takes a long time, maybe even 1 hour). See also note NMkJobs above.
 	To remove the compiled objects/executable: "make clean" and/or "make distclean".
 
@@ -138,7 +150,7 @@ Compiling FET:
 	- IMPORTANT: you might need to write: "qmake -spec macx-g++ fet.pro", if "qmake fet.pro"
 	does not produce a correct makefile. Please see 
 	http://lists.trolltech.com/qt-interest/2007-04/thread01126-0.html for details.
-	See also note NUseSystemLocale above.
+	See also notes NUseSystemLocale and Note3 above.
 	- type "make" (this takes a long time, maybe even 1 hour). See also note NMkJobs above.
 	To remove the compiled objects/executable: "make clean" and/or "make distclean".
 
@@ -156,6 +168,7 @@ Compiling FET:
 	immediate return from it) and then, if you are using MinGW, "mingw32-make" (this takes a long time, maybe even 1 hour)
 	in a command line in the FET directory.
 	See also note NUseSystemLocale above.
+	See also Note3 above.
 	See also note NMkJobs above.
 	(You can use the command line prompt of Windows or the Qt command line prompt shortcut in the Qt shortcuts menu.)
 	Then, you can remove the directories "src" and "tmp", to save up space, if you want.
@@ -203,7 +216,7 @@ Running FET:
 			y is integer (seconds) (default 2000000000, which is practically infinite).
 			z is integer from 0 to 6 and represents the detail level for the generated HTML timetables
 				(default 2, larger values have more details/facilities and larger file sizes).
-			t is one of en_US, ar, ca, da, de, el, es, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk, uz, vi (default en_US).
+			t is one of en_US, ar, ca, da, de, el, es, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk, uz, vi, zh_CN (default en_US).
 			a is either true or false and represets if you want activity tags to be present in the final HTML timetables (default true).
 			u is either "true" or "false" and represents if you want -x- (for true) or --- (for false) in the generated timetables for the
 				not available slots (default true).
