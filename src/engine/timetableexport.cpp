@@ -34,7 +34,8 @@ File timetableexport.cpp
 //            - daily timetable
 //            - activities with same starting time
 //            - reorganized functions. now they can be also used for printing
-//            - split times tables after X names (TIMETABLE_HTML_SPLIT?) and choose if activity tags should be printed (TIMETABLE_HTML_PRINT_ACTIVITY_TAGS?)
+//            - split times tables after X names (TIMETABLE_HTML_SPLIT?) and choose if activity tags should be printed (TIMETABLE_HTML_PRINT_ACTIVITY_TAGS)
+//            - teachers and students statistics (gaps, free days, hours)
 
 //TODO: all must be internal here. so maybe also do daysOfTheWeek and hoursPerDay also internal
 //maybe TODO: use back_odd and back_even (or back0 and back1, because easier to code!) like in printing. so don't use the table_odd and table_even anymore
@@ -174,6 +175,9 @@ const QString ALL_ACTIVITIES_TIMETABLE_TIME_VERTICAL_FILENAME_HTML="activities_t
 const QString TEACHERS_FREE_PERIODS_TIMETABLE_DAYS_HORIZONTAL_FILENAME_HTML="teachers_free_periods_days_horizontal.html";
 const QString TEACHERS_FREE_PERIODS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML="teachers_free_periods_days_vertical.html";
 
+const QString TEACHERS_STATISTICS_FILENAME_HTML="teachers_statistics.html";
+const QString STUDENTS_STATISTICS_FILENAME_HTML="students_statistics.html";
+
 const QString MULTIPLE_TIMETABLE_DATA_RESULTS_FILE="data_and_timetable.fet";
 
 //now the XML tags used for identification of the output file (is that comment correct? it's the old comment)
@@ -189,6 +193,40 @@ extern int XX;
 extern int YY;
 
 QString generationLocalizedTime=QString(""); //to be used in timetableprintform.cpp
+
+bool writeAtLeastATimetable()
+{
+	bool t = WRITE_TIMETABLE_CONFLICTS ||
+	
+	 (WRITE_TIMETABLES_STATISTICS &&
+	 (WRITE_TIMETABLES_SUBGROUPS ||
+	 WRITE_TIMETABLES_GROUPS ||
+	 WRITE_TIMETABLES_YEARS ||
+	 WRITE_TIMETABLES_TEACHERS)) ||
+	
+	 (WRITE_TIMETABLES_XML &&
+	 (WRITE_TIMETABLES_SUBGROUPS ||
+	 WRITE_TIMETABLES_TEACHERS ||
+	 WRITE_TIMETABLES_ACTIVITIES)) ||
+	
+	 ((WRITE_TIMETABLES_DAYS_HORIZONTAL ||
+	 WRITE_TIMETABLES_DAYS_VERTICAL ||
+	 WRITE_TIMETABLES_TIME_HORIZONTAL ||
+	 WRITE_TIMETABLES_TIME_VERTICAL) &&
+	 (WRITE_TIMETABLES_SUBGROUPS ||
+	 WRITE_TIMETABLES_GROUPS ||
+	 WRITE_TIMETABLES_YEARS ||
+	 WRITE_TIMETABLES_TEACHERS ||
+	 WRITE_TIMETABLES_ROOMS ||
+	 WRITE_TIMETABLES_SUBJECTS ||
+	 WRITE_TIMETABLES_ACTIVITIES)) ||
+	
+	 ((WRITE_TIMETABLES_DAYS_HORIZONTAL ||
+	 WRITE_TIMETABLES_DAYS_VERTICAL) &&
+	 WRITE_TIMETABLES_TEACHERS_FREE_PERIODS);
+	
+	 return t;
+}
 
 TimetableExport::TimetableExport()
 {
@@ -439,6 +477,11 @@ void TimetableExport::writeSimulationResults(QWidget* parent){
 	writeTeachersFreePeriodsTimetableDaysHorizontalHtml(parent, s, sTime, na);
 	s=OUTPUT_DIR_TIMETABLES+FILE_SEP+s2+bar+TEACHERS_FREE_PERIODS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML;
 	writeTeachersFreePeriodsTimetableDaysVerticalHtml(parent, s, sTime, na);
+	//statistics
+	s=OUTPUT_DIR_TIMETABLES+FILE_SEP+s2+bar+TEACHERS_STATISTICS_FILENAME_HTML;
+	writeTeachersStatisticsHtml(parent, s, sTime, na);
+	s=OUTPUT_DIR_TIMETABLES+FILE_SEP+s2+bar+STUDENTS_STATISTICS_FILENAME_HTML;
+	writeStudentsStatisticsHtml(parent, s, sTime, na);
 
 	hashSubjectIDsTimetable.clear();
 	hashActivityTagIDsTimetable.clear();
@@ -656,6 +699,11 @@ void TimetableExport::writeHighestStageResults(QWidget* parent){
 	writeTeachersFreePeriodsTimetableDaysHorizontalHtml(parent, s, sTime, na);
 	s=OUTPUT_DIR_TIMETABLES+FILE_SEP+s2+bar+TEACHERS_FREE_PERIODS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML;
 	writeTeachersFreePeriodsTimetableDaysVerticalHtml(parent, s, sTime, na);
+	//statistics
+	s=OUTPUT_DIR_TIMETABLES+FILE_SEP+s2+bar+TEACHERS_STATISTICS_FILENAME_HTML;
+	writeTeachersStatisticsHtml(parent, s, sTime, na);
+	s=OUTPUT_DIR_TIMETABLES+FILE_SEP+s2+bar+STUDENTS_STATISTICS_FILENAME_HTML;
+	writeStudentsStatisticsHtml(parent, s, sTime, na);
 
 	hashSubjectIDsTimetable.clear();
 	hashActivityTagIDsTimetable.clear();
@@ -1147,6 +1195,11 @@ void TimetableExport::writeSimulationResults(QWidget* parent, int n){
 	writeTeachersFreePeriodsTimetableDaysHorizontalHtml(parent, s, sTime, na);
 	s=finalDestDir+TEACHERS_FREE_PERIODS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML;
 	writeTeachersFreePeriodsTimetableDaysVerticalHtml(parent, s, sTime, na);
+	//statistics
+	s=finalDestDir+TEACHERS_STATISTICS_FILENAME_HTML;
+	writeTeachersStatisticsHtml(parent, s, sTime, na);
+	s=finalDestDir+STUDENTS_STATISTICS_FILENAME_HTML;
+	writeStudentsStatisticsHtml(parent, s, sTime, na);
 	
 	hashSubjectIDsTimetable.clear();
 	hashActivityTagIDsTimetable.clear();
@@ -1474,6 +1527,13 @@ void TimetableExport::writeSimulationResultsCommandLine(QWidget* parent, const Q
 	s=add+TEACHERS_FREE_PERIODS_TIMETABLE_DAYS_VERTICAL_FILENAME_HTML;
 	s.prepend(outputDirectory);
 	TimetableExport::writeTeachersFreePeriodsTimetableDaysVerticalHtml(parent, s, sTime, na);
+	//statistics
+	s=add+TEACHERS_STATISTICS_FILENAME_HTML;
+	s.prepend(outputDirectory);
+	TimetableExport::writeTeachersStatisticsHtml(parent, s, sTime, na);
+	s=add+STUDENTS_STATISTICS_FILENAME_HTML;
+	s.prepend(outputDirectory);
+	TimetableExport::writeStudentsStatisticsHtml(parent, s, sTime, na);
 
 	hashSubjectIDsTimetable.clear();
 	hashActivityTagIDsTimetable.clear();
@@ -1761,25 +1821,7 @@ void TimetableExport::writeIndexHtml(QWidget* parent, const QString& htmlfilenam
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 
-	bool writeAtLeastATimetable = WRITE_TIMETABLE_CONFLICTS ||
-	 (WRITE_TIMETABLES_XML &&
-	 (WRITE_TIMETABLES_SUBGROUPS ||
-	 WRITE_TIMETABLES_TEACHERS ||
-	 WRITE_TIMETABLES_ACTIVITIES)) ||
-	 ((WRITE_TIMETABLES_DAYS_HORIZONTAL ||
-	 WRITE_TIMETABLES_DAYS_VERTICAL ||
-	 WRITE_TIMETABLES_TIME_HORIZONTAL ||
-	 WRITE_TIMETABLES_TIME_VERTICAL) &&
-	 (WRITE_TIMETABLES_SUBGROUPS ||
-	 WRITE_TIMETABLES_GROUPS ||
-	 WRITE_TIMETABLES_YEARS ||
-	 WRITE_TIMETABLES_TEACHERS ||
-	 WRITE_TIMETABLES_ROOMS ||
-	 WRITE_TIMETABLES_SUBJECTS ||
-	 WRITE_TIMETABLES_ACTIVITIES)) ||
-	 ((WRITE_TIMETABLES_DAYS_HORIZONTAL ||
-	 WRITE_TIMETABLES_DAYS_VERTICAL) &&
-	 WRITE_TIMETABLES_TEACHERS_FREE_PERIODS);
+	bool _writeAtLeastATimetable = writeAtLeastATimetable();
 
 	//Now we print the results to an HTML file
 	QFile file(htmlfilename);
@@ -1809,7 +1851,7 @@ void TimetableExport::writeIndexHtml(QWidget* parent, const QString& htmlfilenam
 	}
 	tos<<"    <p>\n";
 	
-	if(!writeAtLeastATimetable){
+	if(!_writeAtLeastATimetable){
 		tos<<"      "<<TimetableExport::tr("No timetable was written, because from the settings you disabled writing any timetable.")<<"\n";
 		tos<<"      "<<TimetableExport::tr("The exception is that after each successful (complete) timetable generation the %1 file"
 		 " will be written.").arg("data_and_timetable.fet")<<"\n";
@@ -1822,10 +1864,28 @@ void TimetableExport::writeIndexHtml(QWidget* parent, const QString& htmlfilenam
 		if(WRITE_TIMETABLE_CONFLICTS)
 			tos<<"      <a href=\""<<s2+bar+CONFLICTS_FILENAME<<"\">"<<tr("View the soft conflicts list.")<<"</a><br />\n";
 		else
-			tos<<"      "<<tr("Soft conflicts list - disabled.")<<"<br />\n";
-		//	tos<<"    </p>\n";
-		//	tos<<"    <p>\n";
+			tos<<"      "<<TimetableExport::tr("Soft conflicts list - disabled.")<<"<br />\n";
 
+		///////////////////////////
+
+		QString tmps1, tmps2;
+		if(WRITE_TIMETABLES_STATISTICS && (WRITE_TIMETABLES_YEARS || WRITE_TIMETABLES_GROUPS || WRITE_TIMETABLES_SUBGROUPS) )
+			tmps1="      <a href=\""+s2+bar+STUDENTS_STATISTICS_FILENAME_HTML+"\">"+tr("students")+"</a>";
+		else
+			tmps1=tr("students - disabled");
+		
+		if(WRITE_TIMETABLES_STATISTICS && WRITE_TIMETABLES_TEACHERS)
+			tmps2="<a href=\""+s2+bar+TEACHERS_STATISTICS_FILENAME_HTML+"\">"+tr("teachers")+"</a>";
+		else
+			tmps2=tr("teachers - disabled");
+			
+		QString tmps3=tr("View statistics: %1, %2.", "%1 and %2 are two files in HTML format, to show statistics for students and teachers. The user can click on one file to view it")
+		 .arg(tmps1).arg(tmps2);
+
+		tos<<"      "<<tmps3<<"<br />\n";
+		
+		///////////////////////////
+		
 		QString tmp1, tmp2, tmp3;
 		if(WRITE_TIMETABLES_XML && WRITE_TIMETABLES_SUBGROUPS)
 			tmp1="<a href=\""+s2+bar+SUBGROUPS_TIMETABLE_FILENAME_XML+"\">"+tr("subgroups")+"</a>";
@@ -2080,27 +2140,9 @@ void TimetableExport::writeStylesheetCss(QWidget* parent, const QString& cssfile
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 	
-	bool writeAtLeastATimetable = WRITE_TIMETABLE_CONFLICTS ||
-	 (WRITE_TIMETABLES_XML &&
-	 (WRITE_TIMETABLES_SUBGROUPS ||
-	 WRITE_TIMETABLES_TEACHERS ||
-	 WRITE_TIMETABLES_ACTIVITIES)) ||
-	 ((WRITE_TIMETABLES_DAYS_HORIZONTAL ||
-	 WRITE_TIMETABLES_DAYS_VERTICAL ||
-	 WRITE_TIMETABLES_TIME_HORIZONTAL ||
-	 WRITE_TIMETABLES_TIME_VERTICAL) &&
-	 (WRITE_TIMETABLES_SUBGROUPS ||
-	 WRITE_TIMETABLES_GROUPS ||
-	 WRITE_TIMETABLES_YEARS ||
-	 WRITE_TIMETABLES_TEACHERS ||
-	 WRITE_TIMETABLES_ROOMS ||
-	 WRITE_TIMETABLES_SUBJECTS ||
-	 WRITE_TIMETABLES_ACTIVITIES)) ||
-	 ((WRITE_TIMETABLES_DAYS_HORIZONTAL ||
-	 WRITE_TIMETABLES_DAYS_VERTICAL) &&
-	 WRITE_TIMETABLES_TEACHERS_FREE_PERIODS);
-	
-	if(!writeAtLeastATimetable){
+	bool _writeAtLeastATimetable = writeAtLeastATimetable();
+
+	if(!_writeAtLeastATimetable){
 		if(QFile::exists(cssfilename))
 			QFile::remove(cssfilename);
 
@@ -2116,7 +2158,7 @@ void TimetableExport::writeStylesheetCss(QWidget* parent, const QString& cssfile
 		}
 	}
 
-	//Now we print the results to an CSS file
+	//Now we print the results to a CSS file
 	QFile file(cssfilename);
 	if(!file.open(QIODevice::WriteOnly)){
 		IrreconcilableCriticalMessage::critical(parent, tr("FET critical"),
@@ -4226,6 +4268,78 @@ void TimetableExport::writeTeachersFreePeriodsTimetableDaysVerticalHtml(QWidget*
 		if(PRINT_DETAILED) PRINT_DETAILED=false;
 		else PRINT_DETAILED=true;
 	} while(!PRINT_DETAILED);
+	tos<<"  </body>\n</html>\n";
+
+	if(file.error()>0){
+		IrreconcilableCriticalMessage::critical(parent, tr("FET critical"),
+		 TimetableExport::tr("Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(htmlfilename).arg(file.error()));
+	}
+	file.close();
+}
+
+//Code contributed by Volker Dirr (http://timetabling.de/)
+void TimetableExport::writeTeachersStatisticsHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
+	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
+	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+	
+	if(!WRITE_TIMETABLES_STATISTICS || !WRITE_TIMETABLES_TEACHERS){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
+	//Now we print the results to an HTML file
+	QFile file(htmlfilename);
+	if(!file.open(QIODevice::WriteOnly)){
+		IrreconcilableCriticalMessage::critical(parent, tr("FET critical"),
+		 TimetableExport::tr("Cannot open file %1 for writing. Please check your disk's free space. Saving of %1 aborted.").arg(htmlfilename));
+		return;
+	}
+	QTextStream tos(&file);
+	tos.setCodec("UTF-8");
+	tos.setGenerateByteOrderMark(true);
+
+	tos<<writeHead(true, placedActivities, true);
+	
+	bool PRINT_DETAILED=true;
+	tos<<singleTeachersStatisticsHtml(TIMETABLE_HTML_LEVEL, saveTime, PRINT_DETAILED, TIMETABLE_HTML_REPEAT_NAMES, true);
+	tos<<"  </body>\n</html>\n";
+
+	if(file.error()>0){
+		IrreconcilableCriticalMessage::critical(parent, tr("FET critical"),
+		 TimetableExport::tr("Writing %1 gave error code %2, which means saving is compromised. Please check your disk's free space.").arg(htmlfilename).arg(file.error()));
+	}
+	file.close();
+}
+
+//Code contributed by Volker Dirr (http://timetabling.de/)
+void TimetableExport::writeStudentsStatisticsHtml(QWidget* parent, const QString& htmlfilename, const QString& saveTime, int placedActivities){
+	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
+	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	if(!WRITE_TIMETABLES_STATISTICS || !(WRITE_TIMETABLES_YEARS || WRITE_TIMETABLES_GROUPS || WRITE_TIMETABLES_SUBGROUPS) ){
+		if(QFile::exists(htmlfilename))
+			QFile::remove(htmlfilename);
+
+		return;
+	}
+
+	//Now we print the results to an HTML file
+	QFile file(htmlfilename);
+	if(!file.open(QIODevice::WriteOnly)){
+		IrreconcilableCriticalMessage::critical(parent, tr("FET critical"),
+		 TimetableExport::tr("Cannot open file %1 for writing. Please check your disk's free space. Saving of %1 aborted.").arg(htmlfilename));
+		return;
+	}
+	QTextStream tos(&file);
+	tos.setCodec("UTF-8");
+	tos.setGenerateByteOrderMark(true);
+
+	tos<<writeHead(true, placedActivities, true);
+	bool PRINT_DETAILED=true;
+	tos<<singleStudentsStatisticsHtml(TIMETABLE_HTML_LEVEL, saveTime, PRINT_DETAILED, TIMETABLE_HTML_REPEAT_NAMES, true);
+
 	tos<<"  </body>\n</html>\n";
 
 	if(file.error()>0){
@@ -8168,5 +8282,540 @@ QString TimetableExport::singleTeachersFreePeriodsTimetableDaysVerticalHtml(int 
 	//workaround end.
 	tmpString+="      </tbody>\n";
 	tmpString+="    </table>\n\n";
+	return tmpString;
+}
+
+//by Volker Dirr
+QString TimetableExport::singleTeachersStatisticsHtml(int htmlLevel, const QString& saveTime, bool detailed, bool repeatNames, bool printAll){
+	Q_UNUSED(htmlLevel);
+	QString tmpString;
+	if(!printAll){
+		tmpString+="    <p>\n";
+		tmpString+="      <strong>"+tr("This is a teaser only. Values are not correct!")+"</strong>\n";
+		tmpString+="    </p>\n";
+	}
+	tmpString+="    <p>\n";
+	tmpString+="      "+tr("This file doesn't list limits that are set by constraints. It contains statistics about the min and max values of the currently calculated solution.")+"\n";
+	tmpString+="    </p>\n";
+	
+	QString teachersString="";
+	int freeDaysAllTeachers=0;
+	int minFreeDaysAllTeachers=gt.rules.nDaysPerWeek;
+	int maxFreeDaysAllTeachers=0;
+	int gapsAllTeachers=0;
+	int minGapsPerDayAllTeachers=gt.rules.nHoursPerDay;
+	int maxGapsPerDayAllTeachers=0;
+	int minGapsPerWeekAllTeachers=gt.rules.nHoursPerDay*gt.rules.nDaysPerWeek;
+	int maxGapsPerWeekAllTeachers=0;
+	int minHoursPerDayAllTeachers=gt.rules.nHoursPerDay;
+	int maxHoursPerDayAllTeachers=0;
+	for(int tch=0; tch<gt.rules.nInternalTeachers; tch++){
+		int freeDaysSingleTeacher=0;
+		int gapsSingleTeacher=0;
+		int minGapsPerDaySingleTeacher=gt.rules.nHoursPerDay;
+		int maxGapsPerDaySingleTeacher=0;
+		int minHoursPerDaySingleTeacher=gt.rules.nHoursPerDay;
+		int maxHoursPerDaySingleTeacher=0;
+		for(int d=0; d<gt.rules.nDaysPerWeek; d++){
+			int firstPeriod=-1;
+			int lastPeriod=-1;
+			int gapsPerDaySingleTeacher=0;
+			int hoursPerDaySingleTeacher=0;
+			for(int h=0; h<gt.rules.nHoursPerDay; h++){
+				if(teachers_timetable_weekly[tch][d][h]!=UNALLOCATED_ACTIVITY){
+					if(firstPeriod==-1)
+						firstPeriod=h;
+					lastPeriod=h;
+					hoursPerDaySingleTeacher++;
+				}
+			}
+			if(firstPeriod==-1){
+				freeDaysSingleTeacher++;
+			} else {
+				for(int h=firstPeriod; h<lastPeriod; h++){
+					if(teachers_timetable_weekly[tch][d][h]==UNALLOCATED_ACTIVITY && teacherNotAvailableDayHour[tch][d][h]==false && breakDayHour[d][h]==false){
+						gapsPerDaySingleTeacher++;
+					}
+				}
+			}
+			gapsSingleTeacher+=gapsPerDaySingleTeacher;
+			if(minGapsPerDaySingleTeacher>gapsPerDaySingleTeacher)
+				minGapsPerDaySingleTeacher=gapsPerDaySingleTeacher;
+			if(maxGapsPerDaySingleTeacher<gapsPerDaySingleTeacher)
+				maxGapsPerDaySingleTeacher=gapsPerDaySingleTeacher;
+			if(hoursPerDaySingleTeacher>0){
+				if(minHoursPerDaySingleTeacher>hoursPerDaySingleTeacher)
+					minHoursPerDaySingleTeacher=hoursPerDaySingleTeacher;
+				if(maxHoursPerDaySingleTeacher<hoursPerDaySingleTeacher)
+					maxHoursPerDaySingleTeacher=hoursPerDaySingleTeacher;
+			}
+		}
+		if(minFreeDaysAllTeachers>freeDaysSingleTeacher)
+			minFreeDaysAllTeachers=freeDaysSingleTeacher;
+		if(maxFreeDaysAllTeachers<freeDaysSingleTeacher)
+			maxFreeDaysAllTeachers=freeDaysSingleTeacher;
+		
+		if(minGapsPerDayAllTeachers>minGapsPerDaySingleTeacher)
+			minGapsPerDayAllTeachers=minGapsPerDaySingleTeacher;
+		if(maxGapsPerDayAllTeachers<maxGapsPerDaySingleTeacher)
+			maxGapsPerDayAllTeachers=maxGapsPerDaySingleTeacher;
+			
+		if(minGapsPerWeekAllTeachers>gapsSingleTeacher)
+			minGapsPerWeekAllTeachers=gapsSingleTeacher;
+		if(maxGapsPerWeekAllTeachers<gapsSingleTeacher)
+			maxGapsPerWeekAllTeachers=gapsSingleTeacher;
+		
+		if(minHoursPerDayAllTeachers>minHoursPerDaySingleTeacher)
+			minHoursPerDayAllTeachers=minHoursPerDaySingleTeacher;
+		if(maxHoursPerDayAllTeachers<maxHoursPerDaySingleTeacher)
+			maxHoursPerDayAllTeachers=maxHoursPerDaySingleTeacher;
+
+		gapsAllTeachers+=gapsSingleTeacher;
+		freeDaysAllTeachers+=freeDaysSingleTeacher;
+		
+		if(detailed){
+			if(freeDaysSingleTeacher==gt.rules.nDaysPerWeek)
+				minHoursPerDaySingleTeacher=0;
+			teachersString+="      <tr><th>"+gt.rules.internalTeachersList[tch]->name
+					+"</th><td>"+QString::number(freeDaysSingleTeacher)
+								+"</td><td>"+QString::number(gapsSingleTeacher)
+								+"</td><td>"+QString::number(minGapsPerDaySingleTeacher)
+								+"</td><td>"+QString::number(maxGapsPerDaySingleTeacher)
+								+"</td><td>"+QString::number(minHoursPerDaySingleTeacher)
+								+"</td><td>"+QString::number(maxHoursPerDaySingleTeacher)
+								+"</td>";
+			
+			if(repeatNames){
+				teachersString+="<th>"+gt.rules.internalTeachersList[tch]->name+"</th>";
+			}
+			teachersString+="</tr>\n";
+		}
+		if(!printAll && tch>10){
+			break;
+		}
+	}
+	
+	tmpString+="    <table border=\"1\">\n";
+	tmpString+="      <caption>"+protect2(gt.rules.institutionName)+"</caption>\n";
+	tmpString+="      <thead>\n";
+	tmpString+="        <tr><th>"+tr("All teachers")
+		  +"</th><th>"+tr("Free days")
+		  +"</th><th>"+tr("Gaps")
+		  +"</th><th>"+tr("Gaps per day")
+		  +"</th><th>"+tr("Hours per day")
+		  +"</th></tr>\n";
+	tmpString+="      </thead>\n";
+	tmpString+="      <tr><th>"+tr("Sum")+"</th>";
+	tmpString+="<td>"+QString::number(freeDaysAllTeachers)+"</td>";
+	tmpString+="<td>"+QString::number(gapsAllTeachers)+"</td>";
+	tmpString+="<td>---</td>";
+	tmpString+="<td>---</td>";
+	tmpString+="</tr>\n";
+	tmpString+="      <tr><th>"+tr("Average")+"</th>";
+	tmpString+="<td>"+QString::number(double(freeDaysAllTeachers)/gt.rules.nInternalTeachers,'f',2)+"</td>";
+	tmpString+="<td>"+QString::number(double(gapsAllTeachers)/gt.rules.nInternalTeachers,'f',2)+"</td>";
+	tmpString+="<td>---</td>";
+	tmpString+="<td>---</td>";
+	tmpString+="</tr>\n";
+	tmpString+="      <tr><th>"+tr("Min")+"</th>";
+	tmpString+="<td>"+QString::number(minFreeDaysAllTeachers)+"</td>";
+	tmpString+="<td>"+QString::number(minGapsPerWeekAllTeachers)+"</td>";
+	tmpString+="<td>"+QString::number(minGapsPerDayAllTeachers)+"</td>";
+	tmpString+="<td>"+QString::number(minHoursPerDayAllTeachers)+"</td>";
+	tmpString+="</tr>\n";
+	tmpString+="      <tr><th>"+tr("Max")+"</th>";
+	tmpString+="<td>"+QString::number(maxFreeDaysAllTeachers)+"</td>";
+	tmpString+="<td>"+QString::number(maxGapsPerWeekAllTeachers)+"</td>";
+	tmpString+="<td>"+QString::number(maxGapsPerDayAllTeachers)+"</td>";
+	tmpString+="<td>"+QString::number(maxHoursPerDayAllTeachers)+"</td>";
+	tmpString+="</tr>\n";
+	//workaround begin.
+	tmpString+="        <tr class=\"foot\"><td></td><td colspan=\""+QString::number(4)+"\">"+TimetableExport::tr("Timetable generated with FET %1 on %2", "%1 is FET version, %2 is the date and time of generation").arg(FET_VERSION).arg(saveTime)+"</td></tr>\n";
+	//workaround end.
+        tmpString+="    </table>\n";
+	
+	if(detailed){
+		tmpString+="    <p class=\"back0\"><br /></p>\n\n";
+		
+		tmpString+="    <table border=\"1\">\n";
+		tmpString+="      <caption>"+protect2(gt.rules.institutionName)+"</caption>\n";
+		tmpString+="      <thead>\n";
+		tmpString+="        <tr><th>"+tr("Teacher")
+			+"</th><th>"+tr("Free days")
+			+"</th><th>"+tr("Total gaps")
+			+"</th><th>"+tr("Min gaps per day")
+			+"</th><th>"+tr("Max gaps per day")
+			+"</th><th>"+tr("Min hours per day")
+			+"</th><th>"+tr("Max hours per day")
+			+"</th>";
+		if(repeatNames){
+			tmpString+="<th>"+tr("Teacher")+"</th>";
+		}
+		tmpString+="</tr>\n";
+		tmpString+="      </thead>\n";
+		tmpString+=teachersString;
+		//workaround begin.
+		tmpString+="        <tr class=\"foot\"><td></td><td colspan=\""+QString::number(6)+"\">"+TimetableExport::tr("Timetable generated with FET %1 on %2", "%1 is FET version, %2 is the date and time of generation").arg(FET_VERSION).arg(saveTime)+"</td></tr>\n";
+		//workaround end.
+		tmpString+="    </table>\n";
+	}
+	return tmpString;
+}
+
+//by Volker Dirr
+QString TimetableExport::singleStudentsStatisticsHtml(int htmlLevel, const QString& saveTime, bool detailed, bool repeatNames, bool printAll){
+	Q_UNUSED(htmlLevel);
+	QString tmpString;
+	if(!printAll){
+		tmpString+="    <p>\n";
+		tmpString+="      <strong>"+tr("This is a teaser only. Values are not correct!")+"</strong>\n";
+		tmpString+="    </p>\n";
+	}
+	tmpString+="    <p>\n";
+	tmpString+="      "+tr("This file doesn't list limits that are set by constraints. It contains statistics about the min and max values of the currently calculated solution.")+"\n";
+	tmpString+="    </p>\n";
+	
+	//subgroups statistics (start)
+	QString subgroupsString="";
+	int freeDaysAllSubgroups=0;
+	int minFreeDaysAllSubgroups=gt.rules.nDaysPerWeek;
+	int maxFreeDaysAllSubgroups=0;
+	int gapsAllSubgroups=0;
+	int minGapsPerDayAllSubgroups=gt.rules.nHoursPerDay;
+	int maxGapsPerDayAllSubgroups=0;
+	int minGapsPerWeekAllSubgroups=gt.rules.nHoursPerDay*gt.rules.nDaysPerWeek;
+	int maxGapsPerWeekAllSubgroups=0;
+	int minHoursPerDayAllSubgroups=gt.rules.nHoursPerDay;
+	int maxHoursPerDayAllSubgroups=0;
+	QList<int> freeDaysPerWeekSubgroupList;
+	QList<int> gapsPerWeekSubgroupList;
+	QList<int> minGapsPerDaySubgroupList;
+	QList<int> maxGapsPerDaySubgroupList;
+	QList<int> minHoursPerDaySubgroupList;
+	QList<int> maxHoursPerDaySubgroupList;
+	for(int subgroup=0; subgroup<gt.rules.nInternalSubgroups; subgroup++){
+		int freeDaysSingleSubgroup=0;
+		int gapsSingleSubgroup=0;
+		int minGapsPerDaySingleSubgroup=gt.rules.nHoursPerDay;
+		int maxGapsPerDaySingleSubgroup=0;
+		int minHoursPerDaySingleSubgroup=gt.rules.nHoursPerDay;
+		int maxHoursPerDaySingleSubgroup=0;
+		for(int d=0; d<gt.rules.nDaysPerWeek; d++){
+			int firstPeriod=-1;
+			int lastPeriod=-1;
+			int gapsPerDaySingleSubgroup=0;
+			int hoursPerDaySingleSubgroup=0;
+			for(int h=0; h<gt.rules.nHoursPerDay; h++){
+				if(students_timetable_weekly[subgroup][d][h]!=UNALLOCATED_ACTIVITY){
+					if(firstPeriod==-1)
+						firstPeriod=h;
+					lastPeriod=h;
+					hoursPerDaySingleSubgroup++;
+				}
+			}
+			if(firstPeriod==-1){
+				freeDaysSingleSubgroup++;
+			} else {
+				for(int h=firstPeriod; h<lastPeriod; h++){
+					if(students_timetable_weekly[subgroup][d][h]==UNALLOCATED_ACTIVITY && subgroupNotAvailableDayHour[subgroup][d][h]==false && breakDayHour[d][h]==false){
+						gapsPerDaySingleSubgroup++;
+					}
+				}
+			}
+			gapsSingleSubgroup+=gapsPerDaySingleSubgroup;
+			if(minGapsPerDaySingleSubgroup>gapsPerDaySingleSubgroup)
+				minGapsPerDaySingleSubgroup=gapsPerDaySingleSubgroup;
+			if(maxGapsPerDaySingleSubgroup<gapsPerDaySingleSubgroup)
+				maxGapsPerDaySingleSubgroup=gapsPerDaySingleSubgroup;
+			if(hoursPerDaySingleSubgroup>0){
+				if(minHoursPerDaySingleSubgroup>hoursPerDaySingleSubgroup)
+					minHoursPerDaySingleSubgroup=hoursPerDaySingleSubgroup;
+				if(maxHoursPerDaySingleSubgroup<hoursPerDaySingleSubgroup)
+					maxHoursPerDaySingleSubgroup=hoursPerDaySingleSubgroup;
+			}
+		}
+		if(minFreeDaysAllSubgroups>freeDaysSingleSubgroup)
+			minFreeDaysAllSubgroups=freeDaysSingleSubgroup;
+		if(maxFreeDaysAllSubgroups<freeDaysSingleSubgroup)
+			maxFreeDaysAllSubgroups=freeDaysSingleSubgroup;
+		
+		if(minGapsPerDayAllSubgroups>minGapsPerDaySingleSubgroup)
+			minGapsPerDayAllSubgroups=minGapsPerDaySingleSubgroup;
+		if(maxGapsPerDayAllSubgroups<maxGapsPerDaySingleSubgroup)
+			maxGapsPerDayAllSubgroups=maxGapsPerDaySingleSubgroup;
+			
+		if(minGapsPerWeekAllSubgroups>gapsSingleSubgroup)
+			minGapsPerWeekAllSubgroups=gapsSingleSubgroup;
+		if(maxGapsPerWeekAllSubgroups<gapsSingleSubgroup)
+			maxGapsPerWeekAllSubgroups=gapsSingleSubgroup;
+		
+		if(minHoursPerDayAllSubgroups>minHoursPerDaySingleSubgroup)
+			minHoursPerDayAllSubgroups=minHoursPerDaySingleSubgroup;
+		if(maxHoursPerDayAllSubgroups<maxHoursPerDaySingleSubgroup)
+			maxHoursPerDayAllSubgroups=maxHoursPerDaySingleSubgroup;
+
+		gapsAllSubgroups+=gapsSingleSubgroup;
+		freeDaysAllSubgroups+=freeDaysSingleSubgroup;
+		
+		if(freeDaysSingleSubgroup==gt.rules.nDaysPerWeek)
+			minHoursPerDaySingleSubgroup=0;
+		if(detailed){
+			subgroupsString+="      <tr><th>"+gt.rules.internalSubgroupsList[subgroup]->name
+						+"</th><td>"+QString::number(freeDaysSingleSubgroup)
+							 +"</td><td>"+QString::number(gapsSingleSubgroup)
+							 +"</td><td>"+QString::number(minGapsPerDaySingleSubgroup)
+							 +"</td><td>"+QString::number(maxGapsPerDaySingleSubgroup)
+							 +"</td><td>"+QString::number(minHoursPerDaySingleSubgroup)
+							 +"</td><td>"+QString::number(maxHoursPerDaySingleSubgroup)
+							 +"</td>";
+			if(repeatNames){
+				subgroupsString+="<th>"+gt.rules.internalSubgroupsList[subgroup]->name+"</th>";
+			}
+			subgroupsString+="</tr>\n";
+			freeDaysPerWeekSubgroupList<<freeDaysSingleSubgroup;
+			gapsPerWeekSubgroupList<<gapsSingleSubgroup;
+			minGapsPerDaySubgroupList<<minGapsPerDaySingleSubgroup;
+			maxGapsPerDaySubgroupList<<maxGapsPerDaySingleSubgroup;
+			minHoursPerDaySubgroupList<<minHoursPerDaySingleSubgroup;
+			maxHoursPerDaySubgroupList<<maxHoursPerDaySingleSubgroup;
+		}
+		if(!printAll && subgroup>10){
+			break;
+		}
+	}
+
+	tmpString+="    <table border=\"1\">\n";
+	tmpString+="      <caption>"+protect2(gt.rules.institutionName)+"</caption>\n";
+	tmpString+="      <thead>\n";
+	tmpString+="        <tr><th>"+tr("All students")
+		  +"</th><th>"+tr("Free days")
+		  +"</th><th>"+tr("Gaps")
+		  +"</th><th>"+tr("Gaps per day")
+		  +"</th><th>"+tr("Hours per day")
+		  +"</th></tr>\n";
+	tmpString+="      </thead>\n";
+	tmpString+="      <tr><th>"+tr("Sum")+"</th>";
+	tmpString+="<td>"+QString::number(freeDaysAllSubgroups)+"</td>";
+	tmpString+="<td>"+QString::number(gapsAllSubgroups)+"</td>";
+	tmpString+="<td>---</td>";
+	tmpString+="<td>---</td>";
+	tmpString+="</tr>\n";
+	tmpString+="      <tr><th>"+tr("Average")+"</th>";
+	tmpString+="<td>"+QString::number(double(freeDaysAllSubgroups)/gt.rules.nInternalSubgroups,'f',2)+"</td>";
+	tmpString+="<td>"+QString::number(double(gapsAllSubgroups)/gt.rules.nInternalSubgroups,'f',2)+"</td>";
+	tmpString+="<td>---</td>";
+	tmpString+="<td>---</td>";
+	tmpString+="</tr>\n";
+	tmpString+="      <tr><th>"+tr("Min")+"</th>";
+	tmpString+="<td>"+QString::number(minFreeDaysAllSubgroups)+"</td>";
+	tmpString+="<td>"+QString::number(minGapsPerWeekAllSubgroups)+"</td>";
+	tmpString+="<td>"+QString::number(minGapsPerDayAllSubgroups)+"</td>";
+	tmpString+="<td>"+QString::number(minHoursPerDayAllSubgroups)+"</td>";
+	tmpString+="</tr>\n";
+	tmpString+="      <tr><th>"+tr("Max")+"</th>";
+	tmpString+="<td>"+QString::number(maxFreeDaysAllSubgroups)+"</td>";
+	tmpString+="<td>"+QString::number(maxGapsPerWeekAllSubgroups)+"</td>";
+	tmpString+="<td>"+QString::number(maxGapsPerDayAllSubgroups)+"</td>";
+	tmpString+="<td>"+QString::number(maxHoursPerDayAllSubgroups)+"</td>";
+	tmpString+="</tr>\n";
+	//workaround begin.
+	tmpString+="        <tr class=\"foot\"><td></td><td colspan=\""+QString::number(4)+"\">"+TimetableExport::tr("Timetable generated with FET %1 on %2", "%1 is FET version, %2 is the date and time of generation").arg(FET_VERSION).arg(saveTime)+"</td></tr>\n";
+	//workaround end.
+        tmpString+="    </table>\n";
+	
+	tmpString+="    <p class=\"back0\"><br /></p>\n\n";
+	
+	//subgroups statistics (end)
+	
+	if(detailed){
+		if(!printAll){
+			//similar to source in else part (start)
+			tmpString+="    <p></p>\n";
+			tmpString+="    <table border=\"1\">\n";
+			tmpString+="      <caption>"+protect2(gt.rules.institutionName)+"</caption>\n";
+			tmpString+="      <thead>\n";
+			tmpString+="      <tr><th>"+tr("Subgroup")
+					+"</th><th>"+tr("Free days")
+					+"</th><th>"+tr("Total gaps")
+					+"</th><th>"+tr("Min gaps per day")
+					+"</th><th>"+tr("Max gaps per day")
+					+"</th><th>"+tr("Min hours per day")
+					+"</th><th>"+tr("Max hours per day")
+					+"</th>";
+			if(repeatNames){
+				tmpString+="<td>"+tr("Subgroup")+"</td>";
+			}
+			tmpString+="</tr>\n";
+			tmpString+="      </thead>\n";
+			tmpString+=subgroupsString;
+			//workaround begin.
+			tmpString+="        <tr class=\"foot\"><td></td><td colspan=\""+QString::number(6)+"\">"+TimetableExport::tr("Timetable generated with FET %1 on %2", "%1 is FET version, %2 is the date and time of generation").arg(FET_VERSION).arg(saveTime)+"</td></tr>\n";
+			//workaround end.
+			tmpString+="    </table>\n";
+			//similar to source in else part (end)
+		} else {
+			//groups and years statistics (start)
+			QString yearsString="    <table border=\"1\">\n";
+			yearsString+="      <caption>"+protect2(gt.rules.institutionName)+"</caption>\n";
+			yearsString+="      <thead>\n";
+			yearsString+="      <tr><th>"+tr("Year")
+							+"</th><th>"+tr("Min free days")
+							+"</th><th>"+tr("Max free days")
+							+"</th><th>"+tr("Min hours per day")
+							+"</th><th>"+tr("Max hours per day")
+							+"</th><th>"+tr("Min gaps per week")
+							+"</th><th>"+tr("Max gaps per week")
+							+"</th><th>"+tr("Min gaps per day")
+							+"</th><th>"+tr("Max gaps per day")
+							+"</th>";
+			if(repeatNames){
+					yearsString+="<th>"+tr("Year")+"</th>";
+			}
+			yearsString+="</tr>\n";
+			yearsString+="      </thead>\n";
+			QString groupsString="    <table border=\"1\">\n";
+			groupsString+="      <caption>"+protect2(gt.rules.institutionName)+"</caption>\n";
+			groupsString+="      <thead>\n";
+			groupsString+="      <tr><th>"+tr("Group")
+							+"</th><th>"+tr("Min free days")
+							+"</th><th>"+tr("Max free days")
+							+"</th><th>"+tr("Min hours per day")
+							+"</th><th>"+tr("Max hours per day")
+							+"</th><th>"+tr("Min gaps per week")
+							+"</th><th>"+tr("Max gaps per week")
+							+"</th><th>"+tr("Min gaps per day")
+							+"</th><th>"+tr("Max gaps per day")
+							+"</th>";
+			if(repeatNames){
+				groupsString+="<th>"+tr("Group")+"</th>";
+			}
+			groupsString+="</tr>\n";
+			groupsString+="      </thead>\n";
+			for(int i=0; i<gt.rules.augmentedYearsList.size(); i++){
+				StudentsYear* sty=gt.rules.augmentedYearsList[i];
+				int minFreeDaysPerWeekYear=gt.rules.nDaysPerWeek;
+				int maxFreeDaysPerWeekYear=0;
+				int minGapsPerDayYear=gt.rules.nHoursPerDay;
+				int maxGapsPerDayYear=0;
+				int minGapsPerWeekYear=gt.rules.nHoursPerDay*gt.rules.nDaysPerWeek;
+				int maxGapsPerWeekYear=0;
+				int minHoursPerDayYear=gt.rules.nHoursPerDay;
+				int maxHoursPerDayYear=0;
+				for(int g=0; g<sty->groupsList.size(); g++){
+					StudentsGroup* stg=sty->groupsList[g];
+					int minFreeDaysPerWeekGroup=gt.rules.nDaysPerWeek;
+					int maxFreeDaysPerWeekGroup=0;
+					int minGapsPerDayGroup=gt.rules.nHoursPerDay;
+					int maxGapsPerDayGroup=0;
+					int minGapsPerWeekGroup=gt.rules.nHoursPerDay*gt.rules.nDaysPerWeek;
+					int maxGapsPerWeekGroup=0;
+					int minHoursPerDayGroup=gt.rules.nHoursPerDay;
+					int maxHoursPerDayGroup=0;
+					for(int sg=0; sg<stg->subgroupsList.size(); sg++){
+						StudentsSubgroup* sts=stg->subgroupsList[sg];
+						int subgroup=sts->indexInInternalSubgroupsList;
+
+						if(minFreeDaysPerWeekGroup>freeDaysPerWeekSubgroupList.at(subgroup))
+							minFreeDaysPerWeekGroup=freeDaysPerWeekSubgroupList.at(subgroup);
+						if(maxFreeDaysPerWeekGroup<freeDaysPerWeekSubgroupList.at(subgroup))
+							maxFreeDaysPerWeekGroup=freeDaysPerWeekSubgroupList.at(subgroup);
+						
+						if(minHoursPerDayGroup>minHoursPerDaySubgroupList.at(subgroup))
+							minHoursPerDayGroup=minHoursPerDaySubgroupList.at(subgroup);
+						if(maxHoursPerDayGroup<maxHoursPerDaySubgroupList.at(subgroup))
+							maxHoursPerDayGroup=maxHoursPerDaySubgroupList.at(subgroup);
+						
+						if(minGapsPerWeekGroup>gapsPerWeekSubgroupList.at(subgroup))
+							minGapsPerWeekGroup=gapsPerWeekSubgroupList.at(subgroup);
+						if(maxGapsPerWeekGroup<gapsPerWeekSubgroupList.at(subgroup))
+							maxGapsPerWeekGroup=gapsPerWeekSubgroupList.at(subgroup);
+						
+						if(minGapsPerDayGroup>minGapsPerDaySubgroupList.at(subgroup))
+							minGapsPerDayGroup=minGapsPerDaySubgroupList.at(subgroup);
+						if(maxGapsPerDayGroup<maxGapsPerDaySubgroupList.at(subgroup))
+							maxGapsPerDayGroup=maxGapsPerDaySubgroupList.at(subgroup);
+					}
+					//print groups
+					groupsString+="      <tr><th>"+protect2(stg->name)+"</th><td>"
+					+QString::number(minFreeDaysPerWeekGroup)+"</td><td>"+QString::number(maxFreeDaysPerWeekGroup)+"</td><td>"
+					+QString::number(minHoursPerDayGroup)+"</td><td>"+QString::number(maxHoursPerDayGroup)+"</td><td>"
+					+QString::number(minGapsPerWeekGroup)+"</td><td>"+QString::number(maxGapsPerWeekGroup)+"</td><td>"
+					+QString::number(minGapsPerDayGroup)+"</td><td>"+QString::number(maxGapsPerDayGroup)+"</td>";
+					if(repeatNames){
+						groupsString+="<th>"+protect2(stg->name)+"</th>";
+					}
+					groupsString+="</tr>\n";
+
+					//check years
+					if(minFreeDaysPerWeekYear>minFreeDaysPerWeekGroup)
+						minFreeDaysPerWeekYear=minFreeDaysPerWeekGroup;
+					if(maxFreeDaysPerWeekYear<maxFreeDaysPerWeekGroup)
+						maxFreeDaysPerWeekYear=maxFreeDaysPerWeekGroup;
+					
+					if(minHoursPerDayYear>minHoursPerDayGroup)
+						minHoursPerDayYear=minHoursPerDayGroup;
+					if(maxHoursPerDayYear<maxHoursPerDayGroup)
+						maxHoursPerDayYear=maxHoursPerDayGroup;
+						
+					if(minGapsPerWeekYear>minGapsPerWeekGroup)
+						minGapsPerWeekYear=minGapsPerWeekGroup;
+					if(maxGapsPerWeekYear<maxGapsPerWeekGroup)
+						maxGapsPerWeekYear=maxGapsPerWeekGroup;
+						
+					if(minGapsPerDayYear>minGapsPerDayGroup)
+						minGapsPerDayYear=minGapsPerDayGroup;
+					if(maxGapsPerDayYear<maxGapsPerDayGroup)
+						maxGapsPerDayYear=maxGapsPerDayGroup;
+				}
+				//print years
+					yearsString+="      <tr><th>"+protect2(sty->name)+"</th><td>"
+					+QString::number(minFreeDaysPerWeekYear)+"</td><td>"+QString::number(maxFreeDaysPerWeekYear)+"</td><td>"
+					+QString::number(minHoursPerDayYear)+"</td><td>"+QString::number(maxHoursPerDayYear)+"</td><td>"
+					+QString::number(minGapsPerWeekYear)+"</td><td>"+QString::number(maxGapsPerWeekYear)+"</td><td>"
+					+QString::number(minGapsPerDayYear)+"</td><td>"+QString::number(maxGapsPerDayYear)+"</td>";
+					if(repeatNames){
+						yearsString+="<th>"+protect2(sty->name)+"</th>";
+					}
+					yearsString+="</tr>\n";
+			}
+			//workaround begin.
+			groupsString+="        <tr class=\"foot\"><td></td><td colspan=\""+QString::number(8)+"\">"+TimetableExport::tr("Timetable generated with FET %1 on %2", "%1 is FET version, %2 is the date and time of generation").arg(FET_VERSION).arg(saveTime)+"</td></tr>\n";
+			//workaround end.
+			groupsString+="    </table>\n";
+			groupsString+="    <p class=\"back0\"><br /></p>\n\n";
+			//workaround begin.
+			yearsString+="        <tr class=\"foot\"><td></td><td colspan=\""+QString::number(8)+"\">"+TimetableExport::tr("Timetable generated with FET %1 on %2", "%1 is FET version, %2 is the date and time of generation").arg(FET_VERSION).arg(saveTime)+"</td></tr>\n";
+			//workaround end.
+			yearsString+="    </table>\n";
+			yearsString+="    <p class=\"back0\"><br /></p>\n\n";
+			tmpString+=yearsString;
+			tmpString+=groupsString;
+			//similar to source in if part (start)
+			tmpString+="    <p></p>\n";
+			tmpString+="    <table border=\"1\">\n";
+			tmpString+="      <caption>"+protect2(gt.rules.institutionName)+"</caption>\n";
+			tmpString+="      <thead>\n";
+			tmpString+="      <tr><th>"+tr("Subgroup")
+					+"</th><th>"+tr("Free days")
+					+"</th><th>"+tr("Total gaps")
+					+"</th><th>"+tr("Min gaps per day")
+					+"</th><th>"+tr("Max gaps per day")
+					+"</th><th>"+tr("Min hours per day")
+					+"</th><th>"+tr("Max hours per day")
+					+"</th>";
+			if(repeatNames){
+				tmpString+="<td>"+tr("Subgroup")+"</td>";
+			}
+			tmpString+="</tr>\n";
+			tmpString+="      </thead>\n";
+			tmpString+=subgroupsString;
+			//workaround begin.
+			tmpString+="        <tr class=\"foot\"><td></td><td colspan=\""+QString::number(6)+"\">"+TimetableExport::tr("Timetable generated with FET %1 on %2", "%1 is FET version, %2 is the date and time of generation").arg(FET_VERSION).arg(saveTime)+"</td></tr>\n";
+			//workaround end.
+			tmpString+="    </table>\n";
+			//similar to source in if part (end)
+		}
+	}
+	//groups and years statistics (end)
 	return tmpString;
 }

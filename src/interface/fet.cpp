@@ -174,19 +174,20 @@ void usage(QTextStream* out, const QString& error)
 	s+=QString(
 		"Command line usage: \"fet-cl --inputfile=x [--outputdir=d] [--timelimitseconds=y] [--htmllevel=z] [--language=t] "
 		"[--writetimetableconflicts=wt1] "
-		"[--writetimetablesxml=wt2] "
-		"[--writetimetablesdayshorizontal=wt3] "
-		"[--writetimetablesdaysvertical=wt4] "
-		"[--writetimetablestimehorizontal=wt5] "
-		"[--writetimetablestimevertical=wt6] "
-		"[--writetimetablessubgroups=wt7] "
-		"[--writetimetablesgroups=wt8] "
-		"[--writetimetablesyears=wt9] "
-		"[--writetimetablesteachers=wt10] "
-		"[--writetimetablesteachersfreeperiods=wt11] "
-		"[--writetimetablesrooms=wt12] "
-		"[--writetimetablessubjects=wt13] "
-		"[--writetimetablesactivities=wt14] "
+		"[--writetimetablesstatistics=wt2] "
+		"[--writetimetablesxml=wt3] "
+		"[--writetimetablesdayshorizontal=wt4] "
+		"[--writetimetablesdaysvertical=wt5] "
+		"[--writetimetablestimehorizontal=wt6] "
+		"[--writetimetablestimevertical=wt7] "
+		"[--writetimetablessubgroups=wt8] "
+		"[--writetimetablesgroups=wt9] "
+		"[--writetimetablesyears=wt10] "
+		"[--writetimetablesteachers=wt11] "
+		"[--writetimetablesteachersfreeperiods=wt12] "
+		"[--writetimetablesrooms=wt13] "
+		"[--writetimetablessubjects=wt14] "
+		"[--writetimetablesactivities=wt15] "
 		"[--printactivitytags=a] [--printnotavailable=u] [--printbreak=b] [--dividetimeaxisbydays=v] [--duplicateverticalheaders=e] "
 		"[--printsimultaneousactivities=w] [--randomseedx=rx --randomseedy=ry] [--warnifusingnotperfectconstraints=s] "
 		"[--warnifusingstudentsminhoursdailywithallowemptydays=p] [--warnifusinggroupactivitiesininitialorder=g] [--warnsubgroupswiththesameactivities=ssa] [--verbose=r]\",\n"
@@ -198,7 +199,7 @@ void usage(QTextStream* out, const QString& error)
 		"(default 2, larger values have more details/facilities and larger file sizes).\n"
 		"t is one of en_US, ar, ca, da, de, el, es, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk, uz, vi, "
 		"zh_CN, zh_TW (default en_US).\n"
-		"wt1 to wt14 are either true or false and represent whether you want the corresponding timetables to be written on the disk (default true).\n"
+		"wt1 to wt15 are either true or false and represent whether you want the corresponding timetables to be written on the disk (default true).\n"
 		"a is either true or false and represets if you want activity tags to be present in the final HTML timetables (default true).\n"
 		"u is either true or false and represents if you want -x- (for true) or --- (for false) in the generated timetables for the "
 		"not available slots (default true).\n"
@@ -317,6 +318,7 @@ void readSimulationParameters()
 	
 	WRITE_TIMETABLE_CONFLICTS=newSettings.value("write-timetable-conflicts", "true").toBool();
 
+	WRITE_TIMETABLES_STATISTICS=newSettings.value("write-timetables-statistics", "true").toBool();
 	WRITE_TIMETABLES_XML=newSettings.value("write-timetables-xml", "true").toBool();
 	WRITE_TIMETABLES_DAYS_HORIZONTAL=newSettings.value("write-timetables-days-horizontal", "true").toBool();
 	WRITE_TIMETABLES_DAYS_VERTICAL=newSettings.value("write-timetables-days-vertical", "true").toBool();
@@ -388,6 +390,7 @@ void writeSimulationParameters()
 	
 	settings.setValue("write-timetable-conflicts", WRITE_TIMETABLE_CONFLICTS);
 
+	settings.setValue("write-timetables-statistics", WRITE_TIMETABLES_STATISTICS);
 	settings.setValue("write-timetables-xml", WRITE_TIMETABLES_XML);
 	settings.setValue("write-timetables-days-horizontal", WRITE_TIMETABLES_DAYS_HORIZONTAL);
 	settings.setValue("write-timetables-days-vertical", WRITE_TIMETABLES_DAYS_VERTICAL);
@@ -770,6 +773,7 @@ int main(int argc, char **argv)
 		
 		WRITE_TIMETABLE_CONFLICTS=true;
 	
+		WRITE_TIMETABLES_STATISTICS=true;
 		WRITE_TIMETABLES_XML=true;
 		WRITE_TIMETABLES_DAYS_HORIZONTAL=true;
 		WRITE_TIMETABLES_DAYS_VERTICAL=true;
@@ -876,6 +880,10 @@ int main(int argc, char **argv)
 					WRITE_TIMETABLE_CONFLICTS=false;
 			}
 			//
+			else if(s.left(28)=="--writetimetablesstatistics="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_STATISTICS=false;
+			}
 			else if(s.left(21)=="--writetimetablesxml="){
 				if(s.right(5)=="false")
 					WRITE_TIMETABLES_XML=false;

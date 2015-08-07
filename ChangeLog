@@ -1756,7 +1756,7 @@ Version 5.25.0
 	or students sets could remove only some components of the large split activity.
 	- Some minor strings improvements.
 ---------------------------------------------------------------------------------
-Versions 5.26.0 - 5.26.v
+Versions 5.26.0 - 5.26.2
 - Version 5.26.0
 	- FET is now licensed under the GNU Affero General Public License version 3 or later (suggested by Volker Dirr).
 	- Improved the speed of importing from comma separated values (CSV) files, especially when dealing with many students sets.
@@ -1779,3 +1779,8 @@ Versions 5.26.0 - 5.26.v
 	- Crash bug fix when generating with zero students sets (introduced in FET-5.26.0).
 	- Added a partial Chinese Traditional (zh_TW) translation, by James.
 	- Updated the German translation, by Bob Hairgrove.
+---------------------------------------------------------------------------------
+Versions 5.27.0 - 5.27.v
+- Version 5.27.0
+	- Writing the statistics of the generated timetable (gaps, min/max hours, free days), implemented by Volker Dirr.
+	- Updated the Chinese Traditional translation, by James.

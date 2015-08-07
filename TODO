@@ -3469,3 +3469,62 @@ For assigning these matrixes and some others the code loops (there are 2 variant
 for(int j=0; j<gt.rules.nInternalActivities/*added_act*/; j++){
 
 The code in the loop does some checks that are replicated in several other loops but they check on data that, as far as I understand, can't change between consecutive checks. So it seems to me that they are redundant.
+
+217---------------------------------------------------------
+From Bob Hairgrove:
+
+Liviu:
+
+> > I wrote in the advice on how to translate to not translate the
+> > large 5 fields in HelpAboutForm_template (which contain difficult
+> > and large fields, subject to future changes). If you check now,
+> > your translation of the About is lost (but it is inevitable).
+
+---
+
+Bob:
+
+> Wouldn't it be better to have the strings in a separate file where
+> they could be translated, then build the HTML text in a function
+> which is not routed through the tr() macros? None of the HTML stuff
+> should be in the .ts file, anyway ... IMHO.
+> 
+> Should be easy enough since (I assume) there is only one "About..."
+> form. I wouldn't necessarily translate the list of translators, but
+> the names of the languages could be translated and the HTML code built
+> outside of the tr() function as described above.
+
+---
+
+Liviu:
+
+Unfortunately, I see no easy way to do this. Using a separate file for
+these is not good.
+
+Even if I used simple text instead of HTML, for each new entry I add
+all the previous translated text is lost, if I lupdate with -noobsolete.
+
+I will add this correspondence, and your next email which I just
+received, to the TODO list.
+
+I am not sure what to do.
+
+----
+
+Part 2:
+
+Bob:
+
+Of course, if you don't want the HTML in this form to be translated,
+there is a much easier way to get rid of it (see attached
+screenshot). ;)
+
+(Bob is referring to the property "translatable" of the string.)
+
+---
+
+Liviu:
+
+:-) Yes, sure, I thought of this, but some people might really want to
+translate in a hypothetical situation. All strings in FET should be
+translatable, I think (I am not sure, though).

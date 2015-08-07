@@ -1256,6 +1256,7 @@
       </property>
       <addaction name="enableConflictsTimetableAction"/>
       <addaction name="separator"/>
+      <addaction name="enableStatisticsTimetablesAction"/>
       <addaction name="enableXmlTimetablesAction"/>
       <addaction name="enableDaysHorizontalTimetablesAction"/>
       <addaction name="enableDaysVerticalTimetablesAction"/>
@@ -2610,6 +2611,17 @@
    </property>
    <property name="text">
     <string>Warn subgroups with the same activities</string>
+   </property>
+  </action>
+  <action name="enableStatisticsTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Statistics</string>
    </property>
   </action>
  </widget>

@@ -163,6 +163,7 @@ public slots:
 	///write timetables options
 	void on_enableConflictsTimetableAction_toggled();
 
+	void on_enableStatisticsTimetablesAction_toggled();
 	void on_enableXmlTimetablesAction_toggled();
 	void on_enableDaysHorizontalTimetablesAction_toggled();
 	void on_enableDaysVerticalTimetablesAction_toggled();

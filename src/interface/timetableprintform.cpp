@@ -89,6 +89,7 @@ const QString CBorientationModeState="/orientation-mode-combo-box-state";
 //const QString printSameStartingTimeState="/print-same-starting-time-box-state";
 const QString printDetailedTablesState="/print-detailed-tables-check-box-state";
 const QString printActivityTagsState="/print-activity-tags-check-box-state";
+const QString printRepeatNamesState="/print-repeat-names-check-box-state";
 
 const QString activitiesPaddingState="/activity-padding-spin-box-value-state";
 const QString tablePaddingState="/table-padding-spin-box-value-state";
@@ -169,7 +170,9 @@ TimetablePrintForm::TimetablePrintForm(QWidget *parent): QDialog(parent){
 		<<tr("Teachers Free Periods")
 		<<tr("Rooms")
 		<<tr("Subjects")
-		<<tr("All activities");
+		<<tr("All activities")
+		<<tr("Students Statistics")
+		<<tr("Teachers Statistics");
 	CBTables=new QComboBox();
 	CBTables->addItems(timetableNames);
 
@@ -622,6 +625,8 @@ TimetablePrintForm::TimetablePrintForm(QWidget *parent): QDialog(parent){
 		printDetailedTables->setChecked(settings.value(this->metaObject()->className()+printDetailedTablesState).toBool());
 	if(settings.contains(this->metaObject()->className()+printActivityTagsState))
 		printActivityTags->setChecked(settings.value(this->metaObject()->className()+printActivityTagsState).toBool());
+	if(settings.contains(this->metaObject()->className()+printRepeatNamesState))
+		repeatNames->setChecked(settings.value(this->metaObject()->className()+printRepeatNamesState).toBool());
 	//
 	if(settings.contains(this->metaObject()->className()+activitiesPaddingState))
 		activitiesPadding->setValue(settings.value(this->metaObject()->className()+activitiesPaddingState).toInt());
@@ -667,6 +672,7 @@ TimetablePrintForm::~TimetablePrintForm(){
 	//settings.setValue(this->metaObject()->className()+printSameStartingTimeState, printSameStartingTime->isChecked());
 	settings.setValue(this->metaObject()->className()+printDetailedTablesState, printDetailedTables->isChecked());
 	settings.setValue(this->metaObject()->className()+printActivityTagsState, printActivityTags->isChecked());
+	settings.setValue(this->metaObject()->className()+printRepeatNamesState, repeatNames->isChecked());
 	//
 	settings.setValue(this->metaObject()->className()+activitiesPaddingState, activitiesPadding->value());
 	settings.setValue(this->metaObject()->className()+tablePaddingState, tablePadding->value());
@@ -691,15 +697,6 @@ void TimetablePrintForm::unselectAll(){
 void TimetablePrintForm::updateNamesList(){
 	namesList->clear();
 	
-	/*printActivityTags->setDisabled(false);
-	printDetailedTables->setDisabled(true);
-	
-	RBTimeHorizontal->setDisabled(false);
-	RBTimeVertical->setDisabled(false);
-	CBDivideTimeAxisByDay->setDisabled(false);*/
-	//RBTimeHorizontalDay->setDisabled(false);
-	//RBTimeVerticalDay->setDisabled(false);
-	
 	if(CBTables->currentIndex()==0){
 		for(int subgroup=0; subgroup<gt.rules.nInternalSubgroups; subgroup++){
 			QString name = gt.rules.internalSubgroupsList[subgroup]->name;
@@ -710,6 +707,8 @@ void TimetablePrintForm::updateNamesList(){
 		printActivityTags->setDisabled(false);
 		printDetailedTables->setDisabled(true);
 	
+		RBDaysHorizontal->setDisabled(false);
+		RBDaysVertical->setDisabled(false);
 		RBTimeHorizontal->setDisabled(false);
 		RBTimeVertical->setDisabled(false);
 		//CBDivideTimeAxisByDay->setDisabled(RBDaysHorizontal->isChecked() || RBDaysVertical->isChecked());
@@ -725,6 +724,8 @@ void TimetablePrintForm::updateNamesList(){
 		printActivityTags->setDisabled(false);
 		printDetailedTables->setDisabled(false); //this one is changed
 	
+		RBDaysHorizontal->setDisabled(false);
+		RBDaysVertical->setDisabled(false);
 		RBTimeHorizontal->setDisabled(false);
 		RBTimeVertical->setDisabled(false);
 		//CBDivideTimeAxisByDay->setDisabled(RBDaysHorizontal->isChecked() || RBDaysVertical->isChecked());
@@ -740,6 +741,8 @@ void TimetablePrintForm::updateNamesList(){
 		printActivityTags->setDisabled(false);
 		printDetailedTables->setDisabled(false); //this one is changed
 	
+		RBDaysHorizontal->setDisabled(false);
+		RBDaysVertical->setDisabled(false);
 		RBTimeHorizontal->setDisabled(false);
 		RBTimeVertical->setDisabled(false);
 		//CBDivideTimeAxisByDay->setDisabled(RBDaysHorizontal->isChecked() || RBDaysVertical->isChecked());
@@ -755,6 +758,8 @@ void TimetablePrintForm::updateNamesList(){
 		printActivityTags->setDisabled(false);
 		printDetailedTables->setDisabled(true);
 	
+		RBDaysHorizontal->setDisabled(false);
+		RBDaysVertical->setDisabled(false);
 		RBTimeHorizontal->setDisabled(false);
 		RBTimeVertical->setDisabled(false);
 		//CBDivideTimeAxisByDay->setDisabled(RBDaysHorizontal->isChecked() || RBDaysVertical->isChecked());
@@ -772,6 +777,8 @@ void TimetablePrintForm::updateNamesList(){
 		if(!RBDaysVertical->isChecked())
 			RBDaysHorizontal->setChecked(true);
 
+		RBDaysHorizontal->setDisabled(false);
+		RBDaysVertical->setDisabled(false);
 		RBTimeHorizontal->setDisabled(true);
 		RBTimeVertical->setDisabled(true);
 		//CBDivideTimeAxisByDay->setDisabled(RBDaysHorizontal->isChecked() || RBDaysVertical->isChecked());
@@ -787,6 +794,8 @@ void TimetablePrintForm::updateNamesList(){
 		printActivityTags->setDisabled(false);
 		printDetailedTables->setDisabled(true);
 	
+		RBDaysHorizontal->setDisabled(false);
+		RBDaysVertical->setDisabled(false);
 		RBTimeHorizontal->setDisabled(false);
 		RBTimeVertical->setDisabled(false);
 		//CBDivideTimeAxisByDay->setDisabled(RBDaysHorizontal->isChecked() || RBDaysVertical->isChecked());
@@ -802,6 +811,8 @@ void TimetablePrintForm::updateNamesList(){
 		printActivityTags->setDisabled(false);
 		printDetailedTables->setDisabled(true);
 	
+		RBDaysHorizontal->setDisabled(false);
+		RBDaysVertical->setDisabled(false);
 		RBTimeHorizontal->setDisabled(false);
 		RBTimeVertical->setDisabled(false);
 		//CBDivideTimeAxisByDay->setDisabled(RBDaysHorizontal->isChecked() || RBDaysVertical->isChecked());
@@ -816,11 +827,51 @@ void TimetablePrintForm::updateNamesList(){
 		printActivityTags->setDisabled(false);
 		printDetailedTables->setDisabled(true);
 	
+		RBDaysHorizontal->setDisabled(false);
+		RBDaysVertical->setDisabled(false);
 		RBTimeHorizontal->setDisabled(false);
 		RBTimeVertical->setDisabled(false);
 		//CBDivideTimeAxisByDay->setDisabled(RBDaysHorizontal->isChecked() || RBDaysVertical->isChecked());
 		RBTimeHorizontalDay->setDisabled(false);
 		RBTimeVerticalDay->setDisabled(false);
+	} else if(CBTables->currentIndex()==8){
+		QString name = tr("All activities");
+		namesList->addItem(name);
+		QListWidgetItem* tmpItem=namesList->item(0);
+		tmpItem->setSelected(true);
+
+		printActivityTags->setDisabled(true);
+		printDetailedTables->setDisabled(false);
+		
+		if(!RBDaysVertical->isChecked())
+			RBDaysHorizontal->setChecked(true);
+	
+		RBDaysHorizontal->setDisabled(true);
+		RBDaysVertical->setDisabled(true);
+		RBTimeHorizontal->setDisabled(true);
+		RBTimeVertical->setDisabled(true);
+		//CBDivideTimeAxisByDay->setDisabled(RBDaysHorizontal->isChecked() || RBDaysVertical->isChecked());
+		RBTimeHorizontalDay->setDisabled(true);
+		RBTimeVerticalDay->setDisabled(true);
+	} else if(CBTables->currentIndex()==9){
+		QString name = tr("All activities");
+		namesList->addItem(name);
+		QListWidgetItem* tmpItem=namesList->item(0);
+		tmpItem->setSelected(true);
+
+		printActivityTags->setDisabled(true);
+		printDetailedTables->setDisabled(false);
+		
+		if(!RBDaysVertical->isChecked())
+			RBDaysHorizontal->setChecked(true);
+	
+		RBDaysHorizontal->setDisabled(true);
+		RBDaysVertical->setDisabled(true);
+		RBTimeHorizontal->setDisabled(true);
+		RBTimeVertical->setDisabled(true);
+		//CBDivideTimeAxisByDay->setDisabled(RBDaysHorizontal->isChecked() || RBDaysVertical->isChecked());
+		RBTimeHorizontalDay->setDisabled(true);
+		RBTimeVerticalDay->setDisabled(true);
 	} else assert(0==1);
 }
 
@@ -961,6 +1012,8 @@ void TimetablePrintForm::updateHTMLprintString(bool printAll){
 				case 5: tmp+=TimetableExport::singleRoomsTimetableDaysHorizontalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
 				case 6: tmp+=TimetableExport::singleSubjectsTimetableDaysHorizontalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
 				case 7: tmp+=TimetableExport::singleAllActivitiesTimetableDaysHorizontalHtml(3, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 8: tmp+=TimetableExport::singleStudentsStatisticsHtml(3, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked(), printAll); break;
+				case 9: tmp+=TimetableExport::singleTeachersStatisticsHtml(3, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked(), printAll); break;
 				default: assert(0==1);
 			}
 			if(iNi<includedNamesIndex.size()-1){

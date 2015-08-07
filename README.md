@@ -1,4 +1,4 @@
-This is FET version 5.26.2
+This is FET version 5.27.0
 
 
 Program description:
@@ -219,10 +219,10 @@ Running FET:
 	Run the executable fet.exe (its location is inside the fet-v.v.v directory, you can find it there if you have FET precompiled for Windows or after you compiled it).
 
 	COMMAND LINE: no GUI, just run "fet-cl --inputfile=x [--outputdir=d] [--timelimitseconds=y] [--htmllevel=z] [--language=t]
-	 [--writetimetableconflicts=wt1] [--writetimetablesxml=wt2] [--writetimetablesdayshorizontal=wt3] [--writetimetablesdaysvertical=wt4]
-	 [--writetimetablestimehorizontal=wt5] [--writetimetablestimevertical=wt6] [--writetimetablessubgroups=wt7] [--writetimetablesgroups=wt8]
-	 [--writetimetablesyears=wt9] [--writetimetablesteachers=wt10] [--writetimetablesteachersfreeperiods=wt11] [--writetimetablesrooms=wt12]
-	 [--writetimetablessubjects=wt13] [--writetimetablesactivities=wt14]
+	 [--writetimetableconflicts=wt1] [--writetimetablesstatistics=wt2] [--writetimetablesxml=wt3] [--writetimetablesdayshorizontal=wt4]
+	 [--writetimetablesdaysvertical=wt5] [--writetimetablestimehorizontal=wt6] [--writetimetablestimevertical=wt7] [--writetimetablessubgroups=wt8]
+	 [--writetimetablesgroups=wt9] [--writetimetablesyears=wt10] [--writetimetablesteachers=wt11] [--writetimetablesteachersfreeperiods=wt12]
+	 [--writetimetablesrooms=wt13] [--writetimetablessubjects=wt14] [--writetimetablesactivities=wt15]
 	 [--printactivitytags=a] [--printnotavailable=u] [--printbreak=b] [--dividetimeaxisbydays=v] [--duplicateverticalheaders=e]
 	 [--printsimultaneousactivities=w] [--randomseedx=rx --randomseedy=ry] [--warnifusingnotperfectconstraints=s]
 	 [--warnifusingstudentsminhoursdailywithallowemptydays=p] [--warnsubgroupswiththesameactivities=ssa] [--verbose=r]",
@@ -234,7 +234,7 @@ Running FET:
 				(default 2, larger values have more details/facilities and larger file sizes).
 			t is one of en_US, ar, ca, da, de, el, es, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk, uz, vi,
 				zh_CN, zh_TW (default en_US).
-			wt1 to wt14 are either true or false and represent whether you want the corresponding timetables to be written on the disk (default true).
+			wt1 to wt15 are either true or false and represent whether you want the corresponding timetables to be written on the disk (default true).
 			a is either true or false and represets if you want activity tags to be present in the final HTML timetables (default true).
 			u is either "true" or "false" and represents if you want -x- (for true) or --- (for false) in the generated timetables for the
 				not available slots (default true).
