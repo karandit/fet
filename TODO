@@ -3712,3 +3712,14 @@ From AlexL (on forum):
 
 My proposal is to use transifex for translations: https://www.transifex.com
 It works fine with .ts files, has suggestions for translations, .etc.
+
+227---------------------------------------------------------
+From MilesM (on forum):
+
+I think it would be helpful to be able to assign time lengths to periods (even if the actual periods are multiples of that as suggested above) in order to be able to generate statistics on time per subject, per grade etc. It would allow another level of validation to make sure everything works.
+
+228---------------------------------------------------------
+From adso (on forum):
+
+It would be useful in the best timetable processed (highest html) (but unfinished) to have at the top of the table for each teacher and each class the number of hours included and not included in order to understand where the problems are.
+And have a file fet also not complete to import into Excel to be able to work manually.

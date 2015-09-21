@@ -128,7 +128,7 @@ void HelpInstructionsForm::setText()
 		"(the essence is to make a weekly activity with the sum of teachers and students of both fortnightly activities)");
 	s+="\n\n";
 	s+=tr("9) Even if it takes a long time to generate your timetable with a set of constraints, strengthening the constraints might not "
-		"slow the generation too much. You are adviced to try with stronger constraints after you obtain timetables, because you can "
+		"slow the generation too much. You are advised to try with stronger constraints after you obtain timetables, because you can "
 		"obtain better timetables this way.");
 	s+="\n\n";
 	s+=tr("10) If a constraint is allowed values under 100%, you can use any weight, even fractional numbers like 99.75%. "

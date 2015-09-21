@@ -500,10 +500,10 @@ void HelpFaqForm::setText()
 		"activities equal to the number of days per week. Example: 7 activities with duration 1 in a 5 days week, then "
 		"transform into 5 activities with durations: 2,2,1,1,1 and add a single container activity with these 5 "
 		"components (possibly raising the weight of added constraint min days between activities up to 100%)\n\n"
-		"2. If you don't add 'force consecutive if same day', then add a larger activity splitted into a number of "
-		"activities equal with the number of days per week and the remaining components into other larger splitted activity. For "
+		"2. If you don't add 'force consecutive if same day', then add a larger activity split into a number of "
+		"activities equal with the number of days per week and the remaining components into other larger split activity. For "
 		"example, suppose you need to add 7 activities with duration 1 in a 5 days week. Add 2 larger container activities, "
-		"first one splitted into 5 activities with duration 1 and second one splitted into 2 activities with duration 1 ("
+		"first one split into 5 activities with duration 1 and second one split into 2 activities with duration 1 ("
 		"possibly raising the weight of added constraints min days between activities for each of the 2 containers up to 100%)");
 
 	s+="\n\n";
@@ -962,12 +962,12 @@ void HelpFaqForm::setText()
 	s+="--------------------";
 	s+="\n\n";
 
-	s+=tr("Q: I have many subgroups and I don't explicitely use them. Can I hide them in the combo boxes, to add easier the constraints?"
+	s+=tr("Q: I have many subgroups and I don't explicitly use them. Can I hide them in the combo boxes, to add easier the constraints?"
 	 " Also, can I make the FET interface work faster?");
 	s+="\n\n";
 	s+=tr("A:", "Answer");
 	s+=" ";
-	s+=tr("If you have many subgroups and you don't explicitely use them, it is recommended to use the three global settings: hide subgroups"
+	s+=tr("If you have many subgroups and you don't explicitly use them, it is recommended to use the three global settings: hide subgroups"
 		" in combo boxes, hide subgroups in activity planning, and do not write subgroups timetables on hard disk.");
 	s+="\n";
 	s+=tr("Note that using the global menu setting to hide subgroups in activity planning is a different thing from the check box in the activity"

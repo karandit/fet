@@ -993,19 +993,19 @@ int Import::readFields(QWidget* parent){
 									ok=false;
 								}
 							} else {
-								QStringList splittedList;
+								QStringList splitList;
 								if(itemOfField[FIELD_SPLIT_DURATION].count("+")<MAX_SPLIT_OF_AN_ACTIVITY){
-									splittedList = itemOfField[FIELD_SPLIT_DURATION].split("+", QString::SkipEmptyParts);
+									splitList = itemOfField[FIELD_SPLIT_DURATION].split("+", QString::SkipEmptyParts);
 									int tmpInt=0;
-									QString splitted;
-									while(ok && !splittedList.isEmpty()){
-										splitted=splittedList.takeFirst();
-										tmpInt+=splitted.toInt(&ok, 10);
+									QString split;
+									while(ok && !splitList.isEmpty()){
+										split=splitList.takeFirst();
+										tmpInt+=split.toInt(&ok, 10);
 										if(!ok)
 											warnText+=Import::tr("Skipped line %1: Field '%2' doesn't contain an integer value.").arg(lineNumber).arg(fieldName[FIELD_SPLIT_DURATION])+"\n";
 									}
 									if(itemOfField[FIELD_TOTAL_DURATION].isEmpty()){
-										itemOfField[FIELD_TOTAL_DURATION]=CustomFETString::number(tmpInt);	
+										itemOfField[FIELD_TOTAL_DURATION]=CustomFETString::number(tmpInt);
 									} else {
 										int totalInt=itemOfField[FIELD_TOTAL_DURATION].toInt(&ok, 10);
 										if(totalInt!=tmpInt){

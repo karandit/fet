@@ -90,6 +90,7 @@ Comment[es]=Genere tablas de horarios para instituciones educativas
 Comment[uk]=Створення розкладів для навчальних закладів
 Comment[tr]=Eğitim kurumları için zaman tablosu oluştur
 Comment[vi]=Tạo thời gian biểu cho các tổ chức giáo dục
+Keywords=schedule;planning;school;high-school;university;education;teacher;students;
 Icon=fet
 Exec=fet
 Terminal=false

@@ -4323,7 +4323,7 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 			filev[0]=filev[1]=filev[2]=-1;
 			if(tfile!=0){
 				RulesReconcilableMessage::warning(parent, tr("FET warning"), tr("File contains a version numbering scheme which"
-				" is not matched by v.v.va (3 numbers separated by points, followed by any string a, which may be empty). File will be opened, but you are adviced"
+				" is not matched by v.v.va (3 numbers separated by points, followed by any string a, which may be empty). File will be opened, but you are advised"
 				" to check the version of the .fet file (in the beginning of the file). If this is a FET bug, please report it")+"\n\n"+
 				tr("If you are opening a file older than FET format version 5, it will be converted to latest FET data format"));
 				if(VERBOSE){
@@ -4394,7 +4394,7 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 		RulesReconcilableMessage::warning(parent, tr("FET information"),
 		 tr("Opening older file - it will be converted to latest format, automatically "
 		 "assigning weight percentages to constraints and dropping parity for activities. "
-		 "You are adviced to make a backup of your old file before saving in new format.\n\n"
+		 "You are advised to make a backup of your old file before saving in new format.\n\n"
 		 "Please note that the default weight percentage of constraints min days between activities "
 		 "will be 95% (mainly satisfied, not always) and 'force consecutive if same day' will be set to true "
 		 "(meaning that if the activities are in the same day, they will be placed continuously, in a bigger duration activity). "
@@ -8395,10 +8395,10 @@ TimeConstraint* Rules::readMinNDaysBetweenActivities(QWidget* parent, QXmlStream
 			" (possibly raising the weight of added constraint min days between activities up to 100%)");
 		s+="\n\n";
 
-		s+=tr("2. If you don't add 'force consecutive if same day', then add a larger activity splitted into a number of"
-			" activities equal with the number of days per week and the remaining components into other larger splitted activity."
+		s+=tr("2. If you don't add 'force consecutive if same day', then add a larger activity split into a number of"
+			" activities equal with the number of days per week and the remaining components into other larger split activity."
 			" For example, suppose you need to add 7 activities with duration 1 in a 5 days week. Add 2 larger container activities,"
-			" first one splitted into 5 activities with duration 1 and second one splitted into 2 activities with duration 1"
+			" first one split into 5 activities with duration 1 and second one split into 2 activities with duration 1"
 			" (possibly raising the weight of added constraints min days between activities for each of the 2 containers up to 100%)");
 		
 		int t=QMessageBox::warning(parent, tr("FET warning"), s,
@@ -8534,10 +8534,10 @@ TimeConstraint* Rules::readMinDaysBetweenActivities(QWidget* parent, QXmlStreamR
 			" (possibly raising the weight of added constraint min days between activities up to 100%)");
 		s+="\n\n";
 
-		s+=tr("2. If you don't add 'force consecutive if same day', then add a larger activity splitted into a number of"
-			" activities equal with the number of days per week and the remaining components into other larger splitted activity."
+		s+=tr("2. If you don't add 'force consecutive if same day', then add a larger activity split into a number of"
+			" activities equal with the number of days per week and the remaining components into other larger split activity."
 			" For example, suppose you need to add 7 activities with duration 1 in a 5 days week. Add 2 larger container activities,"
-			" first one splitted into 5 activities with duration 1 and second one splitted into 2 activities with duration 1"
+			" first one split into 5 activities with duration 1 and second one split into 2 activities with duration 1"
 			" (possibly raising the weight of added constraints min days between activities for each of the 2 containers up to 100%)");
 		
 		int t=QMessageBox::warning(parent, tr("FET warning"), s,

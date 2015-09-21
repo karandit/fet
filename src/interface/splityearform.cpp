@@ -714,7 +714,7 @@ void SplitYearForm::help()
 		
 	s+="\n\n";
 	
-	s+=tr("When dividing again a year, you might get a warning about subgroups which will be removed. If you didn't explicitely use"
+	s+=tr("When dividing again a year, you might get a warning about subgroups which will be removed. If you didn't explicitly use"
 		" (these) subgroups in your activities or constraints, probably you can safely ignore this warning. Generally, if you use years' division"
 		" by categories, it is groups that matter.");
 	
@@ -724,7 +724,7 @@ void SplitYearForm::help()
 	
 	s+="\n\n";
 	
-	s+=tr("If you have many subgroups and you don't explicitely use them, it is recommended to use the three global settings: hide subgroups"
+	s+=tr("If you have many subgroups and you don't explicitly use them, it is recommended to use the three global settings: hide subgroups"
 		" in combo boxes, hide subgroups in activity planning, and do not write subgroups timetables on hard disk.");
 	s+="\n";
 	s+=tr("Note that if you are only working to get a feasible timetable, without the need to obtain the students timetable (XML or HTML) on"

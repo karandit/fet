@@ -224,10 +224,10 @@ void ModifyConstraintMinDaysBetweenActivitiesForm::ok()
 
 		  "\n\n"+
 
-		 tr("2. If you don't add 'force consecutive if same day', then add a larger activity splitted into a number of"
-		  " activities equal with the number of days per week and the remaining components into other larger splitted activity."
+		 tr("2. If you don't add 'force consecutive if same day', then add a larger activity split into a number of"
+		  " activities equal with the number of days per week and the remaining components into other larger split activity."
 		  " For example, suppose you need to add 7 activities with duration 1 in a 5 days week. Add 2 larger container activities,"
-		  " first one splitted into 5 activities with duration 1 and second one splitted into 2 activities with duration 1"
+		  " first one split into 5 activities with duration 1 and second one split into 2 activities with duration 1"
 		  " (possibly raising the weight of added constraints min days between activities for each of the 2 containers up to 100%)")+
 
 	  	 "\n\n"+

@@ -1995,7 +1995,7 @@ void FetMainForm::on_helpSettingsAction_triggered()
 		
 	s+="\n\n";
 	
-	s+=tr("If you have many subgroups and you don't explicitely use them, it is recommended to use the three global settings: hide subgroups"
+	s+=tr("If you have many subgroups and you don't explicitly use them, it is recommended to use the three global settings: hide subgroups"
 		" in combo boxes, hide subgroups in activity planning, and do not write subgroups timetables on hard disk.");
 	s+="\n";
 	s+=tr("Note that using the global menu setting to hide subgroups in activity planning is a different thing from the check box in the activity"
