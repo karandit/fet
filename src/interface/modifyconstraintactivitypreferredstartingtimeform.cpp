@@ -236,6 +236,32 @@ void ModifyConstraintActivityPreferredStartingTimeForm::ok()
 	}
 	int id=activitiesList.at(tmp2);
 	
+	bool permanentlyLocked=permLockedCheckBox->isChecked();
+	
+	if(1){
+		ConstraintActivityPreferredStartingTime apst;
+
+		apst.activityId=id;
+		apst.weightPercentage=weight;
+		apst.day=day;
+		apst.hour=startHour;
+		apst.permanentlyLocked=permanentlyLocked;
+		
+		bool duplicate=false;
+		
+		foreach(TimeConstraint* tc, gt.rules.timeConstraintsList)
+			if(tc!=this->_ctr && tc->type==CONSTRAINT_ACTIVITY_PREFERRED_STARTING_TIME)
+				if( ( *((ConstraintActivityPreferredStartingTime*)tc) ) == apst){
+					duplicate=true;
+					break;
+				}
+				
+		if(duplicate){
+			QMessageBox::warning(this, tr("FET information"), tr("Cannot proceed, current constraint is equal to another one (it is duplicated)"));
+			return;
+		}
+	}
+
 	this->_ctr->weightPercentage=weight;
 	this->_ctr->day=day;
 	this->_ctr->hour=startHour;
@@ -257,7 +283,7 @@ void ModifyConstraintActivityPreferredStartingTimeForm::ok()
 		this->_ctr->activityId=id;
 	}
 	
-	this->_ctr->permanentlyLocked=permLockedCheckBox->isChecked();
+	this->_ctr->permanentlyLocked=permanentlyLocked;
 	
 	gt.rules.internalStructureComputed=false;
 	setRulesModifiedAndOtherThings(&gt.rules);

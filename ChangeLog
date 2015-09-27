@@ -1780,7 +1780,7 @@ Versions 5.26.0 - 5.26.2
 	- Added a partial Chinese Traditional (zh_TW) translation, by James.
 	- Updated the German translation, by Bob Hairgrove.
 ---------------------------------------------------------------------------------
-Versions 5.27.0 - 5.27.v
+Versions 5.27.0 - 5.27.9
 - Version 5.27.0
 	- Writing the statistics of the generated timetable (gaps, min/max hours, free days), implemented by Volker Dirr.
 	- Updated the Chinese Traditional translation, by James.
@@ -1813,3 +1813,10 @@ Versions 5.27.0 - 5.27.v
 - Version 5.27.9
 	- Corrected some typos (reported by locutusofborg).
 	- Added a section Keywords in the fet.desktop file (reported by locutusofborg).
+---------------------------------------------------------------------------------
+Versions 5.28.0 - 5.28.v
+- Version 5.28.0
+	- Crash bug fixes (reported by Davide Cottignoli).
+	- Removed useless CONFIG += thread from src.pro and src-cl.pro (reported by locutusofborg).
+	- Corrected a few typos in the Italian translation, by flauta.
+	- Updated the Italian translation, by Marco Barsotti.

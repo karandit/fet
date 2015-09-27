@@ -3374,7 +3374,7 @@ bool Rules::removeTimeConstraint(TimeConstraint* ctr)
 				ConstraintTeacherNotAvailableTimes* c=(ConstraintTeacherNotAvailableTimes*) ctr;
 				QSet<ConstraintTeacherNotAvailableTimes*> cs=tnatHash.value(c->teacher, QSet<ConstraintTeacherNotAvailableTimes*>());
 				assert(cs.contains(c));
-				cs.insert(c);
+				cs.remove(c);
 				tnatHash.insert(c->teacher, cs);
 			}
 
@@ -3440,7 +3440,7 @@ bool Rules::removeTimeConstraints(QList<TimeConstraint*> _tcl)
 				ConstraintTeacherNotAvailableTimes* c=(ConstraintTeacherNotAvailableTimes*) ctr;
 				QSet<ConstraintTeacherNotAvailableTimes*> cs=tnatHash.value(c->teacher, QSet<ConstraintTeacherNotAvailableTimes*>());
 				assert(cs.contains(c));
-				cs.insert(c);
+				cs.remove(c);
 				tnatHash.insert(c->teacher, cs);
 			}
 

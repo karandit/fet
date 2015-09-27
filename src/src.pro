@@ -1301,7 +1301,7 @@ TRANSLATIONS += \
 
 TEMPLATE = app
 
-CONFIG += release warn_on thread
+CONFIG += release warn_on
 QT += network
 
 greaterThan(QT_MAJOR_VERSION, 4){

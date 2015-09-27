@@ -52,7 +52,7 @@ TEMPLATE = app
 
 DEFINES += FET_COMMAND_LINE
 
-CONFIG += release warn_on thread
+CONFIG += release warn_on
 win32 {
 	CONFIG += console
 }

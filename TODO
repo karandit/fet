@@ -3723,3 +3723,27 @@ From adso (on forum):
 
 It would be useful in the best timetable processed (highest html) (but unfinished) to have at the top of the table for each teacher and each class the number of hours included and not included in order to understand where the problems are.
 And have a file fet also not complete to import into Excel to be able to work manually.
+
+229---------------------------------------------------------
+From Volker Dirr:
+
+About adding constraints students/teachers interval max days per week:
+
+I think you should clarify it in the interface: In FET you call it only
+"interval start hour" and "interval end hour", but you might say better
+"start at beginning of hour" and "end at end of hour" (or "until end of hour").
+
+230---------------------------------------------------------
+From Maouhoub:
+
+Add an option to play a sound when a timetable was found.
+
+231---------------------------------------------------------
+From Davide Cottignoli (on forum):
+
+I often need to input many activities with fixed time in working hours and I find the user interface very tedious.
+It would be more simple if the dialog is divided in two parts a follow:
+On the left a list of activities (not the combo-box or drop-down box).
+On the right a table grid with hours and day and the permission to mark only a square of the grid.
+
+In many other dialogs with the same scheme (for example in "add teacher not available times") it would be useful to have the list instead of the drop down box.
