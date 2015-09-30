@@ -1,5 +1,14 @@
 language: cpp
-script : qmake && make sub-src-src-cl-pro
+
 os:
   - linux
   - osx
+
+before-install:
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
+
+install:
+ - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install qt5; fi
+ - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew link --force qt5; fi
+
+script : qmake && make sub-src-src-cl-pro
