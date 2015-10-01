@@ -1,14 +1,31 @@
 language: cpp
 
 os:
-  - linux
-  - osx
+- linux
+- osx
 
-before-install:
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
+before_install:
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
 
 install:
- - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install qt5; fi
- - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew link --force qt5; fi
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install qt5; fi
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew link --force qt5; fi
 
-script : qmake && make sub-src-src-cl-pro
+script: qmake && make sub-src-src-cl-pro
+
+after_success: 
+- if [ "$TRAVIS_OS_NAME" == "linux" ]; then ./fet-cl --version; fi
+- if [ "$TRAVIS_OS_NAME" == "linux" ]; then tar -zcvf fet-cl-$TRAVIS_OS_NAME-$TRAVIS_TAG.tar.gz fet-cl; fi
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then ls -lR; fi
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then git status; fi
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./fet-cl.app/Contents/MacOS/fet-cl --version; fi
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then tar -zcvf fet-cl-$TRAVIS_OS_NAME-$TRAVIS_TAG.tar.gz --directory=fet-cl.app/Contents/MacOS/ fet-cl; fi
+
+deploy:
+  provider: releases
+  api_key:
+    secure: Dm4/NEMzF1RvQUiOZ06PUwHIz8AbmaUJm6iN6txxDUdRjNyEK8Wi3om7847eQBgBfmnqAH+0vOf4I05u17wbCBR3qroW1z2XVciNQeQaQbXuLZ7zVAEIORms1/LvaNKcX8qMoNLZCsb0nh6a11P1g8NLAfWZnjMay4Xd+oSSOfc=
+  file: fet-cl-$TRAVIS_OS_NAME-$TRAVIS_TAG.tar.gz
+  skip_cleanup: true
+  on:
+    tags: true
