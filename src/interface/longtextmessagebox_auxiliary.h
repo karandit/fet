@@ -1,8 +1,12 @@
+/*
+File longtextmessagebox_auxiliary.h
+*/
+
 /***************************************************************************
-                          timetableviewroomsform.h  -  description
+                          longtextmessagebox_auxiliary.h  -  description
                              -------------------
-    begin                : Wed May 14 2003
-    copyright            : (C) 2003 by Lalescu Liviu
+    begin                : 6 October 2015
+    copyright            : (C) 2015 by Lalescu Liviu
     email                : Please see http://lalescu.ro/liviu/ for details about contacting Liviu Lalescu (in particular, you can find here the e-mail address)
  ***************************************************************************/
 
@@ -15,44 +19,32 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef TIMETABLEVIEWROOMSFORM_H
-#define TIMETABLEVIEWROOMSFORM_H
+#ifndef LONGTEXTMESSAGEBOX_AUXILIARY_H
+#define LONGTEXTMESSAGEBOX_AUXILIARY_H
 
-#include "ui_timetableviewroomsform_template.h"
+#ifndef FET_COMMAND_LINE
 
-#include <QResizeEvent>
+#include <QObject>
 
-class QColor; //by Marco Vassura
+#include <QDialog>
 
-class TimetableViewRoomsForm : public QDialog, public Ui::TimetableViewRoomsForm_template
+class QWidget;
+
+class MyDialogWithThreeButtons: public QDialog
 {
 	Q_OBJECT
 	
 public:
-	TimetableViewRoomsForm(QWidget* parent);
-	~TimetableViewRoomsForm();
-
-	void lock(bool lockTime, bool lockSpace);
+	int clickedButton;
 	
-	void resizeRowsAfterShow();
-
-	void detailActivity(QTableWidgetItem* item);
-
+	MyDialogWithThreeButtons(QWidget* parent);
+	~MyDialogWithThreeButtons();
+	
 public slots:
-	void updateRoomsTimetableTable();
-
-	void roomChanged(const QString& roomName);
-
-	void currentItemChanged(QTableWidgetItem* current, QTableWidgetItem* previous);
-	
-	void lock();
-	void lockTime();
-	void lockSpace();
-	void help();
-	
-protected:
-	void resizeEvent(QResizeEvent* event);
-	QColor stringToColor(QString s); //by Marco Vassura
+	void setYes();
+	void setNo();
+	void setCancel();
 };
+#endif
 
 #endif

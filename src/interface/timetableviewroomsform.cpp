@@ -56,6 +56,11 @@
 #include <QObject>
 #include <QMetaObject>
 
+//begin by Marco Vassura
+#include <QBrush>
+#include <QColor>
+//end by Marco Vassura
+
 extern const QString COMPANY;
 extern const QString PROGRAM;
 
@@ -285,8 +290,17 @@ void TimetableViewRoomsForm::updateRoomsTimetableTable(){
 	assert(gt.rules.initialized);
 
 	assert(roomIndex>=0);
+
 	for(int j=0; j<gt.rules.nHoursPerDay && j<roomsTimetableTable->rowCount(); j++){
 		for(int k=0; k<gt.rules.nDaysPerWeek && k<roomsTimetableTable->columnCount(); k++){
+			//begin by Marco Vassura
+			// add colors (start)
+			//if(USE_GUI_COLORS) {
+				roomsTimetableTable->item(j, k)->setBackground(roomsTimetableTable->palette().color(QPalette::Base));
+				roomsTimetableTable->item(j, k)->setForeground(roomsTimetableTable->palette().color(QPalette::Text));
+			//}
+			// add colors (end)
+			//end by Marco Vassura
 			s = "";
 			int ai=rooms_timetable_weekly[roomIndex][k][j]; //activity index
 			//Activity* act=gt.rules.activitiesList.at(ai);
@@ -343,6 +357,20 @@ void TimetableViewRoomsForm::updateRoomsTimetableTable(){
 				}
 				s+=descr;
 				//added by Volker Dirr (end)
+
+				//begin by Marco Vassura
+				// add colors (start)
+				if(USE_GUI_COLORS /*&& act->studentsNames.count()>0*/) {
+					QBrush bg(stringToColor(act->subjectName+" "+act->studentsNames.join(", ")));
+					roomsTimetableTable->item(j, k)->setBackground(bg);
+					double brightness = bg.color().redF()*0.299 + bg.color().greenF()*0.587 + bg.color().blueF()*0.114;
+					if (brightness<0.5)
+						roomsTimetableTable->item(j, k)->setForeground(QBrush(Qt::white));
+					else
+						roomsTimetableTable->item(j, k)->setForeground(QBrush(Qt::black));
+				}
+				// add colors (end)
+				//end by Marco Vassura
 			}
 			else{
 				if(notAllowedRoomTimePercentages[roomIndex][k+j*gt.rules.nDaysPerWeek]>=0 && PRINT_NOT_AVAILABLE_TIME_SLOTS)
@@ -370,6 +398,26 @@ void TimetableViewRoomsForm::resizeEvent(QResizeEvent* event){
 
 	roomsTimetableTable->resizeRowsToContents();
 }
+
+//begin by Marco Vassura
+QColor TimetableViewRoomsForm::stringToColor(QString s)
+{
+	// CRC-24 Based on RFC 2440 Section 6.1
+	unsigned long crc = 0xB704CEL;
+	int i;
+	QChar *data = s.data();
+	while (!data->isNull()) {
+		crc ^= (data->unicode() & 0xFF) << 16;
+		for (i = 0; i < 8; i++) {
+			crc <<= 1;
+			if (crc & 0x1000000)
+				crc ^= 0x1864CFBL;
+		}
+		data++;
+	}
+	return QColor::fromRgb((int)(crc>>16), (int)((crc>>8) & 0xFF), (int)(crc & 0xFF));
+}
+//end by Marco Vassura
 
 void TimetableViewRoomsForm::currentItemChanged(QTableWidgetItem* current, QTableWidgetItem* previous)
 {

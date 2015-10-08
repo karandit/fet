@@ -855,6 +855,7 @@ HEADERS += \
 	interface/advancedlockunlockform.h \
 	\
 	interface/longtextmessagebox.h \
+	interface/longtextmessagebox_auxiliary.h \
 	interface/advancedfilterform.h \
 	\
 	interface/activityplanningform.h \

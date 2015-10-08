@@ -20,6 +20,8 @@
 
 #include <QResizeEvent>
 
+class QColor; //by Marco Vassura
+
 #include "ui_timetableviewstudentsform_template.h"
 
 class TimetableViewStudentsForm : public QDialog, public Ui::TimetableViewStudentsForm_template
@@ -52,6 +54,7 @@ public slots:
 
 protected:
 	void resizeEvent(QResizeEvent* event);
+	QColor stringToColor(QString s); //by Marco Vassura
 };
 
 #endif

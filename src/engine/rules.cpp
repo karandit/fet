@@ -2011,6 +2011,147 @@ bool Rules::modifyStudentsSet(const QString& initialStudentsSetName, const QStri
 	return true;
 }
 
+//by Volker Dirr (start) - very similar to Liviu's modifyStudentsSet
+bool Rules::modifyStudentsSets(const QHash<QString, QString>& oldAndNewStudentsSetNames){
+	if(oldAndNewStudentsSetNames.isEmpty())
+		return true;
+
+	foreach(Activity* act, activitiesList){
+		for(int i=0; i<act->studentsNames.count(); i++)
+			if(oldAndNewStudentsSetNames.contains(act->studentsNames.at(i)))
+				act->studentsNames[i]=oldAndNewStudentsSetNames.value(act->studentsNames.at(i));
+	}
+	
+	foreach(TimeConstraint* ctr, timeConstraintsList){
+		if(ctr->type==CONSTRAINT_STUDENTS_SET_NOT_AVAILABLE_TIMES){
+			ConstraintStudentsSetNotAvailableTimes* crt_constraint=(ConstraintStudentsSetNotAvailableTimes*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->students))
+				crt_constraint->students=oldAndNewStudentsSetNames.value(crt_constraint->students);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_MAX_HOURS_DAILY){
+			ConstraintStudentsSetMaxHoursDaily* crt_constraint=(ConstraintStudentsSetMaxHoursDaily*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->students))
+				crt_constraint->students=oldAndNewStudentsSetNames.value(crt_constraint->students);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_MAX_DAYS_PER_WEEK){
+			ConstraintStudentsSetMaxDaysPerWeek* crt_constraint=(ConstraintStudentsSetMaxDaysPerWeek*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->students))
+				crt_constraint->students=oldAndNewStudentsSetNames.value(crt_constraint->students);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_INTERVAL_MAX_DAYS_PER_WEEK){
+			ConstraintStudentsSetIntervalMaxDaysPerWeek* crt_constraint=(ConstraintStudentsSetIntervalMaxDaysPerWeek*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->students))
+				crt_constraint->students=oldAndNewStudentsSetNames.value(crt_constraint->students);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_MAX_HOURS_CONTINUOUSLY){
+			ConstraintStudentsSetMaxHoursContinuously* crt_constraint=(ConstraintStudentsSetMaxHoursContinuously*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->students))
+				crt_constraint->students=oldAndNewStudentsSetNames.value(crt_constraint->students);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_ACTIVITY_TAG_MAX_HOURS_CONTINUOUSLY){
+			ConstraintStudentsSetActivityTagMaxHoursContinuously* crt_constraint=(ConstraintStudentsSetActivityTagMaxHoursContinuously*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->students))
+				crt_constraint->students=oldAndNewStudentsSetNames.value(crt_constraint->students);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_ACTIVITY_TAG_MAX_HOURS_DAILY){
+			ConstraintStudentsSetActivityTagMaxHoursDaily* crt_constraint=(ConstraintStudentsSetActivityTagMaxHoursDaily*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->students))
+				crt_constraint->students=oldAndNewStudentsSetNames.value(crt_constraint->students);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_MIN_HOURS_DAILY){
+			ConstraintStudentsSetMinHoursDaily* crt_constraint=(ConstraintStudentsSetMinHoursDaily*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->students))
+				crt_constraint->students=oldAndNewStudentsSetNames.value(crt_constraint->students);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_EARLY_MAX_BEGINNINGS_AT_SECOND_HOUR){
+			ConstraintStudentsSetEarlyMaxBeginningsAtSecondHour* crt_constraint=(ConstraintStudentsSetEarlyMaxBeginningsAtSecondHour*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->students))
+				crt_constraint->students=oldAndNewStudentsSetNames.value(crt_constraint->students);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_MAX_GAPS_PER_WEEK){
+			ConstraintStudentsSetMaxGapsPerWeek* crt_constraint=(ConstraintStudentsSetMaxGapsPerWeek*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->students))
+				crt_constraint->students=oldAndNewStudentsSetNames.value(crt_constraint->students);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_MAX_GAPS_PER_DAY){
+			ConstraintStudentsSetMaxGapsPerDay* crt_constraint=(ConstraintStudentsSetMaxGapsPerDay*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->students))
+				crt_constraint->students=oldAndNewStudentsSetNames.value(crt_constraint->students);
+		}
+		else if(ctr->type==CONSTRAINT_ACTIVITIES_PREFERRED_TIME_SLOTS){
+			ConstraintActivitiesPreferredTimeSlots* crt_constraint=(ConstraintActivitiesPreferredTimeSlots*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->p_studentsName))
+				crt_constraint->p_studentsName=oldAndNewStudentsSetNames.value(crt_constraint->p_studentsName);
+		}
+		else if(ctr->type==CONSTRAINT_ACTIVITIES_PREFERRED_STARTING_TIMES){
+			ConstraintActivitiesPreferredStartingTimes* crt_constraint=(ConstraintActivitiesPreferredStartingTimes*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->studentsName))
+				crt_constraint->studentsName=oldAndNewStudentsSetNames.value(crt_constraint->studentsName);
+		}
+		else if(ctr->type==CONSTRAINT_ACTIVITIES_END_STUDENTS_DAY){
+			ConstraintActivitiesEndStudentsDay* crt_constraint=(ConstraintActivitiesEndStudentsDay*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->studentsName))
+				crt_constraint->studentsName=oldAndNewStudentsSetNames.value(crt_constraint->studentsName);
+		}
+		else if(ctr->type==CONSTRAINT_SUBACTIVITIES_PREFERRED_TIME_SLOTS){
+			ConstraintSubactivitiesPreferredTimeSlots* crt_constraint=(ConstraintSubactivitiesPreferredTimeSlots*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->p_studentsName))
+				crt_constraint->p_studentsName=oldAndNewStudentsSetNames.value(crt_constraint->p_studentsName);
+		}
+		else if(ctr->type==CONSTRAINT_SUBACTIVITIES_PREFERRED_STARTING_TIMES){
+			ConstraintSubactivitiesPreferredStartingTimes* crt_constraint=(ConstraintSubactivitiesPreferredStartingTimes*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->studentsName))
+				crt_constraint->studentsName=oldAndNewStudentsSetNames.value(crt_constraint->studentsName);
+		}
+	}
+
+	foreach(SpaceConstraint* ctr, spaceConstraintsList){
+		if(ctr->type==CONSTRAINT_STUDENTS_SET_HOME_ROOM){
+			ConstraintStudentsSetHomeRoom* crt_constraint=(ConstraintStudentsSetHomeRoom*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->studentsName))
+				crt_constraint->studentsName=oldAndNewStudentsSetNames.value(crt_constraint->studentsName);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_HOME_ROOMS){
+			ConstraintStudentsSetHomeRooms* crt_constraint=(ConstraintStudentsSetHomeRooms*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->studentsName))
+				crt_constraint->studentsName=oldAndNewStudentsSetNames.value(crt_constraint->studentsName);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_MAX_BUILDING_CHANGES_PER_DAY){
+			ConstraintStudentsSetMaxBuildingChangesPerDay* crt_constraint=(ConstraintStudentsSetMaxBuildingChangesPerDay*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->studentsName))
+				crt_constraint->studentsName=oldAndNewStudentsSetNames.value(crt_constraint->studentsName);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_MAX_BUILDING_CHANGES_PER_WEEK){
+			ConstraintStudentsSetMaxBuildingChangesPerWeek* crt_constraint=(ConstraintStudentsSetMaxBuildingChangesPerWeek*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->studentsName))
+				crt_constraint->studentsName=oldAndNewStudentsSetNames.value(crt_constraint->studentsName);
+		}
+		else if(ctr->type==CONSTRAINT_STUDENTS_SET_MIN_GAPS_BETWEEN_BUILDING_CHANGES){
+			ConstraintStudentsSetMinGapsBetweenBuildingChanges* crt_constraint=(ConstraintStudentsSetMinGapsBetweenBuildingChanges*)ctr;
+			if(oldAndNewStudentsSetNames.contains(crt_constraint->studentsName))
+				crt_constraint->studentsName=oldAndNewStudentsSetNames.value(crt_constraint->studentsName);
+		}
+	}
+
+	QHashIterator<QString, QString> i(oldAndNewStudentsSetNames);
+	while (i.hasNext()) {
+		i.next();
+		StudentsSet* studentsSet=searchStudentsSet(i.key());
+		assert(studentsSet!=NULL);
+		studentsSet->name=i.value();
+		
+		assert(permanentStudentsHash.contains(i.key()));
+		permanentStudentsHash.remove(i.key());
+		permanentStudentsHash.insert(studentsSet->name, studentsSet);
+	}
+	
+	this->internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(this);
+	
+	return true;
+}
+//by Volker Dirr (end) - very similar to Liviu's modifyStudentsSet
+
 void Rules::sortYearsAlphabetically()
 {
 	std::stable_sort(this->yearsList.begin(), this->yearsList.end(), yearsAscending);
@@ -5330,6 +5471,14 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 					bool ac=true;
 					int nos=-1;
 					bool cnos=true;
+					
+					QSet<QString> _teachersSet;
+					QSet<QString> _studentsSet;
+					QSet<QString> _activityTagsSet;
+					int _duplicateTeachersCount=0;
+					int _duplicateStudentsCount=0;
+					int _duplicateActivityTagsCount=0;
+					
 					assert(xmlReader.isStartElement());
 					while(xmlReader.readNextStartElement()){
 						xmlReadingLog+="    Found "+xmlReader.name().toString()+" tag\n";
@@ -5379,6 +5528,12 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 							QString text=xmlReader.readElementText();
 							tn=text;
 							xmlReadingLog+="    Crt. activity teacher="+tn+"\n";
+							
+							if(_teachersSet.contains(tn))
+								_duplicateTeachersCount++;
+							else
+								_teachersSet.insert(tn);
+							
 							tl.append(tn);
 							if(!allTeachers.contains(tn))
 							//if(this->searchTeacher(tn)<0)
@@ -5396,6 +5551,13 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 							QString text=xmlReader.readElementText();
 							atn=text;
 							xmlReadingLog+="    Crt. activity activity_tag="+atn+"\n";
+
+							if(_activityTagsSet.contains(atn))
+								_duplicateActivityTagsCount++;
+							else
+								_activityTagsSet.insert(atn);
+							
+
 							if(atn!="")
 								atl.append(atn);
 							if(atn!="" && !allActivityTags.contains(atn))
@@ -5406,6 +5568,12 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 							QString text=xmlReader.readElementText();
 							atn=text;
 							xmlReadingLog+="    Crt. activity activity_tag="+atn+"\n";
+
+							if(_activityTagsSet.contains(atn))
+								_duplicateActivityTagsCount++;
+							else
+								_activityTagsSet.insert(atn);
+							
 							if(atn!="")
 								atl.append(atn);
 							if(atn!="" && !allActivityTags.contains(atn))
@@ -5416,6 +5584,12 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 							QString text=xmlReader.readElementText();
 							stn=text;
 							xmlReadingLog+="    Crt. activity students+="+stn+"\n";
+
+							if(_studentsSet.contains(stn))
+								_duplicateStudentsCount++;
+							else
+								_studentsSet.insert(stn);
+
 							stl.append(stn);
 							if(!studentsSetsCount.contains(stn))
 							//if(this->searchStudentsSet(stn)==NULL)
@@ -5458,6 +5632,12 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 						xmlReader.raiseError(tr("%1 is incorrect").arg("Activity_Group_Id"));
 					else if(d<=0)
 						xmlReader.raiseError(tr("%1 is incorrect").arg("Duration"));
+					else if(_duplicateTeachersCount>0)
+						xmlReader.raiseError(tr("Activity with Id=%1 contains %2 duplicate teachers - please correct that").arg(id).arg(_duplicateTeachersCount));
+					else if(_duplicateStudentsCount>0)
+						xmlReader.raiseError(tr("Activity with Id=%1 contains %2 duplicate students sets - please correct that").arg(id).arg(_duplicateStudentsCount));
+					else if(_duplicateActivityTagsCount>0)
+						xmlReader.raiseError(tr("Activity with Id=%1 contains %2 duplicate activity tags - please correct that").arg(id).arg(_duplicateActivityTagsCount));
 					else if(correct){
 						assert(id>=0 && gid>=0);
 						assert(d>0);

@@ -421,6 +421,8 @@ public:
 	*/
 	bool modifyStudentsSet(const QString& initialStudentsSetName, const QString& finalStudentsSetName, int finalNumberOfStudents);
 	
+	bool modifyStudentsSets(const QHash<QString, QString>& oldAndNewStudentsSetNames);
+	
 	/**
 	A function to sort the years alphabetically
 	*/

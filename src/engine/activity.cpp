@@ -239,6 +239,8 @@ bool Activity::removeTeacher(const QString& teacherName)
 {
 	int t=this->teachersNames.removeAll(teacherName);
 	
+	assert(t<=1);
+	
 	return t>0;
 }
 
@@ -263,12 +265,14 @@ bool Activity::removeStudents(Rules& r, const QString& studentsName, int nStuden
 	Q_UNUSED(r);
 
 	int t=this->studentsNames.removeAll(studentsName);
+	
+	assert(t<=1);
 
 	if(t>0 && this->computeNTotalStudents==true){
 		/*StudentsSet* s=r.searchStudentsSet(studentsName);
 		assert(s!=NULL);
 		this->nTotalStudents-=s->numberOfStudents;*/
-		this->nTotalStudents-=nStudents;
+		this->nTotalStudents-=t*nStudents;
 		assert(this->nTotalStudents>=0);
 	}
 	
@@ -342,7 +346,8 @@ void Activity::computeInternalStructure(Rules& r)
 		assert(tag!="");
 		int index=r.activityTagsHash.value(tag, -1); //r.searchActivityTag(tag);
 		assert(index>=0);
-		this->iActivityTagsSet.insert(index);
+		if(!iActivityTagsSet.contains(index))
+			this->iActivityTagsSet.insert(index);
 	}
 	//this->activityTagIndex = r.searchActivityTag(this->activityTagName);
 

@@ -3,7 +3,7 @@ File longtextmessagebox.h
 */
 
 /***************************************************************************
-                          longtextmessagebox.cpp  -  description
+                          longtextmessagebox.h  -  description
                              -------------------
     begin                : 27 June 2009
     copyright            : (C) 2009 by Lalescu Liviu
@@ -26,7 +26,6 @@ File longtextmessagebox.h
 
 class QString;
 class QWidget;
-
 
 class LongTextMessageBox: public QObject
 {
@@ -64,6 +63,13 @@ public:
 
 	static void informationWithDimensions
 	 ( QWidget * parent, const QString & title, const QString & text, int MINW, int MAXW, int MINH, int MAXH);
+
+	//Used only in modifystudentsyearform.cpp
+	static int largeConfirmationWithDimensionsThreeButtonsYesNoCancel
+	 ( QWidget * parent, const QString & title, const QString & text,
+	 const QString& button0Text, const QString& button1Text, const QString& button2Text,
+	 int defaultButton, int escapeButton );
+	 //Yes, No, Cancel, in this order
 };
 
 #endif

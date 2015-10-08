@@ -3371,6 +3371,487 @@ already changed "presettings" because of other years or the simply fear
 that he will do it incorrect; so he like to use delete group only, because
 it is easier.)
 
+Volker wrote code for this, but it is not perfectly optimized for speed.
+Below is his code for file fet-v.v.v/src/interface/groupsform.cpp (see
+the string Volker Dirr start/end):
+
+old file groupsform.cpp - last modified on 8 February 2015 (FET-5.28.0)
+new Volker Dirr's code: 5 October 2015
+
+---
+//
+//
+// Description: This file is part of FET
+//
+//
+// Author: Lalescu Liviu <Please see http://lalescu.ro/liviu/ for details about contacting Liviu Lalescu (in particular, you can find here the e-mail address)>
+// Copyright (C) 2003 Liviu Lalescu <http://lalescu.ro/liviu/>
+//
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Affero General Public License as        *
+ *   published by the Free Software Foundation, either version 3 of the    *
+ *   License, or (at your option) any later version.                       *
+ *                                                                         *
+ ***************************************************************************/
+
+#include "addstudentsgroupform.h"
+#include "modifystudentsgroupform.h"
+#include "groupsform.h"
+#include "timetable_defs.h"
+#include "timetable.h"
+#include "fet.h"
+#include "studentsset.h"
+
+#include "longtextmessagebox.h"
+
+#include <QMessageBox>
+
+#include <QListWidget>
+#include <QScrollBar>
+#include <QAbstractItemView>
+
+#include <QSplitter>
+#include <QSettings>
+#include <QObject>
+#include <QMetaObject>
+
+extern const QString COMPANY;
+extern const QString PROGRAM;
+
+struct subgroupItem{
+	QString yearName;
+	QString groupName;
+	QString subgroupName;
+};
+
+GroupsForm::GroupsForm(QWidget* parent): QDialog(parent)
+{
+	setupUi(this);
+	
+	groupTextEdit->setReadOnly(true);
+	
+	modifyGroupPushButton->setDefault(true);
+
+	yearsListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+	groupsListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+
+	connect(yearsListWidget, SIGNAL(currentTextChanged(const QString&)), this, SLOT(yearChanged(const QString&)));
+	connect(addGroupPushButton, SIGNAL(clicked()), this, SLOT(addGroup()));
+	connect(removeGroupPushButton, SIGNAL(clicked()), this, SLOT(removeGroup()));
+	connect(purgeGroupPushButton, SIGNAL(clicked()), this, SLOT(purgeGroup()));
+	connect(closePushButton, SIGNAL(clicked()), this, SLOT(close()));
+	connect(groupsListWidget, SIGNAL(currentTextChanged(const QString&)), this, SLOT(groupChanged(const QString&)));
+	connect(modifyGroupPushButton, SIGNAL(clicked()), this, SLOT(modifyGroup()));
+	connect(sortGroupsPushButton, SIGNAL(clicked()), this, SLOT(sortGroups()));
+	connect(activateStudentsPushButton, SIGNAL(clicked()), this, SLOT(activateStudents()));
+	connect(deactivateStudentsPushButton, SIGNAL(clicked()), this, SLOT(deactivateStudents()));
+	connect(groupsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(modifyGroup()));
+
+	centerWidgetOnScreen(this);
+	restoreFETDialogGeometry(this);
+	//restore splitter state
+	QSettings settings(COMPANY, PROGRAM);
+	if(settings.contains(this->metaObject()->className()+QString("/splitter-state")))
+		splitter->restoreState(settings.value(this->metaObject()->className()+QString("/splitter-state")).toByteArray());
+	
+	yearsListWidget->clear();
+	for(int i=0; i<gt.rules.yearsList.size(); i++){
+		StudentsYear* year=gt.rules.yearsList[i];
+		yearsListWidget->addItem(year->name);
+	}
+
+	if(yearsListWidget->count()>0)
+		yearsListWidget->setCurrentRow(0);
+	else
+		groupsListWidget->clear();
+}
+
+
+GroupsForm::~GroupsForm()
+{
+	saveFETDialogGeometry(this);
+	//save splitter state
+	QSettings settings(COMPANY, PROGRAM);
+	settings.setValue(this->metaObject()->className()+QString("/splitter-state"), splitter->saveState());
+}
+
+void GroupsForm::addGroup()
+{
+	if(yearsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected year"));
+		return;
+	}
+	QString yearName=yearsListWidget->currentItem()->text();
+	int yearIndex=gt.rules.searchYear(yearName);
+	assert(yearIndex>=0);
+
+	AddStudentsGroupForm form(this, yearName);
+	setParentAndOtherThings(&form, this);
+	form.exec();
+
+	yearChanged(yearsListWidget->currentItem()->text());
+	
+	int i=groupsListWidget->count()-1;
+	if(i>=0)
+		groupsListWidget->setCurrentRow(i);
+}
+
+void GroupsForm::removeGroup()
+{
+	if(yearsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected year"));
+		return;
+	}
+	int yearIndex=gt.rules.searchYear(yearsListWidget->currentItem()->text());
+	assert(yearIndex>=0);
+
+	if(groupsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected group"));
+		return;
+	}
+
+	QString groupName=groupsListWidget->currentItem()->text();
+	int groupIndex=gt.rules.searchGroup(yearsListWidget->currentItem()->text(), groupName);
+	assert(groupIndex>=0);
+
+	QList<QString> yearsContainingGroup_List;
+	QSet<QString> subgroupsList;
+	//QSet<QString> yearsContainingGroup_Set;
+	foreach(StudentsYear* year, gt.rules.yearsList)
+		foreach(StudentsGroup* group, year->groupsList)
+			if(group->name==groupName){
+				yearsContainingGroup_List.append(year->name);
+				foreach(StudentsSubgroup* subgroup, group->subgroupsList)
+					subgroupsList<<subgroup->name;
+			}
+			
+	assert(yearsContainingGroup_List.count()>=1);
+	QString s;
+	if(yearsContainingGroup_List.count()==1)
+		s=tr("This group exists only in year %1. This means that"
+		 " all the related activities and constraints will be removed. Do you want to continue?").arg(yearsListWidget->currentItem()->text());
+	else{
+		s=tr("This group exists in more places, listed below. It will only be removed from the current year,"
+		 " and the related activities and constraints will not be removed. Do you want to continue?");
+		s+="\n";
+		foreach(QString str, yearsContainingGroup_List)
+			s+=QString("\n")+str;
+	}
+	
+	int t=LongTextMessageBox::mediumConfirmation(this, tr("FET confirmation"), s,
+		tr("Yes"), tr("No"), QString(), 0, 1);
+	if(t==1)
+		return;
+	
+	//by Volker Dirr (start)
+	QList<subgroupItem> removeSubgroups;
+	QString removeSubgroupsStringForGUI;
+	foreach(StudentsYear* year, gt.rules.yearsList){
+		foreach(StudentsGroup* group, year->groupsList){
+			if(group->name!=groupName){
+				foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+					if(subgroupsList.contains(subgroup->name)){
+						subgroupItem tmpItem;
+						tmpItem.yearName=year->name;
+						tmpItem.groupName=group->name;
+						tmpItem.subgroupName=subgroup->name;
+						removeSubgroups<<tmpItem;
+						removeSubgroupsStringForGUI+=tr("%1 - %2 - %3").arg(year->name).arg(group->name).arg(subgroup->name)+"\n";
+					}
+				}
+			}
+		}
+	}
+	
+	if(removeSubgroups.count()>0){
+		s=tr("Subgroups of this group are also used in other groups. They might be needles now. In particular if you used FETs automatic split year feature."
+		 " Should the following subgroups be removed also?");
+		s+="\n"+removeSubgroupsStringForGUI;
+	
+		int t=LongTextMessageBox::mediumConfirmation(this, tr("FET confirmation"), s,
+			tr("Yes"), tr("No"), QString(), 0, 1);
+		if(t==0){
+			foreach(subgroupItem tmpItem, removeSubgroups){
+				bool tmp=gt.rules.removeSubgroup(tmpItem.yearName, tmpItem.groupName, tmpItem.subgroupName);
+				assert(tmp);
+			}
+		}
+	}
+	//by Volker Dirr (end)
+
+	/*if(QMessageBox::warning( this, tr("FET"),
+		tr("Are you sure you want to delete group %1 and all related subgroups, activities and constraints?").arg(groupName),
+		tr("Yes"), tr("No"), 0, 0, 1 ) == 1)
+		return;*/
+
+	bool tmp=gt.rules.removeGroup(yearsListWidget->currentItem()->text(), groupName);
+	assert(tmp);
+	if(tmp){
+		int q=groupsListWidget->currentRow();
+		
+		groupsListWidget->setCurrentRow(-1);
+		QListWidgetItem* item;
+		item=groupsListWidget->takeItem(q);
+		delete item;
+		
+		if(q>=groupsListWidget->count())
+			q=groupsListWidget->count()-1;
+		if(q>=0)
+			groupsListWidget->setCurrentRow(q);
+		else
+			groupTextEdit->setPlainText(QString(""));
+	}
+
+	/*if(gt.rules.searchStudentsSet(groupName)!=NULL)
+		QMessageBox::information( this, tr("FET"), tr("This group still exists into another year. "
+			"The related subgroups, activities and constraints were not removed"));*/
+}
+
+void GroupsForm::purgeGroup()
+{
+	if(yearsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected year"));
+		return;
+	}
+	int yearIndex=gt.rules.searchYear(yearsListWidget->currentItem()->text());
+	assert(yearIndex>=0);
+
+	if(groupsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected group"));
+		return;
+	}
+
+	QString groupName=groupsListWidget->currentItem()->text();
+	int groupIndex=gt.rules.searchGroup(yearsListWidget->currentItem()->text(), groupName);
+	assert(groupIndex>=0);
+
+	QList<QString> yearsContainingGroup_List;
+	QSet<QString> subgroupsList;
+	//QSet<QString> yearsContainingGroup_Set;
+	foreach(StudentsYear* year, gt.rules.yearsList)
+		foreach(StudentsGroup* group, year->groupsList)
+			if(group->name==groupName){
+				yearsContainingGroup_List.append(year->name);
+				foreach(StudentsSubgroup* subgroup, group->subgroupsList)
+					subgroupsList<<subgroup->name;
+			}
+		
+	assert(yearsContainingGroup_List.count()>=1);
+	QString s;
+	if(yearsContainingGroup_List.count()==1)
+		s=tr("This group exists only in year %1. All the related activities and constraints "
+		 "will be removed. Do you want to continue?").arg(yearsListWidget->currentItem()->text());
+	else{
+		s=tr("This group exists in more places, listed below. It will be removed from all these places."
+		 " All the related activities and constraints will be removed. Do you want to continue?");
+		s+="\n";
+		foreach(QString str, yearsContainingGroup_List)
+			s+=QString("\n")+str;
+	}
+	
+	int t=LongTextMessageBox::mediumConfirmation(this, tr("FET confirmation"), s,
+		tr("Yes"), tr("No"), QString(), 0, 1);
+	if(t==1)
+		return;
+	
+	//by Volker Dirr (start)
+	QSet<QString> removeSubgroups;
+	QString removeSubgroupsStringForGUI;
+	foreach(StudentsYear* year, gt.rules.yearsList){
+		foreach(StudentsGroup* group, year->groupsList){
+			if(group->name!=groupName){
+				foreach(StudentsSubgroup* subgroup, group->subgroupsList){
+					if(subgroupsList.contains(subgroup->name)){
+						if(!removeSubgroups.contains(subgroup->name)){
+							removeSubgroups<<subgroup->name;
+						}
+						removeSubgroupsStringForGUI+=tr("%1 - %2 - %3").arg(year->name).arg(group->name).arg(subgroup->name)+"\n";
+					}
+				}
+			}
+		}
+	}
+	
+	if(removeSubgroups.count()>0){
+		s=tr("Subgroups of this group are also used in other groups. They might be needles now. In particular if you used FETs automatic split year feature."
+		 " Should the following subgroups be removed also?");
+		s+="\n"+removeSubgroupsStringForGUI;
+	
+		int t=LongTextMessageBox::mediumConfirmation(this, tr("FET confirmation"), s,
+			tr("Yes"), tr("No"), QString(), 0, 1);
+		if(t==0){
+			foreach(QString tmpItem, removeSubgroups){
+				bool tmp=gt.rules.purgeSubgroup(tmpItem);
+				assert(tmp);
+			}
+		}
+	}
+	//by Volker Dirr (end)
+	
+
+	/*if(QMessageBox::warning( this, tr("FET"),
+		tr("Are you sure you want to delete group %1 and all related subgroups, activities and constraints?").arg(groupName),
+		tr("Yes"), tr("No"), 0, 0, 1 ) == 1)
+		return;*/
+
+	bool tmp=gt.rules.purgeGroup(groupName);
+	assert(tmp);
+	if(tmp){
+		int q=groupsListWidget->currentRow();
+		
+		groupsListWidget->setCurrentRow(-1);
+		QListWidgetItem* item;
+		item=groupsListWidget->takeItem(q);
+		delete item;
+		
+		if(q>=groupsListWidget->count())
+			q=groupsListWidget->count()-1;
+		if(q>=0)
+			groupsListWidget->setCurrentRow(q);
+		else
+			groupTextEdit->setPlainText(QString(""));
+	}
+
+	/*if(gt.rules.searchStudentsSet(groupName)!=NULL)
+		QMessageBox::information( this, tr("FET"), tr("This group still exists into another year. "
+			"The related subgroups, activities and constraints were not removed"));*/
+}
+
+void GroupsForm::yearChanged(const QString &yearName)
+{
+	int yearIndex=gt.rules.searchYear(yearName);
+	if(yearIndex<0){
+		groupsListWidget->clear();
+		groupTextEdit->setPlainText(QString(""));
+		return;
+	}
+
+	groupsListWidget->clear();
+
+	StudentsYear* sty=gt.rules.yearsList.at(yearIndex);
+	for(int i=0; i<sty->groupsList.size(); i++){
+		StudentsGroup* stg=sty->groupsList[i];
+		groupsListWidget->addItem(stg->name);
+	}
+
+	if(groupsListWidget->count()>0)
+		groupsListWidget->setCurrentRow(0);
+	else
+		groupTextEdit->setPlainText(QString(""));
+}
+
+void GroupsForm::groupChanged(const QString &groupName)
+{
+	StudentsSet* ss=gt.rules.searchStudentsSet(groupName);
+	if(ss==NULL){
+		groupTextEdit->setPlainText(QString(""));
+		return;
+	}
+	StudentsGroup* sg=(StudentsGroup*)ss;
+	groupTextEdit->setPlainText(sg->getDetailedDescriptionWithConstraints(gt.rules));
+}
+
+void GroupsForm::sortGroups()
+{
+	if(yearsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected year"));
+		return;
+	}
+	int yearIndex=gt.rules.searchYear(yearsListWidget->currentItem()->text());
+	assert(yearIndex>=0);
+	
+	gt.rules.sortGroupsAlphabetically(yearsListWidget->currentItem()->text());
+
+	yearChanged(yearsListWidget->currentItem()->text());
+}
+
+void GroupsForm::modifyGroup()
+{
+	if(yearsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected year"));
+		return;
+	}
+	
+	QString yearName=yearsListWidget->currentItem()->text();
+	
+	int yearIndex=gt.rules.searchYear(yearsListWidget->currentItem()->text());
+	assert(yearIndex>=0);
+	
+	int q=groupsListWidget->currentRow();
+	int valv=groupsListWidget->verticalScrollBar()->value();
+	int valh=groupsListWidget->horizontalScrollBar()->value();
+
+	if(groupsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected group"));
+		return;
+	}
+
+	QString groupName=groupsListWidget->currentItem()->text();
+	int groupIndex=gt.rules.searchGroup(yearsListWidget->currentItem()->text(), groupName);
+	assert(groupIndex>=0);
+
+	StudentsSet* sset=gt.rules.searchStudentsSet(groupName);
+	assert(sset!=NULL);
+	int numberOfStudents=sset->numberOfStudents;
+	
+	ModifyStudentsGroupForm form(this, yearName, groupName, numberOfStudents);
+	setParentAndOtherThings(&form, this);
+	form.exec();
+
+	yearChanged(yearsListWidget->currentItem()->text());
+	
+	groupsListWidget->verticalScrollBar()->setValue(valv);
+	groupsListWidget->horizontalScrollBar()->setValue(valh);
+	
+	if(q>=groupsListWidget->count())
+		q=groupsListWidget->count()-1;
+	if(q>=0)
+		groupsListWidget->setCurrentRow(q);
+	else
+		groupTextEdit->setPlainText(QString(""));
+}
+
+void GroupsForm::activateStudents()
+{
+	if(yearsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected year"));
+		return;
+	}
+	int yearIndex=gt.rules.searchYear(yearsListWidget->currentItem()->text());
+	assert(yearIndex>=0);
+
+	if(groupsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected group"));
+		return;
+	}
+
+	QString groupName=groupsListWidget->currentItem()->text();
+	int count=gt.rules.activateStudents(groupName);
+	QMessageBox::information(this, tr("FET information"), tr("Activated a number of %1 activities").arg(count));
+}
+
+void GroupsForm::deactivateStudents()
+{
+	if(yearsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected year"));
+		return;
+	}
+	int yearIndex=gt.rules.searchYear(yearsListWidget->currentItem()->text());
+	assert(yearIndex>=0);
+
+	if(groupsListWidget->currentRow()<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected group"));
+		return;
+	}
+
+	QString groupName=groupsListWidget->currentItem()->text();
+	int count=gt.rules.deactivateStudents(groupName);
+	QMessageBox::information(this, tr("FET information"), tr("De-activated a number of %1 activities").arg(count));
+}
+---
+
 208---------------------------------------------------------
 From Volker Dirr:
 
@@ -3422,11 +3903,11 @@ void AddConstraintStudentsSetNotAvailableTimesForm::colorItem(QTableWidgetItem* 
 
 I think the colors should be configurable. For example, I would like to use a light green background for available times and white for not available times in the "student set not available" dialog, whereas for the corresponding teacher dialog, perhaps different colors could be used (white = available; dark grey = not available). In case the colors are used, you could hide the "X" by setting the foreground color to the same as the background color since it would be superfluous. That way, you could keep the rest of the functionality the way it is.
 
-213---------------------------------------------------------
-From Volker Dirr:
+213-------------------------DONE----------------------------
+DONE--> From Volker Dirr:
 
 if a user removes a subgroup FET should also ask if this subgroup should
-be removed everywhere.
+be removed everywhere. <-- DONE
 
 214---------------------------------------------------------
 From Khalilullah Yosufi:
@@ -3607,6 +4088,7 @@ foreach(year, newYearsList){
    }
 }
 
+
 222---------------------------------------------------------
 From Mohamed NAJARI:
 
@@ -3621,8 +4103,8 @@ because :
 1. We enter the teacher's tasks ( choice - subject - Partition - period - etc.)
 2. When we want to edit the task of a teacher , we find that the division button is not enabled and we will be forced to delete that task and we retype spot again.
 
-224---------------------------------------------------------
-From Volker Dirr:
+224------------------------DONE-----------------------------
+DONE--> From Volker Dirr:
 
 in modify/rename years form there should be a checkbox "Rename also groups
 and subgroups".
@@ -3663,7 +4145,7 @@ void ModifyStudentsYearForm::renameAlsoGroupsAndSubgroups(){
 			}
 		}
 	}
-}
+} <--DONE
 
 225---------------------------------------------------------
 From jillali elghazoui (on forum):
@@ -3747,3 +4229,60 @@ On the left a list of activities (not the combo-box or drop-down box).
 On the right a table grid with hours and day and the permission to mark only a square of the grid.
 
 In many other dialogs with the same scheme (for example in "add teacher not available times") it would be useful to have the list instead of the drop down box.
+
+232---------------------------------------------------------
+From Davide Cottignoli (on forum):
+
+Implement lock/unlock of activities from a specific building.
+
+233---------------------------------------------------------
+From Volker Dirr and Liviu Lalescu:
+
+About coloring the three timetable view dialogs:
+
+Volker:
+A combobox with "disabled" as first item should be perfect for that task.
+
+Coloring produces sadly pretty many very similar colors. That should be
+fixed. (for example by skipping similar colors or calculating a fixed
+difference between colors.)
+
+Liviu:
+The user can wish to choose the coloring of each view, in a settings menu:
+Color teachers view by: Students, Subject, Tag, etc., or disabled, etc.
+
+234---------------------------------------------------------
+From Luigi Valbonesi:
+
+When fet generates timetables, to run a parallel routine that saves
+every new generated timetable (the best possible at the moment)
+overwriting the previous and the most difficult ativities with the one
+that blocked the generation. If the computer crashes there will be some
+data to think about and work with.
+
+235---------------------------------------------------------
+From fernandolordao and Volker Dirr (on forum):
+
+fernandolordao:
+By default, teachers time constraints are permanently shown at same sequence that we add.
+It would be useful if we could sort them by teachers' name in order to reduce time wasting for systematic modifications in time restrictions for many teachers. By the proposed way we could do modifications teacher-by-teacher following the name sequence without having to apply filter for each of them.
+Similar sort options could be designed to other restrictions.
+
+Liviu Lalescu:
+I'd suggest you to go to "All time constraints" dialog, filter "Contains" "Teacher not available", then "Sorted". Because the weight is always 100% and the teacher is after the weight in the constraint description, it works
+
+Volker:
+The request is to save time. You don't save time if you always need to click a filter, write some stuff and also click sort. Very unhandy.
+
+In fact nearly all constraints and activities should be sorted. For TODO:
+
+Add a new dialog in FET->advanced->sort
+
+there should be checkboxes and a sort pushbutton.
+the checkboxes should be:
+sort teacher constraints by teacher names.
+sort students constraints by students names.
+sort room constraints by room name.
+sort teacher names of all activities
+sort students names of all activities
+sort activity tags of all activities

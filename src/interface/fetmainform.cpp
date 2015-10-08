@@ -786,6 +786,8 @@ void FetMainForm::on_checkForUpdatesAction_toggled()
 void FetMainForm::on_settingsUseColorsAction_toggled()
 {
 	USE_GUI_COLORS=settingsUseColorsAction->isChecked();
+	
+	LockUnlock::increaseCommunicationSpinBox();
 }
 
 void FetMainForm::showSubgroupsInComboBoxesToggled(bool checked)
@@ -1954,6 +1956,9 @@ void FetMainForm::on_helpSettingsAction_triggered()
 	s+="\n";
 	s+=" -";
 	s+=tr("group activities in initial order items, the inactive items will have a distinctive background color");
+	s+="\n";
+	s+=" -";
+	s+=tr("the three timetable view dialogs");
 	
 	s+="\n\n";
 	s+=tr("Enable activity tag max hours daily:");
@@ -4197,6 +4202,8 @@ void FetMainForm::on_settingsRestoreDefaultsAction_triggered()
 
 	setLanguage(*pqapplication, this);
 	setCurrentFile(INPUT_FILENAME_XML);
+
+	LockUnlock::increaseCommunicationSpinBox(); //for GUI colors in timetables
 }
 
 void FetMainForm::on_settingsTimetableHtmlLevelAction_triggered()

@@ -1816,7 +1816,14 @@ Versions 5.27.0 - 5.27.9
 ---------------------------------------------------------------------------------
 Versions 5.28.0 - 5.28.v
 - Version 5.28.0
-	- Crash bug fixes (reported by Davide Cottignoli).
+	- Crash bugs fixed (reported by Davide Cottignoli).
 	- Removed useless CONFIG += thread from src.pro and src-cl.pro (reported by locutusofborg).
 	- Corrected a few typos in the Italian translation, by flauta.
 	- Updated the Italian translation, by Marco Barsotti.
+- Version 5.28.1
+	- Crash bug fix when the input file contained activities with duplicate students sets / teachers and the user
+	renamed these students sets / teachers (reported by Volker Dirr).
+	- When renaming a students year, the user can choose to rename also automatically the groups and subgroups
+	contained in this year (suggested and implemented by Volker Dirr).
+	- Added colors when viewing the timetable from the interface, if the option to use colors in the interface
+	is selected (suggested and implemented by Marco Vassura).

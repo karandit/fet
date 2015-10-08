@@ -20,11 +20,17 @@ File longtextmessagebox.cpp
  ***************************************************************************/
 
 #include "longtextmessagebox.h"
+#include "longtextmessagebox_auxiliary.h"
+
+#include "timetable_defs.h"
 
 #ifndef FET_COMMAND_LINE
 
 #include <QMessageBox>
 
+#include <QObject>
+#include <QDialog>
+#include <QWidget>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPlainTextEdit>
@@ -252,3 +258,141 @@ void LongTextMessageBox::mediumInformation
 {
 	LongTextMessageBox::informationWithDimensions(parent, title, text, MEDIUM_MIN_WIDTH, MEDIUM_MAX_WIDTH, MEDIUM_MIN_HEIGHT, MEDIUM_MAX_HEIGHT);
 }
+
+#ifndef FET_COMMAND_LINE
+MyDialogWithThreeButtons::MyDialogWithThreeButtons(QWidget* parent): QDialog(parent)
+{
+}
+
+MyDialogWithThreeButtons::~MyDialogWithThreeButtons()
+{
+}
+
+void MyDialogWithThreeButtons::setYes()
+{
+	clickedButton=QMessageBox::Yes;
+	accept();
+}
+
+void MyDialogWithThreeButtons::setNo()
+{
+	clickedButton=QMessageBox::No;
+	accept();
+}
+
+void MyDialogWithThreeButtons::setCancel()
+{
+	clickedButton=QMessageBox::Cancel;
+	reject();
+}
+
+int LongTextMessageBox::largeConfirmationWithDimensionsThreeButtonsYesNoCancel
+ ( QWidget * parent, const QString & title, const QString & text,
+ const QString& button0Text, const QString& button1Text, const QString& button2Text,
+ int defaultButton, int escapeButton )
+ //Yes, No, Cancel, in this order.
+{
+	int MINW=LARGE_MIN_WIDTH;
+	int MAXW=LARGE_MAX_WIDTH;
+	int MINH=LARGE_MIN_HEIGHT;
+	int MAXH=LARGE_MAX_HEIGHT;
+
+	if(button0Text==QString() || button1Text==QString() || button2Text==QString()){
+		assert(0);
+	}
+
+	MyDialogWithThreeButtons dialog(parent);
+	dialog.setWindowTitle(title);
+	
+	QVBoxLayout* vl=new QVBoxLayout(&dialog);
+	QPlainTextEdit* te=new QPlainTextEdit();
+	te->setPlainText(text);
+	te->setReadOnly(true);
+	
+	QPushButton* pb0=NULL;
+	if(button0Text!=QString()){
+		pb0=new QPushButton(button0Text);
+		if(defaultButton==0)
+			QObject::connect(pb0, SIGNAL(clicked()), &dialog, SLOT(accept()));
+		if(escapeButton==0)
+			QObject::connect(pb0, SIGNAL(clicked()), &dialog, SLOT(reject()));
+	}
+	
+	QPushButton* pb1=NULL;
+	if(button1Text!=QString()){
+		pb1=new QPushButton(button1Text);
+		if(defaultButton==1)
+			QObject::connect(pb1, SIGNAL(clicked()), &dialog, SLOT(accept()));
+		if(escapeButton==1)
+			QObject::connect(pb1, SIGNAL(clicked()), &dialog, SLOT(reject()));
+	}
+	
+	QPushButton* pb2=NULL;
+	if(button2Text!=QString()){
+		pb2=new QPushButton(button2Text);
+		if(defaultButton==2)
+			QObject::connect(pb2, SIGNAL(clicked()), &dialog, SLOT(accept()));
+		if(escapeButton==2)
+			QObject::connect(pb2, SIGNAL(clicked()), &dialog, SLOT(reject()));
+	}
+	
+	assert(defaultButton==0);
+	assert(escapeButton==2);
+	
+	QObject::connect(pb0, SIGNAL(clicked()), &dialog, SLOT(setYes()));
+	QObject::connect(pb1, SIGNAL(clicked()), &dialog, SLOT(setNo()));
+	QObject::connect(pb2, SIGNAL(clicked()), &dialog, SLOT(setCancel()));
+	
+	QHBoxLayout* hl=new QHBoxLayout();
+	hl->addStretch(1);
+	if(pb0!=NULL)
+		hl->addWidget(pb0);
+	if(pb1!=NULL)
+		hl->addWidget(pb1);
+	if(pb2!=NULL)
+		hl->addWidget(pb2);
+		
+	vl->addWidget(te);
+	vl->addLayout(hl);
+	
+	if(pb0!=NULL && defaultButton==0){
+		pb0->setDefault(true);
+		pb0->setFocus();
+	}
+	else if(pb1!=NULL && defaultButton==1){
+		pb1->setDefault(true);
+		pb1->setFocus();
+	}
+	else if(pb2!=NULL && defaultButton==2){
+		pb2->setDefault(true);
+		pb2->setFocus();
+	}
+	
+	int w=dialog.sizeHint().width();
+	int h=dialog.sizeHint().height();
+	if(w>MAXW) w=MAXW;
+	if(w<MINW) w=MINW;
+	if(h>MAXH) h=MAXH;
+	if(h<MINH) h=MINH;
+	dialog.resize(w, h);
+	if(parent==0)
+		forceCenterWidgetOnScreen(&dialog);
+	
+	dialog.clickedButton=-1;
+	int b=dialog.exec();
+	
+	if(dialog.clickedButton==-1){
+		if(b==QDialog::Accepted){
+			//return defaultButton;
+			dialog.clickedButton=QMessageBox::Yes;
+		}
+		else{
+			//return escapeButton;
+			dialog.clickedButton=QMessageBox::Cancel;
+		}
+	}
+	
+	assert(dialog.clickedButton>=0);
+	return dialog.clickedButton;
+}
+#endif

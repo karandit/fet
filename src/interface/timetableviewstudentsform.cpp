@@ -54,6 +54,11 @@
 #include <QObject>
 #include <QMetaObject>
 
+//begin by Marco Vassura
+#include <QBrush>
+#include <QColor>
+//end by Marco Vassura
+
 extern const QString COMPANY;
 extern const QString PROGRAM;
 
@@ -352,6 +357,14 @@ void TimetableViewStudentsForm::updateStudentsTimetableTable(){
 	assert(i<gt.rules.nInternalSubgroups);
 	for(int j=0; j<gt.rules.nHoursPerDay && j<studentsTimetableTable->rowCount(); j++){
 		for(int k=0; k<gt.rules.nDaysPerWeek && k<studentsTimetableTable->columnCount(); k++){
+			//begin by Marco Vassura
+			// add colors (start)
+			//if(USE_GUI_COLORS) {
+				studentsTimetableTable->item(j, k)->setBackground(studentsTimetableTable->palette().color(QPalette::Base));
+				studentsTimetableTable->item(j, k)->setForeground(studentsTimetableTable->palette().color(QPalette::Text));
+			//}
+			// add colors (end)
+			//end by Marco Vassura
 			s="";
 			int ai=students_timetable_weekly[i][k][j]; //activity index
 			if(ai!=UNALLOCATED_ACTIVITY){
@@ -371,7 +384,6 @@ void TimetableViewStudentsForm::updateStudentsTimetableTable(){
 				else{
 					s+=act->subjectName;
 				}
-				
 				if(act->teachersNames.count()>0){
 					s+="\n";
 					s+=act->teachersNames.join(", ");
@@ -416,6 +428,20 @@ void TimetableViewStudentsForm::updateStudentsTimetableTable(){
 				}
 				s+=descr;
 				//added by Volker Dirr (end)
+				
+				//begin by Marco Vassura
+				// add colors (start)
+				if(USE_GUI_COLORS) {
+					QBrush bg(stringToColor(act->subjectName));
+					studentsTimetableTable->item(j, k)->setBackground(bg);
+					double brightness = bg.color().redF()*0.299 + bg.color().greenF()*0.587 + bg.color().blueF()*0.114;
+					if (brightness<0.5)
+						studentsTimetableTable->item(j, k)->setForeground(QBrush(Qt::white));
+					else
+						studentsTimetableTable->item(j, k)->setForeground(QBrush(Qt::black));
+				}
+				// add colors (end)
+				//end by Marco Vassura
 			}
 			else{
 				if(subgroupNotAvailableDayHour[i][k][j] && PRINT_NOT_AVAILABLE_TIME_SLOTS)
@@ -433,6 +459,26 @@ void TimetableViewStudentsForm::updateStudentsTimetableTable(){
 	
 	detailActivity(studentsTimetableTable->currentItem());
 }
+
+//begin by Marco Vassura
+QColor TimetableViewStudentsForm::stringToColor(QString s)
+{
+	// CRC-24 Based on RFC 2440 Section 6.1
+	unsigned long crc = 0xB704CEL;
+	int i;
+	QChar *data = s.data();
+	while (!data->isNull()) {
+		crc ^= (data->unicode() & 0xFF) << 16;
+		for (i = 0; i < 8; i++) {
+			crc <<= 1;
+			if (crc & 0x1000000)
+				crc ^= 0x1864CFBL;
+		}
+		data++;
+	}
+	return QColor::fromRgb((int)(crc>>16), (int)((crc>>8) & 0xFF), (int)(crc & 0xFF));
+}
+//end by Marco Vassura
 
 void TimetableViewStudentsForm::resizeEvent(QResizeEvent* event)
 {
