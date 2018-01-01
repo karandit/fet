@@ -4554,3 +4554,30 @@ On each day, or only on non-empty days?
 
 If on each day: Please try with activities occupy max time slots from selection; it will not slow down the process.
 This constraint is highly optimized.
+
+249---------------------------------------------------------
+From Handaya:
+
+1) what if the html result be colorfull also as in the program ?
+2) what if the colors be the same for the same teacher ?
+3) what if the program allows marking a weekly meeting for all teachers
+without printing every name in the cell of timetable result ?
+4) what if the timetable result be printable or saveable in some diferent
+formats like doc and pdf ?
+
+Liviu:
+
+(1) - The HTML results can be colored by using the CSS file. It is too
+difficult for us, the programmers, to color them as in the FET
+interface.
+
+(2) - In the interface, the colors are the same for the same
+subject/subject+students set. This is what we came to after some
+thinking.
+
+(3) - This would be possible, but I would need to keep in the .fet data
+file an attribute which does not belong to timetabling, and I prefer
+not to.
+
+(4) - .doc and .pdf - you could print the timetable to a pdf file, or
+copy/paste the HTML code to a doc file.

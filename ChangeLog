@@ -1839,5 +1839,7 @@ Versions 5.28.0 - 5.28.v
 	- Added a new Vietnamese example file, by Nguyễn Hữu Duyệt.
 	- Added a new Namibian example file, by Bobby.
 - Version 5.28.4
-	- Bug fix: not allowing the file name to start with space(s), as the HTML results do not work (reported by Volker Dirr).
+	- Bug fix: not allowing the file name to start with white space(s), as the HTML results do not work (reported by Volker Dirr).
 	- Updated the Arabic translation, by Silver.
+- Version 5.28.5
+	- Bug fix: not allowing the file name to end with white space(s), as this may lead to errors (reported by Volker Dirr).

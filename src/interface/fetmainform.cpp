@@ -1283,11 +1283,27 @@ void FetMainForm::openFile(const QString& fileName)
 		int tmp2=s.lastIndexOf(FILE_SEP);
 		QString s2=s.right(s.length()-tmp2-1);
 		
-		if(s2.startsWith(' ')){
-			QMessageBox::warning(this, tr("FET information"),
-			 tr("Please do not use a filename starting with space(s), the html css code does not work."
-			  " File was not loaded. Please rename it, removing the space(s) from the beginning and open it after that with FET."));
-			return;
+		if(s2.length()>=1){
+			if(s2.at(0).isSpace()){
+				QMessageBox::warning(this, tr("FET information"),
+				 tr("Please do not use a filename starting with white space(s), the html css code does not work."
+				  " File was not loaded. Please rename it, removing the white space(s) from the beginning and open it after that with FET."));
+				return;
+			}
+		}
+		QString s3;
+		if(s2.endsWith(".fet"))
+			s3=s2.left(s2.length()-4);
+		else
+			s3=s2;
+		if(s3.length()>=1){
+			if(s3.at(s3.length()-1).isSpace()){
+				QMessageBox::warning(this, tr("FET information"),
+				 tr("Please do not use a filename ending with white space(s) before the '.fet' termination or at the end of the filename,"
+				 " problems might arise. File was not loaded. Please rename it, removing the white space(s) at the end and open it after"
+				 " that with FET."));
+				return;
+			}
 		}
 		if(s2.indexOf("\"") >= 0){
 			QMessageBox::warning(this, tr("FET information"),
@@ -1374,11 +1390,36 @@ bool FetMainForm::fileSaveAs()
 	int tmp2=s.lastIndexOf(FILE_SEP);
 	QString s2=s.right(s.length()-tmp2-1);
 			
-	if(s2.startsWith(' ')){
-		QMessageBox::warning(this, tr("FET information"),
-		 tr("Please do not use a filename starting with space(s), the html css code does not work.")
-		 +"\n\n"+tr("File was not saved."));
-		return false;
+	if(s2.length()>=1){
+		if(s2.at(0).isSpace()){
+			QMessageBox::warning(this, tr("FET information"),
+			 tr("Please do not use a filename starting with white space(s), the html css code does not work.")
+			 +"\n\n"+tr("File was not saved."));
+			return false;
+		}
+	}
+	QString s3;
+	bool ewf;
+	if(s2.endsWith(".fet")){
+		s3=s2.left(s2.length()-4);
+		ewf=true;
+	}
+	else{
+		s3=s2;
+		ewf=false;
+	}
+	if(s3.length()>=1){
+		if(s3.at(s3.length()-1).isSpace()){
+			if(ewf)
+				QMessageBox::warning(this, tr("FET information"),
+				 tr("Please do not use a filename ending with white space(s) before the '.fet' termination, problems might arise.")
+				 +"\n\n"+tr("File was not saved."));
+			else
+				QMessageBox::warning(this, tr("FET information"),
+				 tr("Please do not use a filename ending with white space(s), problems might arise.")
+				 +"\n\n"+tr("File was not saved."));
+			return false;
+		}
 	}
 	if(s2.indexOf("\"") >= 0){
 		QMessageBox::warning(this, tr("FET information"), tr("Please do not use quotation marks \" in filename, the html css code does not work")
@@ -1569,11 +1610,36 @@ void FetMainForm::on_timetableSaveTimetableAsAction_triggered()
 			int tmp2=s.lastIndexOf(FILE_SEP);
 			QString s2=s.right(s.length()-tmp2-1);
 				
-			if(s2.startsWith(' ')){
-				QMessageBox::warning(this, tr("FET information"),
-				 tr("Please do not use a filename starting with space(s), the html css code does not work.")
-				 +"\n\n"+tr("File was not saved."));
-				return;
+			if(s2.length()>=1){
+				if(s2.at(0).isSpace()){
+					QMessageBox::warning(this, tr("FET information"),
+					 tr("Please do not use a filename starting with white space(s), the html css code does not work.")
+					 +"\n\n"+tr("File was not saved."));
+					return;
+				}
+			}
+			QString s3;
+			bool ewf;
+			if(s2.endsWith(".fet")){
+				s3=s2.left(s2.length()-4);
+				ewf=true;
+			}
+			else{
+				s3=s2;
+				ewf=false;
+			}
+			if(s3.length()>=1){
+				if(s3.at(s3.length()-1).isSpace()){
+					if(ewf)
+						QMessageBox::warning(this, tr("FET information"),
+						 tr("Please do not use a filename ending with white space(s) before the '.fet' termination, problems might arise.")
+						 +"\n\n"+tr("File was not saved."));
+					else
+						QMessageBox::warning(this, tr("FET information"),
+						 tr("Please do not use a filename ending with white space(s), problems might arise.")
+						 +"\n\n"+tr("File was not saved."));
+					return;
+				}
 			}
 			if(s2.indexOf("\"") >= 0){
 				QMessageBox::warning(parent, tr("FET information"), tr("Please do not use quotation marks \" in filename, the html css code does not work")

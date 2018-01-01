@@ -2238,12 +2238,12 @@ void Import::importCSVActivities(QWidget* parent){
 					if(firstWarning){
 						lastWarning+=Import::tr("FET can't import activities, because FET needs to know the stucture of the "
 						"students sets. You must add (or import) years, groups and subgroups first.")+"\n"+
-						tr("I recommend to import also teachers, rooms, buildings, subjects and activity tags before "
+						tr("It is recommended to import also teachers, rooms, buildings, subjects and activity tags before "
 						"importing activities. It is not needed, because FET will automatically do it, but you can "
 						"check the activity csv file by that.")+"\n";
 						firstWarning=false;
 					}
-					lastWarning+=Import::tr("Student set %1 doesn't exist. You must add (or import) years, groups and subgroups first.").arg(students[s])+"\n";
+					lastWarning+=Import::tr("Students set %1 doesn't exist. You must add (or import) years, groups and subgroups first.").arg(students[s])+"\n";
 				}
 			}
 		}
