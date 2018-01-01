@@ -1,4 +1,8 @@
 Makefile
 src/Makefile
 src/Makefile.src-cl
-
+doc/
+examples/
+icons/
+man/
+translations/

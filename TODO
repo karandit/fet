@@ -4286,3 +4286,207 @@ sort room constraints by room name.
 sort teacher names of all activities
 sort students names of all activities
 sort activity tags of all activities
+
+236---------------------------------------------------------
+From Wizard (on forum):
+
+Wizard:
+
+Is there a way to set a minimum distance between first teaching hour and last teaching hour?
+I have set maximum hours continuously to be 4, but sometimes the generated timetable contains a teacher that teaches 4 hours in a day and they become consecutive. What I would like is for him to be at school for at least 5 hours even if he has a gap.
+
+Liviu Lalescu:
+
+Unfortunately, I think this is impossible. I am not sure it can be implemented in the FET algorithm.
+
+237---------------------------------------------------------
+From Volker Dirr:
+
+maybe for the TODO:
+simplify the FET interface.
+it is currently much to confusing if you work with it.
+There are many constraint for a single teacher and all teachers.
+it's unhandy to always check 2 lists.
+in fact there is normally only a single "all" constraint.
+in fact this suggestion should be done similar to students and rooms.
+
+but i explain now with a single example, so it's easier to explain:
+there are 2 dialogs:
+fet -> data -> time constraints -> teachers -> max gaps per week for a 
+teacher
+fet -> data -> time constraints -> teachers -> max gaps per week for all 
+teachers
+
+it should be only a single dialog:
+fet -> data -> time constraints -> teachers -> max gaps per week
+the dialog is similar to the current one. just ordered. first the "all" 
+constraints, then the "single" constraints.
+
+that will help much, since you only need to check a single list now and 
+it is still ordered, because the "all" will be always the first.
+this save a lot of space in the fet main window interface.
+
+then there are 2 ideas how to implement it.
+idea a)
+fet -> data -> time constraints -> teachers -> max gaps per week
+can stay as "fet -> data -> time constraints -> teachers -> max gaps per 
+week for a teacher" currently is.
+the "add" button must be renamed to "add one". And a "add all" 
+pushbutton must be added.
+
+idea b)
+we can also remove a lot of dialogs. in this example:
+remove
+fet -> data -> time constraints -> teachers -> max gaps per week for all 
+teachers
+
+then only modify
+fet -> data -> time constraints -> teachers -> max gaps per week for a 
+teacher
+the combobox of this dialog only need a "all teachers" as first item.
+
+i prefer variant b, because it will save a lot of code, memory, 
+translations, ...
+
+238---------------------------------------------------------
+From Volker Dirr:
+
+The activity description must be more detailed.
+
+Example:
+If i check FET->Data->time constraint->activities->min days between 
+activities
+the right information box is not detailed enough. i need to more 
+information if i want to decide if the activity should keep 100% or if i 
+can reduce it.
+i need to know also the Duration.
+So instead of for example:
+Activity with id=9 (T:LAL, S:Ek, AT:16, St:5a)
+Activity with id=10 (T:LAL, S:Ek, AT:16, St:5a)
+
+it should display:
+Activity with id=9 (T:LAL, S:Ek, AT:16, St:5a, D:1)
+Activity with id=10 (T:LAL, S:Ek, AT:16, St:5a, D:1)
+
+because in that case i will keep maybe reduce the weight of that 
+constraint down to 0%.
+
+but is it for example this:
+Activity with id=9 (T:LAL, S:Ek, AT:16, St:5a, D:2)
+Activity with id=10 (T:LAL, S:Ek, AT:16, St:5a, D:1)
+
+then i will never reduce it under 100%, because a 3 hour activity is to 
+long.
+
+239---------------------------------------------------------
+From Volker Dirr:
+
+short the strings in conflicts.txt. they are much too long. very 
+confusing if you read that. (Maybe use shortcuts, sort them by type and 
+call the type only at the beginning of the list, ... There are many 
+variants to write it more clear.)
+
+240---------------------------------------------------------
+From Davide Cottignoli (on forum):
+
+I have this simple suggestion that would, in my case, save a lot of time:
+
+I have some teachers that bind their worktime to an already built timetable, so they look at various activities and decide to work in those hours.
+Often this happens when teachers are in co-presence in laboratory or when teachers have students with disabilities and need to support them when specific subject are in time.
+So, it is the best to "double click" on the subactivity, on the interface with the generated timetable, to show the dialog that modify the subactivity and add the new teacher.
+Then regenerate all the timetable to obtain the new HTML even for these teachers.
+Whitout this simple "double click" I need to write down the number of the sub-activity, go to Data->Activities then looking for that number, click "modify" then add the teacher.
+
+Is it possible to do this and speed-up data enter?
+
+241---------------------------------------------------------
+From ant7 (on forum):
+
+I do some tricks to make pair of activities to be
+scheduled the same time but in two neighbouring days.
+Because of that I need the constraint:
+Fixed number of days between activities (with default value equal to 1).
+
+To achive it I use:
+Minimum number of days between activities (set to 1)
+ and
+Maximum number of days between activities (set to 1)
+so
+
+t1-t2>=1day   and   t1-t2<= 1day    give  t1=t2 + 1day
+
+Could you add this constraint?
+Fixed number of days between activities (with default value equal to 1).
+
+When I have to click hundreds of times  Min and Max... constraints
+I would save a lot of time if you add this constraint.
+
+242---------------------------------------------------------
+From Lizio (on forum):
+
+Lizio:
+
+What about adding a new value to activities that is difficulty (let say 0=very easy like PE, 1=easy like art, 2= medium, 3=difficult and 4=very difficult like calculus), then it would be possible to add a constraint on maxximum difficulties per day in order to avoid "impossible days" for students.
+
+Liviu:
+
+Maybe you could add activity tags to activities, and use the constraint students activity tag max hours per day?
+
+Lizio:
+
+Unfortunately it would not work. It is not a matter of a max number of hours per day of a subject or a group of subjects, but not to sum too many difficult subjects in a day and your suggestion would work only if you define subjects as difficult or not, but I think it is better to define them with more levels.
+
+For example, you can have physical education that is easy and history that is harder but not so hard, math that is the hardest, so 2 hours of history is like one of math and so on, if you define a maximum difficulty of, let's say 7, you can plan 2 hours of math (3+3) and then you must plan 2 of physical education (0+0) and one o art (1), then you can plan a day with 2 hours of literature (2+2), one of history (2) and one of art (1) and so on and you don't risk to plan 2 hours of math (3+3) than 2 of literature (2+2) and one of history (2) and a day with 2 hours of PE (0+0), 2 of art (1+1) and one of history (2).
+
+Probably to make this improvement is a matter of a lot of coding and the improvement is not worth the effort to do it, but I don't know.
+
+Liviu:
+
+I understand. Do you know that you can add more activity tags for an activity? Also, you could add more constraints students activity tag max hours daily for the same students. Maybe these can help.
+
+To consider a sum of weights might be too difficult to implement.
+
+243---------------------------------------------------------
+From Lizio (on forum):
+
+come posso fare a dire a FET che deve mettere due attività concomitanti, ma non fissate, bensì scelte da un insieme?
+
+Facciamo un esempio:
+La palestra deve essere occupata per forza da due classi contemporaneamente e per farlo l'ho dichiarata come due aule distinte, ora vorrei che una prima fosse in palestra con un'altra prima e non, magari, con una quinta.
+Le ore di ginnastica sono tutte attività separate e ho messo il vincolo di spazio sulle due palestre fittizie, FET mi alloca bene le cose, ma le classi sono mescolate, ora vorrei provare ad avere prime con prime, seconde con seconde, ecc.
+
+Qualche soluzione che non comporti il numero totale di classi al quadrato di vincoli da scrivere? (Ho 31 classi da piazzare e scrivere 900 e passa vincoli è proibitivo)
+
+---
+
+I have 4 1st grade classes, 4 2nd grade, 6 3rd grade, 4 4th grade and 2 5th,  I have 1 gymn and it must be used by 2 classes at the same time, so I created "palestra1" and "palestra2" and I have put the space constrain on each activity of physical education to be tought either in palestra1 or in palestra2.
+
+Now I want in the gymn 2 classes of the same grade and not 2 of different grades.
+
+The problem is that in my school we have 31 classes...
+
+I don't want to put toghether 2 classes of my choice as this would be a real hard constrain to be managed.
+
+244---------------------------------------------------------
+From Arsenio Stabile:
+
+He has a custom version, so that if he has minimum gaps between building changes = 1,
+if a teacher name ends in " AB", if he changes buildings from hour 3 to 4 from
+a building ending in " A" to a building ending in " B", the gap is no longer necessary.
+
+Liviu Lalescu:
+
+I am sorry, but this kind of constraint is too specialized. I cannot
+think of a name and good implementation for everybody to use it. I
+think I'll add your suggestion in the TODO list.
+
+About you choosing the hours - this can made on your custom version,
+but again I am not sure about a good way to present it to the user.
+
+Arsenio:
+
+In Italy it often happens that a school is divided into two buildings
+one hour away for which is required a gap for the exchange and this
+creates a major constraint. Some time ago I saw a commercial program
+that provides the opportunity to do so now the gap is not attributed
+to a teacher if the change takes place in the building at a certain time.

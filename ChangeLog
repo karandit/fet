@@ -1827,3 +1827,6 @@ Versions 5.28.0 - 5.28.v
 	contained in this year (suggested and implemented by Volker Dirr).
 	- Added colors when viewing the timetable from the interface, if the option to use colors in the interface
 	is selected (suggested and implemented by Marco Vassura).
+- Version 5.28.2
+	- Updated to Qt 5.5.1.
+	- Source cleanup.

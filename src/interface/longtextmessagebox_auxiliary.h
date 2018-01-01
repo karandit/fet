@@ -22,8 +22,6 @@ File longtextmessagebox_auxiliary.h
 #ifndef LONGTEXTMESSAGEBOX_AUXILIARY_H
 #define LONGTEXTMESSAGEBOX_AUXILIARY_H
 
-#ifndef FET_COMMAND_LINE
-
 #include <QObject>
 
 #include <QDialog>
@@ -45,6 +43,5 @@ public slots:
 	void setNo();
 	void setCancel();
 };
-#endif
 
 #endif

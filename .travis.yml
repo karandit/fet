@@ -24,7 +24,7 @@ after_success:
 deploy:
   provider: releases
   api_key:
-    secure: Dm4/NEMzF1RvQUiOZ06PUwHIz8AbmaUJm6iN6txxDUdRjNyEK8Wi3om7847eQBgBfmnqAH+0vOf4I05u17wbCBR3qroW1z2XVciNQeQaQbXuLZ7zVAEIORms1/LvaNKcX8qMoNLZCsb0nh6a11P1g8NLAfWZnjMay4Xd+oSSOfc=
+    secure: $FET_ACCESS_TOKEN
   file: fet-cl-$TRAVIS_OS_NAME-$TRAVIS_TAG.tar.gz
   skip_cleanup: true
   on:

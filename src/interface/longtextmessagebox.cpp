@@ -20,11 +20,12 @@ File longtextmessagebox.cpp
  ***************************************************************************/
 
 #include "longtextmessagebox.h"
-#include "longtextmessagebox_auxiliary.h"
 
 #include "timetable_defs.h"
 
 #ifndef FET_COMMAND_LINE
+
+#include "longtextmessagebox_auxiliary.h"
 
 #include <QMessageBox>
 
