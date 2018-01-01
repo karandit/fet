@@ -1121,6 +1121,7 @@ bool Rules::modifyTeacher(const QString& initialTeacherName, const QString& fina
 	if(tnatHash.contains(initialTeacherName)){
 		QSet<ConstraintTeacherNotAvailableTimes*> cs=tnatHash.value(initialTeacherName);
 		tnatHash.remove(initialTeacherName);
+		assert(!tnatHash.contains(finalTeacherName));
 		tnatHash.insert(finalTeacherName, cs);
 	}
 
@@ -2015,6 +2016,7 @@ bool Rules::modifyStudentsSet(const QString& initialStudentsSetName, const QStri
 		if(ssnatHash.contains(initialStudentsSetName)){
 			QSet<ConstraintStudentsSetNotAvailableTimes*> cs=ssnatHash.value(initialStudentsSetName);
 			ssnatHash.remove(initialStudentsSetName);
+			assert(!ssnatHash.contains(finalStudentsSetName));
 			ssnatHash.insert(finalStudentsSetName, cs);
 		}
 	}
@@ -2162,6 +2164,7 @@ bool Rules::modifyStudentsSets(const QHash<QString, QString>& oldAndNewStudentsS
 		if(ssnatHash.contains(i.key())){
 			QSet<ConstraintStudentsSetNotAvailableTimes*> cs=ssnatHash.value(i.key());
 			ssnatHash.remove(i.key());
+			assert(!ssnatHash.contains(i.value()));
 			ssnatHash.insert(i.value(), cs);
 		}
 	}

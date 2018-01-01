@@ -1866,3 +1866,6 @@ Versions 5.29.0 - 5.29.v
 	(reported by Wizard).
 	- Brazilian Portuguese translation update, by Alexandre R. Soares. It is now complete.
 	- Code cleanup (improvements found by Volker Dirr using Cppcheck 1.73).
+- Version 5.29.3
+	- Code cleanup.
+	- Corrected two minor typos in the source code (reported by Alexandre R. Soares).
