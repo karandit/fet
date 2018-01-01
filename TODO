@@ -4517,3 +4517,40 @@ I don't want to insert these tags manualy in activity dialog because it is some 
 From Nguyễn Hữu Duyệt (on forum):
 
 Activate/deactivate more activities at once.
+
+247---------------------------------------------------------
+From Volker Dirr:
+
+rethink about all used QList stuff in generate.cpp (in FET version 5.28.3)
+
+examples:
+
+Line 293: QList<int>& conflActivities
+conflActivities is used only to check "contains". So isn't a QSet better/faster?
+
+Line 1990:
+QList<int> occupiedRoomsList;
+
+it is only used for a foreach. So maybe a QStack or QQueue is better/faster?
+
+So maybe all should be rechecked.
+
+Liviu: You are right. The first part is more important, but I also need the
+same order of the conflicting activities, as they are added. So I could
+add a QSet and a QList together. But this will require more memory
+allocation and operation. I am not sure.
+
+248---------------------------------------------------------
+From alex (on forum):
+
+Is there ANY way to achieve a constraint like: "Min hours daily with an activity tag for a students set"? The polar
+opposite (max hours) is available in FET, but what about MIN HOURS? I was thinking of the equivalent of inserting
+for each day the constraint "a set of activities occupies max time slots from selection", but this might severely
+slow down the whole process...
+
+Liviu:
+
+On each day, or only on non-empty days?
+
+If on each day: Please try with activities occupy max time slots from selection; it will not slow down the process.
+This constraint is highly optimized.

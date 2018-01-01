@@ -1282,7 +1282,13 @@ void FetMainForm::openFile(const QString& fileName)
 
 		int tmp2=s.lastIndexOf(FILE_SEP);
 		QString s2=s.right(s.length()-tmp2-1);
-			
+		
+		if(s2.startsWith(' ')){
+			QMessageBox::warning(this, tr("FET information"),
+			 tr("Please do not use a filename starting with space(s), the html css code does not work."
+			  " File was not loaded. Please rename it, removing the space(s) from the beginning and open it after that with FET."));
+			return;
+		}
 		if(s2.indexOf("\"") >= 0){
 			QMessageBox::warning(this, tr("FET information"),
 			 tr("Please do not use quotation marks \" in filename, the html css code does not work."
@@ -1368,16 +1374,25 @@ bool FetMainForm::fileSaveAs()
 	int tmp2=s.lastIndexOf(FILE_SEP);
 	QString s2=s.right(s.length()-tmp2-1);
 			
+	if(s2.startsWith(' ')){
+		QMessageBox::warning(this, tr("FET information"),
+		 tr("Please do not use a filename starting with space(s), the html css code does not work.")
+		 +"\n\n"+tr("File was not saved."));
+		return false;
+	}
 	if(s2.indexOf("\"") >= 0){
-		QMessageBox::warning(this, tr("FET information"), tr("Please do not use quotation marks \" in filename, the html css code does not work"));
+		QMessageBox::warning(this, tr("FET information"), tr("Please do not use quotation marks \" in filename, the html css code does not work")
+		 +"\n\n"+tr("File was not saved."));
 		return false;
 	}
 	if(s2.indexOf(";") >= 0){
-		QMessageBox::warning(this, tr("FET information"), tr("Please do not use semicolon ; in filename, the html css code does not work"));
+		QMessageBox::warning(this, tr("FET information"), tr("Please do not use semicolon ; in filename, the html css code does not work")
+		 +"\n\n"+tr("File was not saved."));
 		return false;
 	}
 	if(s2.indexOf("#") >= 0){
-		QMessageBox::warning(this, tr("FET information"), tr("Please do not use # in filename, the html css code does not work"));
+		QMessageBox::warning(this, tr("FET information"), tr("Please do not use # in filename, the html css code does not work")
+		 +"\n\n"+tr("File was not saved."));
 		return false;
 	}
 	
@@ -1554,16 +1569,25 @@ void FetMainForm::on_timetableSaveTimetableAsAction_triggered()
 			int tmp2=s.lastIndexOf(FILE_SEP);
 			QString s2=s.right(s.length()-tmp2-1);
 				
+			if(s2.startsWith(' ')){
+				QMessageBox::warning(this, tr("FET information"),
+				 tr("Please do not use a filename starting with space(s), the html css code does not work.")
+				 +"\n\n"+tr("File was not saved."));
+				return;
+			}
 			if(s2.indexOf("\"") >= 0){
-				QMessageBox::warning(parent, tr("FET information"), tr("Please do not use quotation marks \" in filename, the html css code does not work"));
+				QMessageBox::warning(parent, tr("FET information"), tr("Please do not use quotation marks \" in filename, the html css code does not work")
+				 +"\n\n"+tr("File was not saved."));
 				return;
 			}
 			if(s2.indexOf(";") >= 0){
-				QMessageBox::warning(parent, tr("FET information"), tr("Please do not use semicolon ; in filename, the html css code does not work"));
+				QMessageBox::warning(parent, tr("FET information"), tr("Please do not use semicolon ; in filename, the html css code does not work")
+				 +"\n\n"+tr("File was not saved."));
 				return;
 			}
 			if(s2.indexOf("#") >= 0){
-				QMessageBox::warning(parent, tr("FET information"), tr("Please do not use # in filename, the html css code does not work"));
+				QMessageBox::warning(parent, tr("FET information"), tr("Please do not use # in filename, the html css code does not work")
+				 +"\n\n"+tr("File was not saved."));
 				return;
 			}
 			
