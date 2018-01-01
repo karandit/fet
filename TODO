@@ -4215,10 +4215,18 @@ I think you should clarify it in the interface: In FET you call it only
 "interval start hour" and "interval end hour", but you might say better
 "start at beginning of hour" and "end at end of hour" (or "until end of hour").
 
-230---------------------------------------------------------
+230---------------------------DONE--------------------------
 From Maouhoub:
 
-Add an option to play a sound when a timetable was found.
+DONE since FET-5.28.3 on 16 November 2015 --> Add an option to play a sound when a timetable was found.
+
+Also, from uni_instructor, on the forum:
+
+I remember earlier versions of FET made an acoustic sound after successful  or aborted  timetable generation.
+The current version  5.28.2 does not report any signal.
+Sometimes timetable generation may take a longer time and it happens quite often, that I forget my last running computation if I don't check FET's current status (e.g. still running, timetable generation completed).
+
+So I'm asking if it is possible to re-enable the old acoustic signaling? <-- DONE
 
 231---------------------------------------------------------
 From Davide Cottignoli (on forum):
@@ -4490,3 +4498,22 @@ one hour away for which is required a gap for the exchange and this
 creates a major constraint. Some time ago I saw a commercial program
 that provides the opportunity to do so now the gap is not attributed
 to a teacher if the change takes place in the building at a certain time.
+
+245---------------------------------------------------------
+From ant7 (on forum):
+
+After timetable generation
+in timetable tab (teachers, students etc.)
+I can see which activities are time or space locked ( I see LT or/and LS acronims)
+and I can toggle these constraints for one or more activities whith mouse highlighting.
+It would be very usefull If I can see the same signature in HTML files.
+When I updates timetable many times on website
+I would like to tell people that some their activities are already fixed time or place.
+It should be some general option in FET allowing user to decide wether show this tags or not in HTML files.
+When timetable is finished it should be easy switched off visibility of the two tags in all timetable in HTML files.
+I don't want to insert these tags manualy in activity dialog because it is some cumbersome.
+
+246---------------------------------------------------------
+From Nguyễn Hữu Duyệt (on forum):
+
+Activate/deactivate more activities at once.

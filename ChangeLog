@@ -1830,3 +1830,10 @@ Versions 5.28.0 - 5.28.v
 - Version 5.28.2
 	- Updated to Qt 5.5.1.
 	- Source cleanup.
+- Version 5.28.3
+	- After a successful single generation (or after an impossible one), an attention sound will be emitted. Also, after all the timetables finished
+	in a multiple generation, the same attention sound will be emitted (suggested by Maouhoub and uni_instructor).
+	- Updated the Vietnamese translation, by Nguyễn Hữu Duyệt.
+	- Updated the Arabic translation, by Silver.
+	- Added a new Vietnamese example file, by Nguyễn Hữu Duyệt.
+	- Added a new Namibian example file, by Bobby.

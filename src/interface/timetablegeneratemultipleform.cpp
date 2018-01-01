@@ -35,6 +35,8 @@
 
 #include <QDir>
 
+#include <QApplication>
+
 extern QMutex myMutex;
 
 static GenerateMultipleThread generateMultipleThread;
@@ -442,6 +444,10 @@ void TimetableGenerateMultipleForm::simulationFinished()
 	ms+=TimetableGenerateMultipleForm::tr("Total searching time was %1h %2m %3s").arg(h).arg(m).arg(s);
 	
 	TimetableExport::writeReportForMultiple(this, QString("\n")+ms, false);
+
+#ifndef Q_WS_QWS
+	QApplication::beep();
+#endif
 	
 	QMessageBox::information(this, TimetableGenerateMultipleForm::tr("FET information"), ms);
 	

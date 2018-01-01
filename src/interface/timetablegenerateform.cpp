@@ -36,6 +36,8 @@
 
 #include <QDir>
 
+#include <QApplication>
+
 #include "longtextmessagebox.h"
 
 QMutex myMutex;
@@ -475,7 +477,6 @@ void TimetableGenerateForm::impossibleToSolve()
 	myMutex.lock();
 
 
-
 	Solution& c=gen.c;
 
 	//needed to find the conflicts strings
@@ -568,6 +569,11 @@ void TimetableGenerateForm::impossibleToSolve()
 	restoreFETDialogGeometry(&dialog, settingsName);
 
 	setParentAndOtherThings(&dialog, this);
+
+#ifndef Q_WS_QWS
+	QApplication::beep();
+#endif
+
 	dialog.exec();
 	saveFETDialogGeometry(&dialog, settingsName);
 
@@ -647,6 +653,11 @@ void TimetableGenerateForm::simulationFinished()
 	s+=tr("Weighted soft conflicts: %1").arg(CustomFETString::number(c.conflictsTotal));
 	s+=QString("\n\n");
 	s+=tr("Results were saved in the directory %1").arg(QDir::toNativeSeparators(OUTPUT_DIR+FILE_SEP+"timetables"+kk));
+
+#ifndef Q_WS_QWS
+	QApplication::beep();
+#endif
+
 	QMessageBox::information(this, TimetableGenerateForm::tr("FET information"), s);
 
 	startPushButton->setEnabled(true);
