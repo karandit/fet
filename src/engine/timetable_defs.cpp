@@ -34,7 +34,7 @@ QString internetVersion;
 /**
 FET version
 */
-const QString FET_VERSION="5.28.6";
+const QString FET_VERSION="5.29.0";
 
 /**
 FET language
@@ -72,13 +72,13 @@ bool TIMETABLE_HTML_REPEAT_NAMES;
 
 bool VERBOSE;
 
-//this hashs are needed to get the IDs for html and css in timetableexport and statistics
-QHash<QString, QString> hashSubjectIDs;
+//these hashes are needed to get the IDs for html and css in timetableexport and statistics
+/*QHash<QString, QString> hashSubjectIDs;
 QHash<QString, QString> hashActivityTagIDs;
 QHash<QString, QString> hashStudentIDs;
 QHash<QString, QString> hashTeacherIDs;
 QHash<QString, QString> hashRoomIDs;
-QHash<QString, QString> hashDayIDs;
+QHash<QString, QString> hashDayIDs;*/
 
 /**
 A log file explaining how the xml input file was parsed

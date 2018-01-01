@@ -93,7 +93,7 @@ StatisticsExport::~StatisticsExport()
 void StatisticsExport::exportStatistics(QWidget* parent){
 	assert(gt.rules.initialized);
 	assert(TIMETABLE_HTML_LEVEL>=0);
-	assert(TIMETABLE_HTML_LEVEL<=6);
+	assert(TIMETABLE_HTML_LEVEL<=7);
 
 	FetStatistics statisticValues;
 	computeHashForIDsStatistics(&statisticValues);

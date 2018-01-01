@@ -1,4 +1,4 @@
-This is FET version 5.28.6
+This is FET version 5.29.0
 
 
 Program description:
@@ -15,7 +15,7 @@ Program description:
 Requirements:
 
 	FET is created in the following environment: openSUSE Leap 42.1 GNU/Linux distribution, Linux 4.1.15, Xfce 4.12,
-	Midnight Commander 4.8.15, KDiff3 0.9.98, Qt 5.5.1, gcc 5.3.1, g++ 5.3.1, make 4.0, sed 4.2.2,
+	Midnight Commander 4.8.15, KDiff3 0.9.98, Qt 5.6.0, gcc 5.3.1, g++ 5.3.1, make 4.0, sed 4.2.2,
 	Valgrind 3.10.1, Coverity Scan 7.7.0.4, Cppcheck 1.72, other great free tools.
 	FET can be run on any platform supported by the free software Qt (GNU/Linux, Windows, Mac OS X).
 
@@ -24,7 +24,7 @@ Requirements:
 		make 4.0 or similar (GNU Make)
 		gcc 5.3.1 or similar
 		g++ 5.3.1 or similar (or gcc-g++, or gcc-c++, the name may vary. This program may be included in the gcc package)
-		Qt 5.5.1 or compatible (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
+		Qt 5.6.0 or compatible (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
 
 	Windows:
 	For running, you need only the archive of FET compiled for Windows (which contains the MinGW and Qt dlls).
@@ -53,13 +53,14 @@ Getting - compiling - installing Qt:
 
 	Qt homepage: http://www.qt.io/
 
-	You will need Qt 5.5.1 or compatible to compile FET (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
+	You will need Qt 5.6.0 or compatible to compile FET (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
 	You can get the corresponding version of Qt with your package manager or from the Qt homepage.
 	Qt can be used with the LGPL or commercial license.
 
 	GNU/Linux: It is possible to use YaST (or Adept Manager) or other package managers to get your version of Qt, pre-compiled.
 	Or you can download, (possibly) compile and install Qt from its homepage.
 	A possible name for the precompiled package is libqt5.
+	A user reported that on Ubuntu "sudo apt-get install qt5-default" without quotes should work.
 
 	Windows - Download latest Qt from its homepage. Usually, you can get a precompiled Qt version for your C++ compiler, but sometimes
 	you may need to compile Qt from its sources.
@@ -70,7 +71,7 @@ Getting - compiling - installing Qt:
 	Note about the Qt "QMAKESPEC" variable: advanced topic, read this if you get Qt errors about the environment not being set, or environment
 	variable QMAKESPEC not being set, or if the Qt environment is not set correctly: Qt needs to know the environment you are using. It is usually
 	something like: linux-g++, macx-g++ or win32-g++ (platform-compiler). You can find all the supported platforms in the directory "mkspecs" of Qt
-	(some usual locations are /usr/share/qt5/mkspecs or /usr/lib/qt5/mkspecs on GNU/Linux or C:\Qt\5.5.1\mkspecs on Windows).
+	(some usual locations are /usr/share/qt5/mkspecs or /usr/lib/qt5/mkspecs on GNU/Linux or C:\Qt\5.6.0\mkspecs on Windows).
 	It seems that Qt automatically finds the platform (there is a default configuration in the "default" subdirectory of the "mkspecs" directory,
 	which is created automatically when you install Qt). If the default configuration is not working or is wrong, you may need to set the
 	correct QMAKESPEC variable for your platform. Under Windows, you can create an environment variable QMAKESPEC equal to win32-g++
@@ -123,7 +124,7 @@ Compiling FET:
 	to keep a core free for other tasks, write "make -j 3"). This is proven to work under GNU/Linux and Mac OS X. Under Windows it depends on the C++ compiler (you
 	may try it to see if it works).
 
-	Currently FET can be compiled with a C++ compiler, using Qt version 5.5.1 or compatible.
+	Currently FET can be compiled with a C++ compiler, using Qt version 5.6.0 or compatible.
 
 	Note NUseSystemLocale: If you want FET to autodetect the system locale language, type <<qmake fet.pro "DEFINES+=USE_SYSTEM_LOCALE">>
 	or simply <<qmake "DEFINES+=USE_SYSTEM_LOCALE">>. This will work if you recompile from the beginning all the FET package (remove
@@ -147,7 +148,7 @@ Compiling FET:
 
 
 	GNU/Linux:
-	- You will need Qt 5.5.1 or compatible to compile this program.
+	- You will need Qt 5.6.0 or compatible to compile this program.
 	- type "qmake fet.pro" or simply "qmake". You have to use qmake from Qt 5 series, which on some systems
 	might be named qmake-qt5 (this command is executed very fast, so don't worry if you get immediate return from it)
 	See also notes NUseSystemLocale and Note4 above.
@@ -159,7 +160,7 @@ Compiling FET:
 	2 Variants:
 
 	1. First variant, if you use gcc compiler:
-	- You will need Qt 5.5.1 or compatible to compile this program.
+	- You will need Qt 5.6.0 or compatible to compile this program.
 	- type "qmake fet.pro" or simply "qmake". You have to use qmake from Qt 5 series.
 	(this command is executed very fast, so don't worry if you get immediate return from it)
 	- IMPORTANT: you might need to write: "qmake -spec macx-g++ fet.pro", if "qmake fet.pro"
@@ -176,7 +177,7 @@ Compiling FET:
 	http://lists.trolltech.com/qt-interest/2007-04/thread01126-0.html
 
 
-	Windows: MinGW C++ compiler: you need Qt 5.5.1 or compatible, and MinGW.
+	Windows: MinGW C++ compiler: you need Qt 5.6.0 or compatible, and MinGW.
 	You might use other compilers if you want, please see the Qt homepage.
 	for other variants. Any C++ compiler that supports Qt should be good.
 	You need to run "qmake fet.pro" or "qmake" (this command is executed very fast, so don't worry if you get
@@ -233,7 +234,7 @@ Running FET:
 			d is the path to results directory, without trailing slash or backslash (default is current working path).
 				Make sure you have write permissions there.
 			y is integer (seconds) (default 2000000000, which is practically infinite).
-			z is integer from 0 to 6 and represents the detail level for the generated HTML timetables
+			z is integer from 0 to 7 and represents the detail level for the generated HTML timetables
 				(default 2, larger values have more details/facilities and larger file sizes).
 			t is one of en_US, ar, ca, cs, da, de, el, es, eu, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk,
 				uz, vi, zh_CN, zh_TW (default en_US).

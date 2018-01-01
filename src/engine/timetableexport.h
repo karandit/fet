@@ -26,10 +26,17 @@ File timetableexport.h
 #include "timetable.h"
 
 #include <QString>
+#include <QHash>
+#include <QList>
 
 class QWidget;
 
 bool writeAtLeastATimetable();
+
+extern QHash<int, int> hashActivityColorBySubject;
+extern QList<int> activeHashActivityColorBySubjectAndStudents;
+extern QHash<int, int> hashActivityColorBySubject;
+extern QList<int> activeHashActivityColorBySubjectAndStudents;
 
 class TimetableExport: public QObject{
 	Q_OBJECT
@@ -37,6 +44,8 @@ class TimetableExport: public QObject{
 public:
 	TimetableExport();
 	~TimetableExport();
+	
+	static void stringToColor(QString s, int *r, int *g, int *b);
 
 	static void getStudentsTimetable(Solution& c);
 	static void getTeachersTimetable(Solution& c);
@@ -104,6 +113,9 @@ public:
 	static QString singleTeachersFreePeriodsTimetableDaysVerticalHtml(int htmlLevel, const QString& saveTime, bool detailed, bool repeatNames);
 	static QString singleTeachersStatisticsHtml(int htmlLevel, const QString& saveTime, bool detailed, bool repeatNames, bool printAll);
 	static QString singleStudentsStatisticsHtml(int htmlLevel, const QString& saveTime, bool detailed, bool repeatNames, bool printAll);
+	
+	static void computeHashActivityColorBySubject();
+	static void computeHashActivityColorBySubjectAndStudents();
 
 private:
 	//this function must be called before export html files, because it compute the IDs
@@ -185,7 +197,7 @@ private:
 	//the following functions return QStrings, because they are 'only' subfunctions to the writeActivity-iesXxx functions
 	static QString writeHead(bool java, int placedActivities, bool printInstitution);
 	static QString writeTOCDays(bool detailed);
-	static QString writeStartTagTDofActivities(int htmlLevel, const Activity* act, bool detailed, bool colspan, bool rowspan);
+	static QString writeStartTagTDofActivities(int htmlLevel, const Activity* act, bool detailed, bool colspan, bool rowspan, int colorBy);
 	static QString writeSubjectAndActivityTags(int htmlLevel, const Activity* act, const QString& startTag, const QString& startTagAttribute, bool activityTagsOnly, bool printActivityTags);
 	static QString writeStudents(int htmlLevel, const Activity* act, const QString& startTag, const QString& startTagAttribute);
 	static QString writeTeachers(int htmlLevel, const Activity* act, const QString& startTag, const QString& startTagAttribute);

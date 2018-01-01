@@ -449,7 +449,12 @@ void TimetableGenerateMultipleForm::simulationFinished()
 	QApplication::beep();
 #endif
 	
-	QMessageBox::information(this, TimetableGenerateMultipleForm::tr("FET information"), ms);
+	//Trick so that the message box will be silent (the only sound is thus the beep above).
+	QMessageBox msgBox(this);
+	msgBox.setWindowTitle(TimetableGenerateMultipleForm::tr("FET information"));
+	msgBox.setText(ms);
+	msgBox.exec();
+	//QMessageBox::information(this, TimetableGenerateMultipleForm::tr("FET information"), ms);
 	
 	startPushButton->setEnabled(true);
 	stopPushButton->setDisabled(true);

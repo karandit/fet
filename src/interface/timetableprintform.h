@@ -99,6 +99,7 @@ private:
 	QCheckBox* printActivityTags;	//TODO: to this with combo box: "always", "never", "if available".
 									//maybe TODO: do it similar with students, teachers, rooms, ...
 	QCheckBox* repeatNames;
+	QCheckBox* automaticColors;
 	
 	QPushButton* pbPrintPreviewSmall;
 	QPushButton* pbPrintPreviewFull;
@@ -111,7 +112,7 @@ private slots:
 	void unselectAll();
 
 	void updateNamesList();
-	QString updateHTMLprintString(bool printAll);
+	QString updateHtmlPrintString(bool printAll);
 	
 	//void updateCBDivideTimeAxisByDay();
 

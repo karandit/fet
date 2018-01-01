@@ -168,7 +168,7 @@ public:
 	int subjectIndex;
 
 	/**
-	The index of the activity tag.
+	The indices of the activity tags.
 	*/
 	QSet<int> iActivityTagsSet;
 	//int activityTagIndex;

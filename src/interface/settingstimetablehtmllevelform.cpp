@@ -49,6 +49,8 @@ SettingsTimetableHtmlLevelForm::SettingsTimetableHtmlLevelForm(QWidget* parent):
 		level5RadioButton->setChecked(true);
 	else if(TIMETABLE_HTML_LEVEL==6)
 		level6RadioButton->setChecked(true);
+	else if(TIMETABLE_HTML_LEVEL==7)
+		level7RadioButton->setChecked(true);
 }
 
 SettingsTimetableHtmlLevelForm::~SettingsTimetableHtmlLevelForm()
@@ -73,6 +75,8 @@ void SettingsTimetableHtmlLevelForm::ok()
 		level=5;
 	else if(level6RadioButton->isChecked())
 		level=6;
+	else if(level7RadioButton->isChecked())
+		level=7;
 	else{
 		QMessageBox::warning(this, tr("FET warning"), tr("No level selected"));
 		return;
@@ -85,7 +89,7 @@ void SettingsTimetableHtmlLevelForm::ok()
 		 " and 20 MB for all files of a timetable or even more."
 		 " Are you sure you have enough disk space?"),
 		 QMessageBox::Yes, QMessageBox::Cancel);
-								 		 
+		
 		if(t==QMessageBox::Cancel)
 			return;
 	}

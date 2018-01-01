@@ -4559,7 +4559,8 @@ This constraint is highly optimized.
 249---------------------------------------------------------
 From Handaya:
 
-1) what if the html result be colorfull also as in the program ?
+DONE since FET-5.29.0 on 15 March 2016 --> 1) what if the html result be colorfull also as in the program ?
+(This point was also suggested by hudrea and by Udo Schütz). <-- DONE
 2) what if the colors be the same for the same teacher ?
 3) what if the program allows marking a weekly meeting for all teachers
 without printing every name in the cell of timetable result ?
@@ -4568,9 +4569,9 @@ formats like doc and pdf ?
 
 Liviu:
 
-(1) - The HTML results can be colored by using the CSS file. It is too
+DONE since FET-5.29.0 on 15 March 2016 --> (1) - The HTML results can be colored by using the CSS file. It is too
 difficult for us, the programmers, to color them as in the FET
-interface.
+interface. <-- DONE
 
 (2) - In the interface, the colors are the same for the same
 subject/subject+students set. This is what we came to after some
@@ -4582,3 +4583,29 @@ not to.
 
 (4) - .doc and .pdf - you could print the timetable to a pdf file, or
 copy/paste the HTML code to a doc file.
+
+250---------------------------------------------------------
+From alex (on forum):
+
+After generating a timetable and pressing the "Teachers" tab, the generated timetable appears in a teachers-days-horizontal-like
+form. Of course we can lock and unlock activities on this type of timetable. I wonder if it's easy (for you) to add an alternative form.
+I think that the teachers-time-horizontal-like form is easier to use for locking/unlocking activities, since it presents the whole
+timetable at once. What do you think?
+
+Liviu: The table might be too large.
+
+alex: I think that it would be easier if this teachers-time-horizontal-like timetable had just the necessary information and nothing more.
+I.e. just the teachers' names and the student groups (and the locked/unlocked indication). This would result in a far more "compact" timetable
+than including information such as subject titles and tags.
+
+251---------------------------------------------------------
+From Bobby Wise:
+
+I suggest that perhaps an additional printout be added that displays
+all the teachers that are not occupied in a particular period.
+
+So it is basically a Free Teacher timetable printout, but it does not have
+any comments like "Must come earlier" or "Single gap", it just displays the
+names of all the teachers who are not working in that period.
+
+I would like this to be part of the mainstream FET if possible.

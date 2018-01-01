@@ -196,7 +196,7 @@ void usage(QTextStream* out, const QString& error)
 		"d is the path to results directory, without trailing slash or backslash (default is current working path). "
 		"Make sure you have write permissions there.\n"
 		"y is integer (seconds) (default 2000000000, which is practically infinite).\n"
-		"z is integer from 0 to 6 and represents the detail level for the generated HTML timetables "
+		"z is integer from 0 to 7 and represents the detail level for the generated HTML timetables "
 		"(default 2, larger values have more details/facilities and larger file sizes).\n"
 		"t is one of en_US, ar, ca, cs, da, de, el, es, eu, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk, "
 		"uz, vi, zh_CN, zh_TW (default en_US).\n"
@@ -1113,8 +1113,8 @@ int main(int argc, char **argv)
 			logFile.close();
 			return 1;
 		}
-		if(TIMETABLE_HTML_LEVEL>6 || TIMETABLE_HTML_LEVEL<0){
-			usage(&out, QString("Html level must be 0, 1, 2, 3, 4, 5 or 6"));
+		if(TIMETABLE_HTML_LEVEL>7 || TIMETABLE_HTML_LEVEL<0){
+			usage(&out, QString("Html level must be 0, 1, 2, 3, 4, 5, 6, or 7"));
 			logFile.close();
 			return 1;
 		}
@@ -1153,7 +1153,7 @@ int main(int argc, char **argv)
 			}
 		}
 		
-		if(TIMETABLE_HTML_LEVEL>6 || TIMETABLE_HTML_LEVEL<0)
+		if(TIMETABLE_HTML_LEVEL>7 || TIMETABLE_HTML_LEVEL<0)
 			TIMETABLE_HTML_LEVEL=2;
 	
 		bool t=gt.rules.read(NULL, filename, true, initialDir);

@@ -124,6 +124,14 @@ static QHash<QString, QString> hashTeacherIDsTimetable;
 static QHash<QString, QString> hashRoomIDsTimetable;
 static QHash<QString, QString> hashDayIDsTimetable;
 
+//static QHash<QString, QString> hashColorStringIDsTimetable;
+QHash<int, int> hashActivityColorBySubject;
+QList<int> activeHashActivityColorBySubject;
+QHash<int, int> hashActivityColorBySubjectAndStudents;
+QList<int> activeHashActivityColorBySubjectAndStudents;
+const int COLOR_BY_SUBJECT=1;
+const int COLOR_BY_SUBJECT_STUDENTS=2;
+
 //this hash is needed to care about sctivities with same starting time
 static QHash<int, QList<int> >activitiesWithSameStartingTime;
 
@@ -193,6 +201,29 @@ extern int XX;
 extern int YY;
 
 QString generationLocalizedTime=QString(""); //to be used in timetableprintform.cpp
+
+//similar to code from Marco Vassura, modified by Volker Dirr to get rid of QColor and QBrush, since they need QtGui.
+//The command-line version does not have access to QtGui.
+void TimetableExport::stringToColor(QString s, int *r, int *g, int *b)
+{
+	// CRC-24 Based on RFC 2440 Section 6.1
+	unsigned long crc = 0xB704CEL;
+	int i;
+	QChar *data = s.data();
+	while (!data->isNull()) {
+		crc ^= (data->unicode() & 0xFF) << 16;
+		for (i = 0; i < 8; i++) {
+			crc <<= 1;
+			if (crc & 0x1000000)
+				crc ^= 0x1864CFBL;
+		}
+		data++;
+	}
+	*r=(crc>>16);
+	*g=((crc>>8) & 0xFF);
+	*b=(crc & 0xFF);
+}
+//similar to code from Marco Vassura, modified by Volker Dirr
 
 bool writeAtLeastATimetable()
 {
@@ -297,7 +328,7 @@ void TimetableExport::writeSimulationResults(QWidget* parent){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 	assert(TIMETABLE_HTML_LEVEL>=0);
-	assert(TIMETABLE_HTML_LEVEL<=6);
+	assert(TIMETABLE_HTML_LEVEL<=7);
 
 	computeHashForIDsTimetable();
 	computeActivitiesAtTime();
@@ -489,6 +520,10 @@ void TimetableExport::writeSimulationResults(QWidget* parent){
 	hashTeacherIDsTimetable.clear();
 	hashRoomIDsTimetable.clear();
 	hashDayIDsTimetable.clear();
+	hashActivityColorBySubject.clear();
+	hashActivityColorBySubjectAndStudents.clear();
+	activeHashActivityColorBySubject.clear();
+	activeHashActivityColorBySubjectAndStudents.clear();
 
 	if(VERBOSE){
 		cout<<"Writing simulation results to disk completed successfully"<<endl;
@@ -519,7 +554,7 @@ void TimetableExport::writeHighestStageResults(QWidget* parent){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 	assert(TIMETABLE_HTML_LEVEL>=0);
-	assert(TIMETABLE_HTML_LEVEL<=6);
+	assert(TIMETABLE_HTML_LEVEL<=7);
 
 	computeHashForIDsTimetable();
 	computeActivitiesAtTime();
@@ -711,6 +746,10 @@ void TimetableExport::writeHighestStageResults(QWidget* parent){
 	hashTeacherIDsTimetable.clear();
 	hashRoomIDsTimetable.clear();
 	hashDayIDsTimetable.clear();
+	hashActivityColorBySubject.clear();
+	hashActivityColorBySubjectAndStudents.clear();
+	activeHashActivityColorBySubject.clear();
+	activeHashActivityColorBySubjectAndStudents.clear();
 
 	if(VERBOSE){
 		cout<<"Writing highest stage results to disk completed successfully"<<endl;
@@ -1005,7 +1044,7 @@ void TimetableExport::writeSimulationResults(QWidget* parent, int n){
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 	assert(TIMETABLE_HTML_LEVEL>=0);
-	assert(TIMETABLE_HTML_LEVEL<=6);
+	assert(TIMETABLE_HTML_LEVEL<=7);
 
 	computeHashForIDsTimetable();
 	computeActivitiesAtTime();
@@ -1207,6 +1246,10 @@ void TimetableExport::writeSimulationResults(QWidget* parent, int n){
 	hashTeacherIDsTimetable.clear();
 	hashRoomIDsTimetable.clear();
 	hashDayIDsTimetable.clear();
+	hashActivityColorBySubject.clear();
+	hashActivityColorBySubjectAndStudents.clear();
+	activeHashActivityColorBySubject.clear();
+	activeHashActivityColorBySubjectAndStudents.clear();
 
 	if(VERBOSE){
 		cout<<"Writing multiple simulation results to disk completed successfully"<<endl;
@@ -1321,7 +1364,7 @@ void TimetableExport::writeSimulationResultsCommandLine(QWidget* parent, const Q
 	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
 	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 	assert(TIMETABLE_HTML_LEVEL>=0);
-	assert(TIMETABLE_HTML_LEVEL<=6);
+	assert(TIMETABLE_HTML_LEVEL<=7);
 
 	computeHashForIDsTimetable();
 	computeActivitiesAtTime();
@@ -1541,6 +1584,10 @@ void TimetableExport::writeSimulationResultsCommandLine(QWidget* parent, const Q
 	hashTeacherIDsTimetable.clear();
 	hashRoomIDsTimetable.clear();
 	hashDayIDsTimetable.clear();
+	hashActivityColorBySubject.clear();
+	hashActivityColorBySubjectAndStudents.clear();
+	activeHashActivityColorBySubject.clear();
+	activeHashActivityColorBySubjectAndStudents.clear();
 }
 
 void TimetableExport::writeRandomSeedCommandLine(QWidget* parent, const QString& outputDirectory, bool before){ //outputDirectory contains trailing FILE_SEP
@@ -2207,7 +2254,69 @@ void TimetableExport::writeStylesheetCss(QWidget* parent, const QString& cssfile
 		tos<<"th.xAxis {\n/* width: 8em; */\n}\n\n";
 		tos<<"th.yAxis {\n  height: 8ex;\n}\n\n";
 	}
-	if(TIMETABLE_HTML_LEVEL>=4){ // must be written before LEVEL 3, because LEVEL 3 should have higher priority
+	
+	//By Liviu, with ideas from Volker
+	if(TIMETABLE_HTML_LEVEL==7){ //must be written before LEVEL 3, because LEVEL 3 should have higher priority
+		int cnt=0;
+		foreach(int i, activeHashActivityColorBySubject){
+			Activity* act=&gt.rules.internalActivitiesList[i];
+			
+			QString tmpString=act->subjectName;
+			
+			//similar to the coloring by Marco Vassura (start)
+			int r,g,b;
+			stringToColor(tmpString, &r, &g, &b);
+			tos << "td.c_"<<QString::number(cnt+1)<<" { /* Activity id: "<<QString::number(act->id)<<" (subject) */\n ";
+			tos<<"background-color: rgb("<<QString::number(r)<<", "<<QString::number(g)<<", "<<QString::number(b)<<");\n";
+			double brightness = (double)r*0.299 + (double)g*0.587 + (double)b*0.114;
+			if (brightness<127.5)
+				tos<<" color: white;\n";
+			else
+				tos<<" color: black;\n";
+			tos<<"}\n\n";
+			//similar to the coloring by Marco Vassura (end)
+			cnt++;
+		}
+		foreach(int i, activeHashActivityColorBySubjectAndStudents){
+			Activity* act=&gt.rules.internalActivitiesList[i];
+			
+			QString tmpString=act->subjectName+" "+act->studentsNames.join(", ");
+			
+			//similar to the coloring by Marco Vassura (start)
+			int r,g,b;
+			stringToColor(tmpString, &r, &g, &b);
+			tos << "td.c_"<<QString::number(cnt+1)<<" { /* Activity id: "<<QString::number(act->id)<<" (subject+students) */\n ";
+			tos<<"background-color: rgb("<<QString::number(r)<<", "<<QString::number(g)<<", "<<QString::number(b)<<");\n";
+			double brightness = (double)r*0.299 + (double)g*0.587 + (double)b*0.114;
+			if (brightness<127.5)
+				tos<<" color: white;\n";
+			else
+				tos<<" color: black;\n";
+			tos<<"}\n\n";
+			//similar to the coloring by Marco Vassura (end)
+			cnt++;
+		}
+	}
+//	if(TIMETABLE_HTML_LEVEL==7){ // must be written before LEVEL 3, because LEVEL 3 should have higher priority
+//		QHashIterator<QString, QString> i(hashColorStringIDsTimetable);
+//		while(i.hasNext()) {
+//			i.next();
+//			tos << "td.c_"<<i.value()<<" { /* "<<i.key()<<" */\n ";
+//			
+//			//similar to the coloring by Marco Vassura (start)
+//			int r,g,b;
+//			stringToColor(i.key(), &r, &g, &b);
+//			tos<<"background-color: rgb("<<QString::number(r)<<", "<<QString::number(g)<<", "<<QString::number(b)<<");\n";
+//			double brightness = (double)r*0.299 + (double)g*0.587 + (double)b*0.114;
+//			if (brightness<127.5)
+//				tos<<" color: white;\n";
+//			else
+//				tos<<" color: black;\n";
+//			//similar to the coloring by Marco Vassura (end)
+//			tos<<"}\n\n";
+//		}
+//	}
+	else if(TIMETABLE_HTML_LEVEL>=4){ // must be written before LEVEL 3, because LEVEL 3 should have higher priority
 		for(int i=0; i<gt.rules.nInternalSubjects; i++){
 			tos << "span.s_"<<hashSubjectIDsTimetable.value(gt.rules.internalSubjectsList[i]->name)<<" { /* subject "<<gt.rules.internalSubjectsList[i]->name<<" */\n\n}\n\n";
 		}
@@ -2252,10 +2361,17 @@ void TimetableExport::writeStylesheetCss(QWidget* parent, const QString& cssfile
 		tos<<"tr.studentsset, div.studentsset {\n\n}\n\n";
 		tos<<"tr.teacher, div.teacher {\n\n}\n\n";
 		tos<<"tr.room, div.room {\n\n}\n\n";
-                tos<<"tr.line0, div.line0 {\n  font-size: smaller;\n}\n\n";
-		tos<<"tr.line1, div.line1 {\n\n}\n\n";
-		tos<<"tr.line2, div.line2 {\n  font-size: smaller;\n  color: gray;\n}\n\n";
-		tos<<"tr.line3, div.line3 {\n  font-size: smaller;\n  color: silver;\n}\n\n";
+		if(TIMETABLE_HTML_LEVEL!=7){
+			tos<<"tr.line0, div.line0 {\n  font-size: smaller;\n}\n\n";
+			tos<<"tr.line1, div.line1 {\n\n}\n\n";
+			tos<<"tr.line2, div.line2 {\n  font-size: smaller;\n  color: gray;\n}\n\n";
+			tos<<"tr.line3, div.line3 {\n  font-size: smaller;\n  color: silver;\n}\n\n";
+		} else {
+			tos<<"tr.line0, div.line0 {\n  font-size: smaller;\n}\n\n";
+			tos<<"tr.line1, div.line1 {\n\n}\n\n";
+			tos<<"tr.line2, div.line2 {\n  font-size: smaller;\n}\n\n";
+			tos<<"tr.line3, div.line3 {\n  font-size: smaller;\n}\n\n";
+		}
 	}
 	if(TIMETABLE_HTML_LEVEL==6){
 		tos<<endl<<"/* "<<TimetableExport::tr("Be careful. You might get mutual and ambiguous styles. CSS means that the last definition will be used.")<<" */\n\n";
@@ -4355,8 +4471,8 @@ void TimetableExport::writeStudentsStatisticsHtml(QWidget* parent, const QString
 void TimetableExport::computeHashForIDsTimetable(){
 // by Volker Dirr
 
-//TODO if an use a relational data base this is unneded, because we can use the primary key id of the database 
-//This is very similar to statistics compute hash. so always check it if you change something here!
+//TODO This is unneeded if you use a relational data base, because we can use the primary key id of the database.
+//This is very similar to statistics compute hash. So always check it if you change something here!
 
 /*	QSet<QString> usedStudents;
 	for(int i=0; i<gt.rules.nInternalActivities; i++){
@@ -4365,6 +4481,8 @@ void TimetableExport::computeHashForIDsTimetable(){
 				usedStudents<<st;
 		}
 	}*/
+	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
+	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
 	hashStudentIDsTimetable.clear();
 	int cnt=1;
 	for(int i=0; i<gt.rules.augmentedYearsList.size(); i++){
@@ -4415,7 +4533,112 @@ void TimetableExport::computeHashForIDsTimetable(){
 	for(int day=0; day<gt.rules.nDaysPerWeek; day++){
 		hashDayIDsTimetable.insert(gt.rules.daysOfTheWeek[day], CustomFETString::number(day+1));
 	}
+	if(TIMETABLE_HTML_LEVEL==7){
+		computeHashActivityColorBySubject();
+		computeHashActivityColorBySubjectAndStudents();
+	}
 }
+
+//By Liviu, with ideas from Volker
+void TimetableExport::computeHashActivityColorBySubject(){
+	QHash<QString, int> tmpHash;
+
+	hashActivityColorBySubject.clear();
+	activeHashActivityColorBySubject.clear();
+	
+	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
+	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	QSet<QString> alreadyAdded;
+	
+	for(int i=0; i<gt.rules.nInternalActivities; i++){
+		if(best_solution.times[i]!=UNALLOCATED_TIME){
+			Activity* act=&gt.rules.internalActivitiesList[i];
+			QString tmpString=act->subjectName;
+			if(!alreadyAdded.contains(tmpString)){
+				alreadyAdded.insert(tmpString);
+				hashActivityColorBySubject.insert(i, alreadyAdded.count());
+				activeHashActivityColorBySubject.append(i);
+				tmpHash.insert(tmpString, alreadyAdded.count());
+			}
+			else{
+				assert(tmpHash.contains(tmpString));
+				int k=tmpHash.value(tmpString);
+				hashActivityColorBySubject.insert(i, k);
+			}
+		}
+	}
+	
+	//cout<<"hashActivityColorBySubject.count()=="<<hashActivityColorBySubject.count()<<endl;
+}
+
+//By Liviu, with ideas from Volker
+void TimetableExport::computeHashActivityColorBySubjectAndStudents(){
+	QHash<QString, int> tmpHash;
+
+	hashActivityColorBySubjectAndStudents.clear();
+	activeHashActivityColorBySubjectAndStudents.clear();
+	
+	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
+	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+
+	QSet<QString> alreadyAdded;
+	
+	for(int i=0; i<gt.rules.nInternalActivities; i++){
+		if(best_solution.times[i]!=UNALLOCATED_TIME){
+			Activity* act=&gt.rules.internalActivitiesList[i];
+			
+			QString tmpString=act->subjectName+" "+act->studentsNames.join(", ");
+			if(!alreadyAdded.contains(tmpString)){
+				alreadyAdded.insert(tmpString);
+				hashActivityColorBySubjectAndStudents.insert(i, alreadyAdded.count());
+				activeHashActivityColorBySubjectAndStudents.append(i);
+				tmpHash.insert(tmpString, alreadyAdded.count());
+			}
+			else{
+				assert(tmpHash.contains(tmpString));
+				int k=tmpHash.value(tmpString);
+				hashActivityColorBySubjectAndStudents.insert(i, k);
+			}
+		}
+	}
+	
+	//cout<<"hashActivityColorBySubjectAndStudents.count()=="<<hashActivityColorBySubjectAndStudents.count()<<endl;
+}
+
+/*void TimetableExport::computeHashForColors(QHash<QString, QString>& hashColorStringIDsTimetable){
+// by Volker Dirr
+	qWarning("compute hash for colors");
+	hashColorStringIDsTimetable.clear();
+	assert(gt.rules.initialized && gt.rules.internalStructureComputed);
+	assert(students_schedule_ready && teachers_schedule_ready && rooms_schedule_ready);
+	QSet<QString> alreadyAddedString;
+	for(int i=0; i<gt.rules.nInternalActivities; i++) {
+		Activity* act=&gt.rules.internalActivitiesList[i];
+		if(best_solution.times[i]!=UNALLOCATED_TIME) {
+			qWarning("add a hash");
+			//coloring for students
+			QString tmpString=act->subjectName;
+			if(!alreadyAddedString.contains(tmpString)){
+				alreadyAddedString<<tmpString;
+				hashColorStringIDsTimetable.insert(tmpString, CustomFETString::number(alreadyAddedString.count()));
+			}
+			//coloring for teachers
+			tmpString=act->subjectName+" "+act->studentsNames.join(", ");
+			if(!alreadyAddedString.contains(tmpString)){
+				alreadyAddedString<<tmpString;
+				hashColorStringIDsTimetable.insert(tmpString, CustomFETString::number(alreadyAddedString.count()));
+			}
+			//coloring for rooms
+//			it is similar to students
+//			tmpString=act->subjectName+" "+act->studentsNames.join(", ");
+//			if(!alreadyAddedString.contains(tmpString)){
+//				alreadyAddedString<<tmpString;
+//				hashColorStringIDsTimetable.insert(tmpString, CustomFETString::number(alreadyAddedString.count()));
+//			}
+		}
+	}
+}*/
 
 void TimetableExport::computeActivitiesAtTime(){		// by Liviu Lalescu
 	for(int day=0; day<gt.rules.nDaysPerWeek; day++)
@@ -4535,7 +4758,7 @@ QString TimetableExport::writeHead(bool java, int placedActivities, bool printIn
 		tmp+="    <link rel=\"stylesheet\" media=\"all\" href=\""+cssfilename+"\" type=\"text/css\" />\n";
 	}
 	if(java){
-		if(TIMETABLE_HTML_LEVEL>=5){  // the following JavaScript code is pretty similar to an example of Les Richardson
+		if(TIMETABLE_HTML_LEVEL>=5 && TIMETABLE_HTML_LEVEL!=7){  // the following JavaScript code is pretty similar to an example of Les Richardson
 			tmp+="    <meta http-equiv=\"Content-Script-Type\" content=\"text/javascript\" />\n";
 			tmp+="    <script type=\"text/javascript\">\n";
 			tmp+="      function highlight(classval) {\n";
@@ -4585,7 +4808,7 @@ QString TimetableExport::writeTOCDays(bool detailed){
 }
 
 // by Volker Dirr
-QString TimetableExport::writeStartTagTDofActivities(int htmlLevel, const Activity* act, bool detailed, bool colspan, bool rowspan){
+QString TimetableExport::writeStartTagTDofActivities(int htmlLevel, const Activity* act, bool detailed, bool colspan, bool rowspan, int colorBy){
 	QString tmp;
 	assert(!(colspan && rowspan));
 	if(detailed)
@@ -4623,6 +4846,19 @@ QString TimetableExport::writeStartTagTDofActivities(int htmlLevel, const Activi
 			tmp+=" detailed";
 		tmp+="\"";
 	}
+	if(htmlLevel==7){
+		assert(gt.rules.activitiesHash.contains(act->id));
+		int index=gt.rules.activitiesHash.value(act->id);
+		switch(colorBy){
+			case COLOR_BY_SUBJECT_STUDENTS: tmp+=" class=\"c_"+QString::number(activeHashActivityColorBySubject.count()+hashActivityColorBySubjectAndStudents.value(index)); break;
+			case COLOR_BY_SUBJECT: tmp+=" class=\"c_"+QString::number(hashActivityColorBySubject.value(index)); break;
+			default: assert(0==1);
+		}
+		
+		if(detailed)
+			tmp+=" detailed";
+		tmp+="\"";
+	}
 	if(detailed && htmlLevel>=1 && htmlLevel<=5)
 		tmp+=" class=\"detailed\"";
 	tmp+=">";
@@ -4641,6 +4877,7 @@ QString TimetableExport::writeSubjectAndActivityTags(int htmlLevel, const Activi
 				case 4 : tmp+="<span class=\"subject\"><span class=\"s_"+hashSubjectIDsTimetable.value(act->subjectName)+"\">"+protect2(act->subjectName)+"</span></span>"; break;
 				case 5 : ;
 				case 6 : tmp+="<span class=\"subject\"><span class=\"s_"+hashSubjectIDsTimetable.value(act->subjectName)+"\" onmouseover=\"highlight('s_"+hashSubjectIDsTimetable.value(act->subjectName)+"')\">"+protect2(act->subjectName)+"</span></span>"; break;
+				case 7 : tmp+="<span class=\"subject\">"+protect2(act->subjectName)+"</span>"; break;
 				default: tmp+=protect2(act->subjectName); break;
 			}
 			if(act->activityTagsNames.size()>0 && printActivityTags){
@@ -4760,6 +4997,7 @@ QString TimetableExport::writeNotAvailableSlot(int htmlLevel, const QString& wei
 		case 4 : tmp="          <td class=\"notAvailable\"><span class=\"notAvailable\">"+protect2(STRING_NOT_AVAILABLE_TIME_SLOT)+weight+"</span></td>\n"; break;
 		case 5 : ;
 		case 6 : tmp="          <td class=\"notAvailable\"><span class=\"notAvailable\" onmouseover=\"highlight('notAvailable')\">"+protect2(STRING_NOT_AVAILABLE_TIME_SLOT)+weight+"</span></td>\n"; break;
+		case 7 : tmp="          <td class=\"notAvailable\"><span class=\"notAvailable\">"+protect2(STRING_NOT_AVAILABLE_TIME_SLOT)+weight+"</span></td>\n"; break;
 		default: tmp="          <td>"+protect2(STRING_NOT_AVAILABLE_TIME_SLOT)+weight+"</td>\n";
 	}
 	return tmp;
@@ -4774,6 +5012,7 @@ QString TimetableExport::writeBreakSlot(int htmlLevel, const QString& weight){
 		case 4 : tmp="          <td class=\"break\"><span class=\"break\">"+protect2(STRING_BREAK_SLOT)+weight+"</span></td>\n"; break;
 		case 5 : ;
 		case 6 : tmp="          <td class=\"break\"><span class=\"break\" onmouseover=\"highlight('break')\">"+protect2(STRING_BREAK_SLOT)+weight+"</span></td>\n"; break;
+		case 7 : tmp="          <td class=\"break\"><span class=\"break\">"+protect2(STRING_BREAK_SLOT)+weight+"</span></td>\n"; break;
 		default: tmp="          <td>"+protect2(STRING_BREAK_SLOT)+weight+"</td>\n";
 	}
 	return tmp;
@@ -4787,6 +5026,7 @@ QString TimetableExport::writeEmpty(int htmlLevel){
 		case 4 : tmp="          <td class=\"empty\"><span class=\"empty\">"+protect2(STRING_EMPTY_SLOT)+"</span></td>\n"; break;
 		case 5 : ;
 		case 6 : tmp="          <td class=\"empty\"><span class=\"empty\" onmouseover=\"highlight('empty')\">"+protect2(STRING_EMPTY_SLOT)+"</span></td>\n"; break;
+		case 7 : tmp="          <td class=\"empty\"><span class=\"empty\">"+protect2(STRING_EMPTY_SLOT)+"</span></td>\n"; break;
 		default: tmp="          <td>"+protect2(STRING_EMPTY_SLOT)+"</td>\n";
 	}
 	return tmp;
@@ -4799,7 +5039,7 @@ QString TimetableExport::writeActivityStudents(int htmlLevel, int ai, int day, i
 	if(ai!=UNALLOCATED_ACTIVITY){
 		if(best_solution.times[ai]==currentTime){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, false, colspan, rowspan);
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, false, colspan, rowspan, COLOR_BY_SUBJECT);
 			//TODO line0
 			bool skipLine0=false;
 			if(act->studentsNames.size()==1){
@@ -4844,7 +5084,7 @@ QString TimetableExport::writeActivitiesStudents(int htmlLevel, const QList<int>
 		int ai=allActivities[a];
 		if(ai!=UNALLOCATED_ACTIVITY){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeStudents(htmlLevel, act, "", "")+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT)+writeStudents(htmlLevel, act, "", "")+"</td>";
 		}
 	}
 	tmp+="</tr>";
@@ -4855,7 +5095,7 @@ QString TimetableExport::writeActivitiesStudents(int htmlLevel, const QList<int>
 		int ai=allActivities[a];
 		if(ai!=UNALLOCATED_ACTIVITY){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeSubjectAndActivityTags(htmlLevel, act, "", "", false, printActivityTags)+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT)+writeSubjectAndActivityTags(htmlLevel, act, "", "", false, printActivityTags)+"</td>";
 		}
 	}
 	tmp+="</tr>";
@@ -4866,7 +5106,7 @@ QString TimetableExport::writeActivitiesStudents(int htmlLevel, const QList<int>
 		int ai=allActivities[a];
 		if(ai!=UNALLOCATED_ACTIVITY){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeTeachers(htmlLevel, act, "", "")+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT)+writeTeachers(htmlLevel, act, "", "")+"</td>";
 		}
 	}
 	tmp+="</tr>";
@@ -4877,7 +5117,7 @@ QString TimetableExport::writeActivitiesStudents(int htmlLevel, const QList<int>
 		int ai=allActivities[a];
 		if(ai!=UNALLOCATED_ACTIVITY){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeRoom(htmlLevel, ai, "", "")+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT)+writeRoom(htmlLevel, ai, "", "")+"</td>";
 		}
 	}
 	tmp+="</tr>";
@@ -4893,7 +5133,7 @@ QString TimetableExport::writeActivityTeacher(int htmlLevel, int teacher, int da
 	if(ai!=UNALLOCATED_ACTIVITY){
 		if(best_solution.times[ai]==currentTime){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, false, colspan, rowspan);
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, false, colspan, rowspan, COLOR_BY_SUBJECT_STUDENTS);
 			//TODO line0
 			bool skipLine0=false;
 			if(act->teachersNames.size()==1){
@@ -4938,7 +5178,7 @@ QString TimetableExport::writeActivitiesTeachers(int htmlLevel, const QList<int>
 		int ai=allActivities[a];
 		if(ai!=UNALLOCATED_ACTIVITY){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeTeachers(htmlLevel, act, "", "")+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT_STUDENTS)+writeTeachers(htmlLevel, act, "", "")+"</td>";
 		}
 	}
 	tmp+="</tr>";
@@ -4949,7 +5189,7 @@ QString TimetableExport::writeActivitiesTeachers(int htmlLevel, const QList<int>
 		int ai=allActivities[a];
 		if(ai!=UNALLOCATED_ACTIVITY){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeStudents(htmlLevel, act, "", "")+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT_STUDENTS)+writeStudents(htmlLevel, act, "", "")+"</td>";
 		}
 	}
 	tmp+="</tr>";
@@ -4960,7 +5200,7 @@ QString TimetableExport::writeActivitiesTeachers(int htmlLevel, const QList<int>
 		int ai=allActivities[a];
 		if(ai!=UNALLOCATED_ACTIVITY){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeSubjectAndActivityTags(htmlLevel, act, "", "", false, printActivityTags)+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT_STUDENTS)+writeSubjectAndActivityTags(htmlLevel, act, "", "", false, printActivityTags)+"</td>";
 		}
 	}
 	tmp+="</tr>";
@@ -4972,7 +5212,7 @@ QString TimetableExport::writeActivitiesTeachers(int htmlLevel, const QList<int>
 		int ai=allActivities[a];
 		if(ai!=UNALLOCATED_ACTIVITY){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeRoom(htmlLevel, ai, "", "")+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT_STUDENTS)+writeRoom(htmlLevel, ai, "", "")+"</td>";
 		}
 	}
 	tmp+="</tr>";
@@ -4988,7 +5228,7 @@ QString TimetableExport::writeActivityRoom(int htmlLevel, int room, int day, int
 	if(ai!=UNALLOCATED_ACTIVITY){
 		if(best_solution.times[ai]==currentTime){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, false, colspan, rowspan);
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, false, colspan, rowspan, COLOR_BY_SUBJECT_STUDENTS);
 			//Each activity has only a single room. So there is no need for line0. Modify this as soon as FET supports multiple rooms per activity.
 			tmp+=writeStudents(htmlLevel, act, "div", " class=\"studentsset line1\"");
 			tmp+=writeTeachers(htmlLevel, act, "div", " class=\"teacher line2\"");
@@ -5024,7 +5264,7 @@ QString TimetableExport::writeActivitiesRooms(int htmlLevel, const QList<int>& a
 		int ai=allActivities[a];
 		if(ai!=UNALLOCATED_ACTIVITY){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeRoom(htmlLevel, ai, "", "")+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT_STUDENTS)+writeRoom(htmlLevel, ai, "", "")+"</td>";
 		}
 	}
 	tmp+="</tr>";
@@ -5035,7 +5275,7 @@ QString TimetableExport::writeActivitiesRooms(int htmlLevel, const QList<int>& a
 		int ai=allActivities[a];
 		if(ai!=UNALLOCATED_ACTIVITY){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeStudents(htmlLevel, act, "", "")+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT_STUDENTS)+writeStudents(htmlLevel, act, "", "")+"</td>";
 		}
 	}
 	tmp+="</tr>";
@@ -5046,7 +5286,7 @@ QString TimetableExport::writeActivitiesRooms(int htmlLevel, const QList<int>& a
 		int ai=allActivities[a];
 		if(ai!=UNALLOCATED_ACTIVITY){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeTeachers(htmlLevel, act, "", "")+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT_STUDENTS)+writeTeachers(htmlLevel, act, "", "")+"</td>";
 		}
 	}
 	tmp+="</tr>";
@@ -5057,7 +5297,7 @@ QString TimetableExport::writeActivitiesRooms(int htmlLevel, const QList<int>& a
 		int ai=allActivities[a];
 		if(ai!=UNALLOCATED_ACTIVITY){
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeSubjectAndActivityTags(htmlLevel, act, "", "", false, printActivityTags)+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT_STUDENTS)+writeSubjectAndActivityTags(htmlLevel, act, "", "", false, printActivityTags)+"</td>";
 		}
 	}
 	tmp+="</tr>";
@@ -5083,7 +5323,7 @@ QString TimetableExport::writeActivitiesSubjects(int htmlLevel, const QList<int>
 			else	tmp+="<tr>";
 			for(int a=0; a<allActivities.size(); a++){
 				Activity* act=&gt.rules.internalActivitiesList[allActivities[a]];
-				tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeSubjectAndActivityTags(htmlLevel, act, "", "", true, printActivityTags)+"</td>";
+				tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT_STUDENTS)+writeSubjectAndActivityTags(htmlLevel, act, "", "", true, printActivityTags)+"</td>";
 			}
 			tmp+="</tr>";
 		}
@@ -5092,7 +5332,7 @@ QString TimetableExport::writeActivitiesSubjects(int htmlLevel, const QList<int>
 		else	tmp+="<tr>";
 		for(int a=0; a<allActivities.size(); a++){
 			Activity* act=&gt.rules.internalActivitiesList[allActivities[a]];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeStudents(htmlLevel, act, "", "")+"</td>";	
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT_STUDENTS)+writeStudents(htmlLevel, act, "", "")+"</td>";	
 		}
 		tmp+="</tr>";
 		if(htmlLevel>=3)
@@ -5100,7 +5340,7 @@ QString TimetableExport::writeActivitiesSubjects(int htmlLevel, const QList<int>
 		else	tmp+="<tr>";
 		for(int a=0; a<allActivities.size(); a++){
 			Activity* act=&gt.rules.internalActivitiesList[allActivities[a]];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeTeachers(htmlLevel, act, "", "")+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT_STUDENTS)+writeTeachers(htmlLevel, act, "", "")+"</td>";
 		}
 		tmp+="</tr>";
 		if(htmlLevel>=3)
@@ -5109,7 +5349,7 @@ QString TimetableExport::writeActivitiesSubjects(int htmlLevel, const QList<int>
 		for(int a=0; a<allActivities.size(); a++){
 			int ai=allActivities[a];
 			Activity* act=&gt.rules.internalActivitiesList[ai];
-			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false)+writeRoom(htmlLevel, ai, "", "")+"</td>";
+			tmp+=writeStartTagTDofActivities(htmlLevel, act, true, false, false, COLOR_BY_SUBJECT_STUDENTS)+writeRoom(htmlLevel, ai, "", "")+"</td>";
 		}
 		tmp+="</tr>";
 		tmp+="</table></td>\n";

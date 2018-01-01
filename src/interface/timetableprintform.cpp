@@ -29,6 +29,7 @@
 #include "timetable.h"
 #include "timetable_defs.h"
 #include "timetableexport.h"
+#include "solution.h"
 
 #include "longtextmessagebox.h"
 
@@ -53,6 +54,11 @@ extern Timetable gt;
 extern bool students_schedule_ready;
 extern bool teachers_schedule_ready;
 extern bool rooms_schedule_ready;
+
+extern QHash<int, int> hashActivityColorBySubject;
+extern QList<int> activeHashActivityColorBySubject;
+extern QHash<int, int> hashActivityColorBySubjectAndStudents;
+extern QList<int> activeHashActivityColorBySubjectAndStudents;
 
 extern QString generationLocalizedTime;
 
@@ -90,6 +96,7 @@ const QString CBorientationModeState="/orientation-mode-combo-box-state";
 const QString printDetailedTablesState="/print-detailed-tables-check-box-state";
 const QString printActivityTagsState="/print-activity-tags-check-box-state";
 const QString printRepeatNamesState="/print-repeat-names-check-box-state";
+const QString printAutomaticColorsState="/print-automatic-colors-check-box-state";
 
 const QString activitiesPaddingState="/activity-padding-spin-box-value-state";
 const QString tablePaddingState="/table-padding-spin-box-value-state";
@@ -307,6 +314,9 @@ TimetablePrintForm::TimetablePrintForm(QWidget *parent): QDialog(parent){
 	repeatNames=new QCheckBox(tr("Repeat vertical names"));
 	repeatNames->setChecked(false);
 	
+	automaticColors=new QCheckBox(tr("Colors"));
+	automaticColors->setChecked(false);
+	
 	fontSizeTable=new QSpinBox;
 	fontSizeTable->setRange(4, 20);
 	fontSizeTable->setValue(8);
@@ -519,6 +529,7 @@ TimetablePrintForm::TimetablePrintForm(QWidget *parent): QDialog(parent){
 	optionsBoxGrid->addWidget(printDetailedTables,6,1);
 	
 	optionsBoxGrid->addWidget(repeatNames,7,0);
+	optionsBoxGrid->addWidget(automaticColors,7,1);
 
 	optionsBox->setLayout(optionsBoxGrid);
 	optionsBox->setSizePolicy(QSizePolicy::Expanding, optionsBox->sizePolicy().verticalPolicy());
@@ -620,6 +631,8 @@ TimetablePrintForm::TimetablePrintForm(QWidget *parent): QDialog(parent){
 		printActivityTags->setChecked(settings.value(this->metaObject()->className()+printActivityTagsState).toBool());
 	if(settings.contains(this->metaObject()->className()+printRepeatNamesState))
 		repeatNames->setChecked(settings.value(this->metaObject()->className()+printRepeatNamesState).toBool());
+	if(settings.contains(this->metaObject()->className()+printAutomaticColorsState))
+		automaticColors->setChecked(settings.value(this->metaObject()->className()+printAutomaticColorsState).toBool());
 	//
 	if(settings.contains(this->metaObject()->className()+activitiesPaddingState))
 		activitiesPadding->setValue(settings.value(this->metaObject()->className()+activitiesPaddingState).toInt());
@@ -666,6 +679,7 @@ TimetablePrintForm::~TimetablePrintForm(){
 	settings.setValue(this->metaObject()->className()+printDetailedTablesState, printDetailedTables->isChecked());
 	settings.setValue(this->metaObject()->className()+printActivityTagsState, printActivityTags->isChecked());
 	settings.setValue(this->metaObject()->className()+printRepeatNamesState, repeatNames->isChecked());
+	settings.setValue(this->metaObject()->className()+printAutomaticColorsState, automaticColors->isChecked());
 	//
 	settings.setValue(this->metaObject()->className()+activitiesPaddingState, activitiesPadding->value());
 	settings.setValue(this->metaObject()->className()+tablePaddingState, tablePadding->value());
@@ -866,9 +880,8 @@ void TimetablePrintForm::updateNamesList(){
 	} else assert(0==1);
 }
 
-QString TimetablePrintForm::updateHTMLprintString(bool printAll){
+QString TimetablePrintForm::updateHtmlPrintString(bool printAll){
 	QString saveTime=generationLocalizedTime;
-
 	QString tmp;
 	tmp+="<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n";
 	tmp+="  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n\n";
@@ -908,7 +921,7 @@ QString TimetablePrintForm::updateHTMLprintString(bool printAll){
 	//start. the "back" stuff is needed because of an qt bug (*1*). it also solve the last empty page problem.
 	tmp+="      p.back0 {\n";	//i can't to that with a class in table, because of a qt bug
 	if(CBBreak->currentIndex()==0)
-		tmp+="        font-size: "+QString::number(tablePadding->value())+"pt;\n";	//i can't do that in table, because it will also effect detailed table cells. it is not possible with a class, because of a qt bug.
+		tmp+="        font-size: "+QString::number(tablePadding->value())+"pt;\n";	//i can't do that in table, because it will also affect detailed table cells. it is not possible with a class, because of a qt bug.
 	else
 		tmp+="        font-size: 1pt;\n";	//font size 0 is not possible.
 //	tmp+="        padding-top: "+QString::number(tablePadding->value())+"px;\n";	//not possible: qt bug.
@@ -918,7 +931,7 @@ QString TimetablePrintForm::updateHTMLprintString(bool printAll){
 	tmp+="      }\n";
 	tmp+="      p.back1 {\n";	//i can't to that with a class in table, because of a qt bug
 	if(CBBreak->currentIndex()==0 || CBBreak->currentIndex()==2)
-		tmp+="        font-size: "+QString::number(tablePadding->value())+"pt;\n";	//i can't do that in table, because it will also effect detailed table cells. it is not possible with a class, because of a qt bug.
+		tmp+="        font-size: "+QString::number(tablePadding->value())+"pt;\n";	//i can't do that in table, because it will also affect detailed table cells. it is not possible with a class, because of a qt bug.
 	else
 		tmp+="        font-size: 1pt;\n";	//font size 0 is not possible.
 //	tmp+="        padding-top: "+QString::number(tablePadding->value())+"px;\n";	//not possible: qt bug.
@@ -926,19 +939,88 @@ QString TimetablePrintForm::updateHTMLprintString(bool printAll){
 	if(CBBreak->currentIndex()==1)
 		tmp+="        page-break-after: always;";
 	tmp+="      }\n";
-	//end. the "back" stuff is only needed because of an qt bug (*1*). delete this as soon as bug is solved
+	//end. the "back" stuff is only needed because of a qt bug (*1*). delete this as soon as bug is solved
 	
+	int htmlLevel=3;
+	if(automaticColors->isChecked()){
+		htmlLevel=7;
+	}
+	if(htmlLevel==7){	 // must be written before LEVEL 3, because LEVEL 3 should have higher priority
+		TimetableExport::computeHashActivityColorBySubject();
+		TimetableExport::computeHashActivityColorBySubjectAndStudents();
+		
+		int cnt=0;
+		foreach(int i, activeHashActivityColorBySubject){
+			Activity* act=&gt.rules.internalActivitiesList[i];
+			
+			QString tmpString=act->subjectName;
+			
+			//similar to the coloring by Marco Vassura (start)
+			int r,g,b;
+			TimetableExport::stringToColor(tmpString, &r, &g, &b);
+			tmp += "td.c_"+QString::number(cnt+1)+" { /* Activity id: "+QString::number(act->id)+" (subject) */\n ";
+			tmp+="background-color: rgb("+QString::number(r)+", "+QString::number(g)+", "+QString::number(b)+");\n";
+			double brightness = (double)r*0.299 + (double)g*0.587 + (double)b*0.114;
+			if (brightness<127.5)
+				tmp+=" color: white;\n";
+			else
+				tmp+=" color: black;\n";
+			tmp+="}\n\n";
+			//similar to the coloring by Marco Vassura (end)
+			cnt++;
+		}
+		foreach(int i, activeHashActivityColorBySubjectAndStudents){
+			Activity* act=&gt.rules.internalActivitiesList[i];
+			
+			QString tmpString=act->subjectName+" "+act->studentsNames.join(" ,");
+			
+			//similar to the coloring by Marco Vassura (start)
+			int r,g,b;
+			TimetableExport::stringToColor(tmpString, &r, &g, &b);
+			tmp += "td.c_"+QString::number(cnt+1)+" { /* Activity id: "+QString::number(act->id)+" (subject+students) */\n ";
+			tmp+="background-color: rgb("+QString::number(r)+", "+QString::number(g)+", "+QString::number(b)+");\n";
+			double brightness = (double)r*0.299 + (double)g*0.587 + (double)b*0.114;
+			if (brightness<127.5)
+				tmp+=" color: white;\n";
+			else
+				tmp+=" color: black;\n";
+			tmp+="}\n\n";
+			//similar to the coloring by Marco Vassura (end)
+			cnt++;
+		}
+		
+//		QHashIterator<QString, QString> i(hashColorStringIDsTimetable);
+//		qWarning("prepare css file");
+//		while(i.hasNext()) {
+//			qWarning("add color in css file");
+//			i.next();
+//			tmp+="td.c_"+i.value()+" { /* "+i.key()+" */\n ";
+//			
+//			//similar to the coloring by Marco Vassura (start)
+//			int r,g,b;
+//			TimetableExport::stringToColor(i.key(), &r, &g, &b);
+//			tmp+="background-color: rgb("+QString::number(r)+", "+QString::number(g)+", "+QString::number(b)+");\n";
+//			double brightness = (double)r*0.299 + (double)g*0.587 + (double)b*0.114;
+//			if (brightness<127.5)
+//				tmp+=" color: white;\n";
+//			else
+//				tmp+=" color: black;\n";
+//			//similar to the coloring by Marco Vassura (end)
+//			tmp+="}\n\n";
+//		}
+	}
+
 	tmp+="      table {\n";
 	tmp+="        font-size: "+QString::number(fontSizeTable->value())+"pt;\n";
 	tmp+="        padding-top: "+QString::number(tablePadding->value())+"px;\n";
 	tmp+="      }\n";
 	tmp+="      th {\n";
-	tmp+="        text-align: center;\n"; //currently no effect because of an qt bug (compare http://bugreports.qt.nokia.com/browse/QTBUG-2730 )
+	tmp+="        text-align: center;\n"; //currently no effect because of a qt bug (compare http://bugreports.qt.nokia.com/browse/QTBUG-2730 )
 	tmp+="        vertical-align: middle;\n";
 	tmp+="        white-space: "+CBWhiteSpace->currentText()+";\n";
 	tmp+="      }\n";
 	tmp+="      td {\n";
-	tmp+="        text-align: center;\n"; //currently no effect because of an qt bug (compare http://bugreports.qt.nokia.com/browse/QTBUG-2730 )
+	tmp+="        text-align: center;\n"; //currently no effect because of a qt bug (compare http://bugreports.qt.nokia.com/browse/QTBUG-2730 )
 	tmp+="        vertical-align: middle;\n";
 	tmp+="        white-space: "+CBWhiteSpace->currentText()+";\n";
 	tmp+="        padding-left: "+QString::number(activitiesPadding->value())+"px;\n";
@@ -948,28 +1030,34 @@ QString TimetablePrintForm::updateHTMLprintString(bool printAll){
 //	tmp+="        padding-left: 4px;\n";
 //	tmp+="        padding-right: 4px;\n";
 	tmp+="      }\n";
-	tmp+="      th.xAxis {\n";	//need level 2
+	tmp+="      th.xAxis {\n";	//needs level 2
 //	tmp+="        padding-left: 4px;\n";
 //	tmp+="        padding-right: 4px;\n";
 	tmp+="      }\n";
-	tmp+="      th.yAxis {\n";	//need level 2
+	tmp+="      th.yAxis {\n";	//needs level 2
 //	tmp+="        padding-top: 4px;\n";
 //	tmp+="        padding-bottom: 4px;\n";
 	tmp+="      }\n";
-	tmp+="      tr.line0, div.line0 {\n";	//need level 3
+	tmp+="      tr.line0, div.line0 {\n";	//needs level 3
 	tmp+="        /*font-size: 12pt;*/\n";
-	tmp+="        color: gray;\n";
+	if(htmlLevel!=7){
+		tmp+="        color: gray;\n";
+	}
 	tmp+="      }\n";
-	tmp+="      tr.line1, div.line1 {\n";	//need level 3
+	tmp+="      tr.line1, div.line1 {\n";	//needs level 3
 	tmp+="        /*font-size: 12pt;*/\n";
 	tmp+="      }\n";
-	tmp+="      tr.line2, div.line2 {\n";	//need level 3
+	tmp+="      tr.line2, div.line2 {\n";	//needs level 3
 	tmp+="        /*font-size: 12pt;*/\n";
-	tmp+="        color: gray;\n";
+	if(htmlLevel!=7){
+		tmp+="        color: gray;\n";
+	}
 	tmp+="      }\n";
-	tmp+="      tr.line3, div.line3 {\n";	//need level 3
+	tmp+="      tr.line3, div.line3 {\n";	//needs level 3
 	tmp+="        /*font-size: 12pt;*/\n";
-	tmp+="        color: silver;\n";
+	if(htmlLevel!=7){
+		tmp+="        color: silver;\n";
+	}
 	tmp+="      }\n";
 	tmp+="    </style>\n";
 	tmp+="  </head>\n\n";
@@ -991,20 +1079,19 @@ QString TimetablePrintForm::updateHTMLprintString(bool printAll){
 	
 	//maybe TODO: do the pagebreak similar in timetableexport. (so remove the odd and even table tag and use only back1 and back2 (maybe rename to odd and even))
 	//            check the GroupsTimetableDaysHorizontalHtml and Year parameter then (iNi%2) isn't needed anymore then.
-	
 	if(RBDaysHorizontal->isChecked()){
 		for(int iNi=0; iNi<includedNamesIndex.size(); iNi++){
 			switch(CBTables->currentIndex()){
-				case 0: tmp+=TimetableExport::singleSubgroupsTimetableDaysHorizontalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 1: tmp+=TimetableExport::singleGroupsTimetableDaysHorizontalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-				case 2: tmp+=TimetableExport::singleYearsTimetableDaysHorizontalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-				case 3: tmp+=TimetableExport::singleTeachersTimetableDaysHorizontalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 4: tmp+=TimetableExport::singleTeachersFreePeriodsTimetableDaysHorizontalHtml(3, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-				case 5: tmp+=TimetableExport::singleRoomsTimetableDaysHorizontalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 6: tmp+=TimetableExport::singleSubjectsTimetableDaysHorizontalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 7: tmp+=TimetableExport::singleAllActivitiesTimetableDaysHorizontalHtml(3, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 8: tmp+=TimetableExport::singleStudentsStatisticsHtml(3, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked(), printAll); break;
-				case 9: tmp+=TimetableExport::singleTeachersStatisticsHtml(3, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked(), printAll); break;
+				case 0: tmp+=TimetableExport::singleSubgroupsTimetableDaysHorizontalHtml(htmlLevel, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 1: tmp+=TimetableExport::singleGroupsTimetableDaysHorizontalHtml(htmlLevel, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+				case 2: tmp+=TimetableExport::singleYearsTimetableDaysHorizontalHtml(htmlLevel, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+				case 3: tmp+=TimetableExport::singleTeachersTimetableDaysHorizontalHtml(htmlLevel, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 4: tmp+=TimetableExport::singleTeachersFreePeriodsTimetableDaysHorizontalHtml(htmlLevel, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+				case 5: tmp+=TimetableExport::singleRoomsTimetableDaysHorizontalHtml(htmlLevel, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 6: tmp+=TimetableExport::singleSubjectsTimetableDaysHorizontalHtml(htmlLevel, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 7: tmp+=TimetableExport::singleAllActivitiesTimetableDaysHorizontalHtml(htmlLevel, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 8: tmp+=TimetableExport::singleStudentsStatisticsHtml(htmlLevel, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked(), printAll); break;
+				case 9: tmp+=TimetableExport::singleTeachersStatisticsHtml(htmlLevel, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked(), printAll); break;
 				default: assert(0==1);
 			}
 			if(iNi<includedNamesIndex.size()-1){
@@ -1020,14 +1107,14 @@ QString TimetablePrintForm::updateHTMLprintString(bool printAll){
 	if(RBDaysVertical->isChecked()){
 		for(int iNi=0; iNi<includedNamesIndex.size(); iNi++){
 			switch(CBTables->currentIndex()){
-				case 0: tmp+=TimetableExport::singleSubgroupsTimetableDaysVerticalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 1: tmp+=TimetableExport::singleGroupsTimetableDaysVerticalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-				case 2: tmp+=TimetableExport::singleYearsTimetableDaysVerticalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-				case 3: tmp+=TimetableExport::singleTeachersTimetableDaysVerticalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 4: tmp+=TimetableExport::singleTeachersFreePeriodsTimetableDaysVerticalHtml(3, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-				case 5: tmp+=TimetableExport::singleRoomsTimetableDaysVerticalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 6: tmp+=TimetableExport::singleSubjectsTimetableDaysVerticalHtml(3, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 7: tmp+=TimetableExport::singleAllActivitiesTimetableDaysVerticalHtml(3, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 0: tmp+=TimetableExport::singleSubgroupsTimetableDaysVerticalHtml(htmlLevel, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 1: tmp+=TimetableExport::singleGroupsTimetableDaysVerticalHtml(htmlLevel, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+				case 2: tmp+=TimetableExport::singleYearsTimetableDaysVerticalHtml(htmlLevel, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+				case 3: tmp+=TimetableExport::singleTeachersTimetableDaysVerticalHtml(htmlLevel, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 4: tmp+=TimetableExport::singleTeachersFreePeriodsTimetableDaysVerticalHtml(htmlLevel, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+				case 5: tmp+=TimetableExport::singleRoomsTimetableDaysVerticalHtml(htmlLevel, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 6: tmp+=TimetableExport::singleSubjectsTimetableDaysVerticalHtml(htmlLevel, includedNamesIndex.at(iNi), saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 7: tmp+=TimetableExport::singleAllActivitiesTimetableDaysVerticalHtml(htmlLevel, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
 				default: assert(0==1);
 			}
 			if(iNi<includedNamesIndex.size()-1){
@@ -1044,14 +1131,14 @@ QString TimetablePrintForm::updateHTMLprintString(bool printAll){
 		int count=0;
 		while(excludedNamesIndex.size()<namesList->count()){
 			switch(CBTables->currentIndex()){
-				case 0: tmp+=TimetableExport::singleSubgroupsTimetableTimeHorizontalHtml(3, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 1: tmp+=TimetableExport::singleGroupsTimetableTimeHorizontalHtml(3, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-				case 2: tmp+=TimetableExport::singleYearsTimetableTimeHorizontalHtml(3, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-				case 3: tmp+=TimetableExport::singleTeachersTimetableTimeHorizontalHtml(3, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 4: /*tmp+=TimetableExport::singleTeachersFreePeriodsTimetableTimeHorizontalHtml(3, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked());*/ break;
-				case 5: tmp+=TimetableExport::singleRoomsTimetableTimeHorizontalHtml(3, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 6: tmp+=TimetableExport::singleSubjectsTimetableTimeHorizontalHtml(3, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 7: tmp+=TimetableExport::singleAllActivitiesTimetableTimeHorizontalHtml(3, saveTime, printActivityTags->isChecked(), repeatNames->isChecked());
+				case 0: tmp+=TimetableExport::singleSubgroupsTimetableTimeHorizontalHtml(htmlLevel, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 1: tmp+=TimetableExport::singleGroupsTimetableTimeHorizontalHtml(htmlLevel, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+				case 2: tmp+=TimetableExport::singleYearsTimetableTimeHorizontalHtml(htmlLevel, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+				case 3: tmp+=TimetableExport::singleTeachersTimetableTimeHorizontalHtml(htmlLevel, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 4: /*tmp+=TimetableExport::singleTeachersFreePeriodsTimetableTimeHorizontalHtml(htmlLevel, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked());*/ break;
+				case 5: tmp+=TimetableExport::singleRoomsTimetableTimeHorizontalHtml(htmlLevel, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 6: tmp+=TimetableExport::singleSubjectsTimetableTimeHorizontalHtml(htmlLevel, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 7: tmp+=TimetableExport::singleAllActivitiesTimetableTimeHorizontalHtml(htmlLevel, saveTime, printActivityTags->isChecked(), repeatNames->isChecked());
 						excludedNamesIndex<<-1; break;
 				default: assert(0==1);
 			}
@@ -1070,14 +1157,14 @@ QString TimetablePrintForm::updateHTMLprintString(bool printAll){
 		int count=0;
 		while(excludedNamesIndex.size()<namesList->count()){
 			switch(CBTables->currentIndex()){
-				case 0: tmp+=TimetableExport::singleSubgroupsTimetableTimeVerticalHtml(3, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 1: tmp+=TimetableExport::singleGroupsTimetableTimeVerticalHtml(3, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-				case 2: tmp+=TimetableExport::singleYearsTimetableTimeVerticalHtml(3, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-				case 3: tmp+=TimetableExport::singleTeachersTimetableTimeVerticalHtml(3, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 4: /*tmp+=TimetableExport::singleTeachersFreePeriodsTimetableTimeVerticalHtml(3, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked());*/ break;
-				case 5: tmp+=TimetableExport::singleRoomsTimetableTimeVerticalHtml(3, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 6: tmp+=TimetableExport::singleSubjectsTimetableTimeVerticalHtml(3, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-				case 7: tmp+=TimetableExport::singleAllActivitiesTimetableTimeVerticalHtml(3, saveTime, printActivityTags->isChecked(), repeatNames->isChecked());
+				case 0: tmp+=TimetableExport::singleSubgroupsTimetableTimeVerticalHtml(htmlLevel, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 1: tmp+=TimetableExport::singleGroupsTimetableTimeVerticalHtml(htmlLevel, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+				case 2: tmp+=TimetableExport::singleYearsTimetableTimeVerticalHtml(htmlLevel, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+				case 3: tmp+=TimetableExport::singleTeachersTimetableTimeVerticalHtml(htmlLevel, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 4: /*tmp+=TimetableExport::singleTeachersFreePeriodsTimetableTimeVerticalHtml(htmlLevel, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked());*/ break;
+				case 5: tmp+=TimetableExport::singleRoomsTimetableTimeVerticalHtml(htmlLevel, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 6: tmp+=TimetableExport::singleSubjectsTimetableTimeVerticalHtml(htmlLevel, maxNames->value(), excludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+				case 7: tmp+=TimetableExport::singleAllActivitiesTimetableTimeVerticalHtml(htmlLevel, saveTime, printActivityTags->isChecked(), repeatNames->isChecked());
 						excludedNamesIndex<<-1; break;
 				default: assert(0==1);
 			}
@@ -1099,14 +1186,14 @@ QString TimetablePrintForm::updateHTMLprintString(bool printAll){
 			tmpExcludedNamesIndex=excludedNamesIndex;
 			while(tmpExcludedNamesIndex.size()<namesList->count()){
 				switch(CBTables->currentIndex()){
-					case 0: tmp+=TimetableExport::singleSubgroupsTimetableTimeHorizontalDailyHtml(3, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-					case 1: tmp+=TimetableExport::singleGroupsTimetableTimeHorizontalDailyHtml(3, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-					case 2: tmp+=TimetableExport::singleYearsTimetableTimeHorizontalDailyHtml(3, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-					case 3: tmp+=TimetableExport::singleTeachersTimetableTimeHorizontalDailyHtml(3, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-					case 4: /*tmp+=TimetableExport::singleTeachersFreePeriodsTimetableTimeHorizontalDailyHtml(3, day, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked());*/ break;
-					case 5: tmp+=TimetableExport::singleRoomsTimetableTimeHorizontalDailyHtml(3, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-					case 6: tmp+=TimetableExport::singleSubjectsTimetableTimeHorizontalDailyHtml(3, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-					case 7: tmp+=TimetableExport::singleAllActivitiesTimetableTimeHorizontalDailyHtml(3, day, saveTime, printActivityTags->isChecked(), repeatNames->isChecked());
+					case 0: tmp+=TimetableExport::singleSubgroupsTimetableTimeHorizontalDailyHtml(htmlLevel, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+					case 1: tmp+=TimetableExport::singleGroupsTimetableTimeHorizontalDailyHtml(htmlLevel, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+					case 2: tmp+=TimetableExport::singleYearsTimetableTimeHorizontalDailyHtml(htmlLevel, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+					case 3: tmp+=TimetableExport::singleTeachersTimetableTimeHorizontalDailyHtml(htmlLevel, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+					case 4: /*tmp+=TimetableExport::singleTeachersFreePeriodsTimetableTimeHorizontalDailyHtml(htmlLevel, day, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked());*/ break;
+					case 5: tmp+=TimetableExport::singleRoomsTimetableTimeHorizontalDailyHtml(htmlLevel, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+					case 6: tmp+=TimetableExport::singleSubjectsTimetableTimeHorizontalDailyHtml(htmlLevel, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+					case 7: tmp+=TimetableExport::singleAllActivitiesTimetableTimeHorizontalDailyHtml(htmlLevel, day, saveTime, printActivityTags->isChecked(), repeatNames->isChecked());
 							tmpExcludedNamesIndex<<-1; break;
 					default: assert(0==1);
 				}
@@ -1130,14 +1217,14 @@ QString TimetablePrintForm::updateHTMLprintString(bool printAll){
 			tmpExcludedNamesIndex=excludedNamesIndex;
 			while(tmpExcludedNamesIndex.size()<namesList->count()){
 				switch(CBTables->currentIndex()){
-					case 0: tmp+=TimetableExport::singleSubgroupsTimetableTimeVerticalDailyHtml(3, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-					case 1: tmp+=TimetableExport::singleGroupsTimetableTimeVerticalDailyHtml(3, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-					case 2: tmp+=TimetableExport::singleYearsTimetableTimeVerticalDailyHtml(3, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
-					case 3: tmp+=TimetableExport::singleTeachersTimetableTimeVerticalDailyHtml(3, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-					case 4: /*tmp+=TimetableExport::singleTeachersFreePeriodsTimetableTimeVerticalDailyHtml(3, day, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked());*/ break;
-					case 5: tmp+=TimetableExport::singleRoomsTimetableTimeVerticalDailyHtml(3, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-					case 6: tmp+=TimetableExport::singleSubjectsTimetableTimeVerticalDailyHtml(3, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
-					case 7: tmp+=TimetableExport::singleAllActivitiesTimetableTimeVerticalDailyHtml(3, day, saveTime, printActivityTags->isChecked(), repeatNames->isChecked());
+					case 0: tmp+=TimetableExport::singleSubgroupsTimetableTimeVerticalDailyHtml(htmlLevel, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+					case 1: tmp+=TimetableExport::singleGroupsTimetableTimeVerticalDailyHtml(htmlLevel, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+					case 2: tmp+=TimetableExport::singleYearsTimetableTimeVerticalDailyHtml(htmlLevel, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), printDetailedTables->isChecked(), repeatNames->isChecked()); break;
+					case 3: tmp+=TimetableExport::singleTeachersTimetableTimeVerticalDailyHtml(htmlLevel, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+					case 4: /*tmp+=TimetableExport::singleTeachersFreePeriodsTimetableTimeVerticalDailyHtml(htmlLevel, day, saveTime, printDetailedTables->isChecked(), repeatNames->isChecked());*/ break;
+					case 5: tmp+=TimetableExport::singleRoomsTimetableTimeVerticalDailyHtml(htmlLevel, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+					case 6: tmp+=TimetableExport::singleSubjectsTimetableTimeVerticalDailyHtml(htmlLevel, day, maxNames->value(), tmpExcludedNamesIndex, saveTime, printActivityTags->isChecked(), repeatNames->isChecked()); break;
+					case 7: tmp+=TimetableExport::singleAllActivitiesTimetableTimeVerticalDailyHtml(htmlLevel, day, saveTime, printActivityTags->isChecked(), repeatNames->isChecked());
 							tmpExcludedNamesIndex<<-1; break;
 					default: assert(0==1);
 				}
@@ -1204,7 +1291,7 @@ void TimetablePrintForm::print(){
 		QTextDocument textDocument;
 		textDocument.documentLayout()->setPaintDevice(&printer);
 		textDocument.setPageSize(QSizeF(printer.pageRect().size()));
-		textDocument.setHtml(updateHTMLprintString(true));
+		textDocument.setHtml(updateHtmlPrintString(true));
 		textDocument.print(&printer);
 	}
 	//delete printDialog;
@@ -1257,7 +1344,7 @@ void TimetablePrintForm::updatePreviewFull(QPrinter* printer){
 	QTextDocument textDocument;
 	textDocument.documentLayout()->setPaintDevice(printer);
 	textDocument.setPageSize(QSizeF(printer->pageRect().size()));
-	textDocument.setHtml(updateHTMLprintString(true));
+	textDocument.setHtml(updateHtmlPrintString(true));
 	textDocument.print(printer);
 #endif
 }
@@ -1309,7 +1396,7 @@ void TimetablePrintForm::updatePreviewSmall(QPrinter* printer){
 	QTextDocument textDocument;
 	textDocument.documentLayout()->setPaintDevice(printer);
 	textDocument.setPageSize(QSizeF(printer->pageRect().size()));
-	textDocument.setHtml(updateHTMLprintString(false));
+	textDocument.setHtml(updateHtmlPrintString(false));
 	textDocument.print(printer);
 #endif
 }

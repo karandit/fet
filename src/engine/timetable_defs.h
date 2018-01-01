@@ -269,12 +269,12 @@ QString protect2vert(const QString& str);
 /**
 A function used in html saving
 */
-QString protect2id(const QString& str);
+//QString protect2id(const QString& str);
 
 /**
 A function used in html saving
 */
-QString protect2java(const QString& str);
+//QString protect2java(const QString& str);
 
 /**
 This constants represents free periods of a teacher in the teachers free periods timetable
@@ -287,7 +287,7 @@ const int TEACHER_MUST_COME_EARLIER = 4;
 const int TEACHER_MUST_COME_MUCH_EARLIER = 6;
 
 const int TEACHER_MUST_STAY_LONGER = 3;
-const int TEACHER_MUST_STAY_MUCH_LONGER = 5;		// BE CAREFULL, I just print into LESS_DETAILED timetable, if it's smaller then TEACHER_MUST_STAY_MUCH_LONGER
+const int TEACHER_MUST_STAY_MUCH_LONGER = 5;		// BE CAREFUL, I just print into LESS_DETAILED timetable, if it's smaller than TEACHER_MUST_STAY_MUCH_LONGER
 
 const int TEACHER_HAS_A_FREE_DAY = 7;
 

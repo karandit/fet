@@ -1814,7 +1814,7 @@ Versions 5.27.0 - 5.27.9
 	- Corrected some typos (reported by locutusofborg).
 	- Added a section Keywords in the fet.desktop file (reported by locutusofborg).
 ---------------------------------------------------------------------------------
-Versions 5.28.0 - 5.28.v
+Versions 5.28.0 - 5.28.6
 - Version 5.28.0
 	- Crash bugs fixed (reported by Davide Cottignoli).
 	- Removed useless CONFIG += thread from src.pro and src-cl.pro (reported by locutusofborg).
@@ -1847,3 +1847,14 @@ Versions 5.28.0 - 5.28.v
 	- The user can now change the order of the teachers, students, subjects, activity tags, buildings, rooms, time constraints, and space constraints
 	from the interface (suggested by Volker Dirr).
 	- Added a new Indian example file, by Sudharshan K M and Nataraj Urs H D.
+---------------------------------------------------------------------------------
+Versions 5.29.0 - 5.29.v
+- Version 5.29.0
+	- Updated to Qt 5.6.0.
+	- Added the possibility of automatic coloring of the HTML timetables, using the HTML level 7 in the "Settings/Timetables" menu.
+	Also, the user can color the timetables in a similar way from the "Timetable print" dialog.
+	(Suggested by Handaya, hudrea and Udo Schütz, implemented by Volker Dirr and Liviu Lalescu, using also code by Marco Vassura.)
+	- Code cleanup.
+	- Brazilian Portuguese translation update, by Alexandre R. Soares.
+	- Added a new Indian example file, by Jijo Jose.
+	- Added two new Namibian example files, by Bobby.
