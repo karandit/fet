@@ -1858,3 +1858,6 @@ Versions 5.29.0 - 5.29.v
 	- Brazilian Portuguese translation update, by Alexandre R. Soares.
 	- Added a new Indian example file, by Jijo Jose.
 	- Added two new Namibian example files, by Bobby.
+- Version 5.29.1
+	- The selection of the categories of timetables to be written on disk after generation is now improved (suggested by Alexandre R. Soares).
+	- Brazilian Portuguese translation update, by Alexandre R. Soares.

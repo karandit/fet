@@ -15,8 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef REMOVE_REDUNDANT_CONFIRMATION_FORM_H
-#define REMOVE_REDUNDANT_CONFIRMATION_FORM_H
+#ifndef REMOVEREDUNDANTCONFIRMATIONFORM_H
+#define REMOVEREDUNDANTCONFIRMATIONFORM_H
 
 #include "ui_removeredundantconfirmationform_template.h"
 

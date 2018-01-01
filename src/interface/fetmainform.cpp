@@ -199,6 +199,8 @@ using namespace std;
 
 #include "savetimetableconfirmationform.h"
 
+#include "timetablestowriteondiskform.h"
+
 #include "lockunlock.h"
 #include "advancedlockunlockform.h"
 
@@ -565,44 +567,6 @@ FetMainForm::FetMainForm()
 	settingsShowSubgroupsInComboBoxesAction->setChecked(SHOW_SUBGROUPS_IN_COMBO_BOXES);
 	settingsShowSubgroupsInActivityPlanningAction->setCheckable(true);
 	settingsShowSubgroupsInActivityPlanningAction->setChecked(SHOW_SUBGROUPS_IN_ACTIVITY_PLANNING);
-
-	///
-	enableConflictsTimetableAction->setCheckable(true);
-
-	enableStatisticsTimetablesAction->setCheckable(true);
-	enableXmlTimetablesAction->setCheckable(true);
-	enableDaysHorizontalTimetablesAction->setCheckable(true);
-	enableDaysVerticalTimetablesAction->setCheckable(true);
-	enableTimeHorizontalTimetablesAction->setCheckable(true);
-	enableTimeVerticalTimetablesAction->setCheckable(true);
-
-	enableSubgroupsTimetablesAction->setCheckable(true);
-	enableGroupsTimetablesAction->setCheckable(true);
-	enableYearsTimetablesAction->setCheckable(true);
-	enableTeachersTimetablesAction->setCheckable(true);
-	enableTeachersFreePeriodsTimetablesAction->setCheckable(true);
-	enableRoomsTimetablesAction->setCheckable(true);
-	enableSubjectsTimetablesAction->setCheckable(true);
-	enableActivitiesTimetablesAction->setCheckable(true);
-	//
-	enableConflictsTimetableAction->setChecked(WRITE_TIMETABLE_CONFLICTS);
-
-	enableStatisticsTimetablesAction->setChecked(WRITE_TIMETABLES_STATISTICS);
-	enableXmlTimetablesAction->setChecked(WRITE_TIMETABLES_XML);
-	enableDaysHorizontalTimetablesAction->setChecked(WRITE_TIMETABLES_DAYS_HORIZONTAL);
-	enableDaysVerticalTimetablesAction->setChecked(WRITE_TIMETABLES_DAYS_VERTICAL);
-	enableTimeHorizontalTimetablesAction->setChecked(WRITE_TIMETABLES_TIME_HORIZONTAL);
-	enableTimeVerticalTimetablesAction->setChecked(WRITE_TIMETABLES_TIME_VERTICAL);
-
-	enableSubgroupsTimetablesAction->setChecked(WRITE_TIMETABLES_SUBGROUPS);
-	enableGroupsTimetablesAction->setChecked(WRITE_TIMETABLES_GROUPS);
-	enableYearsTimetablesAction->setChecked(WRITE_TIMETABLES_YEARS);
-	enableTeachersTimetablesAction->setChecked(WRITE_TIMETABLES_TEACHERS);
-	enableTeachersFreePeriodsTimetablesAction->setChecked(WRITE_TIMETABLES_TEACHERS_FREE_PERIODS);
-	enableRoomsTimetablesAction->setChecked(WRITE_TIMETABLES_ROOMS);
-	enableSubjectsTimetablesAction->setChecked(WRITE_TIMETABLES_SUBJECTS);
-	enableActivitiesTimetablesAction->setChecked(WRITE_TIMETABLES_ACTIVITIES);
-	///
 	
 	////////confirmations
 	settingsConfirmActivityPlanningAction->setCheckable(true);
@@ -875,82 +839,18 @@ void FetMainForm::on_settingsDuplicateVerticalNamesAction_toggled()
 	TIMETABLE_HTML_REPEAT_NAMES=settingsDuplicateVerticalNamesAction->isChecked();
 }
 
-///write timetables options
-void FetMainForm::on_enableConflictsTimetableAction_toggled()
+void FetMainForm::on_timetablesToWriteOnDiskAction_triggered()
 {
-	WRITE_TIMETABLE_CONFLICTS=enableConflictsTimetableAction->isChecked();
-}
+	if(simulation_running){
+		QMessageBox::information(this, tr("FET information"),
+			tr("Allocation in course.\nPlease stop simulation before this."));
+		return;
+	}
 
-void FetMainForm::on_enableStatisticsTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_STATISTICS=enableStatisticsTimetablesAction->isChecked();
+	TimetablesToWriteOnDiskForm form(this);
+	setParentAndOtherThings(&form, this);
+	form.exec();
 }
-
-void FetMainForm::on_enableXmlTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_XML=enableXmlTimetablesAction->isChecked();
-}
-
-void FetMainForm::on_enableDaysHorizontalTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_DAYS_HORIZONTAL=enableDaysHorizontalTimetablesAction->isChecked();
-}
-
-void FetMainForm::on_enableDaysVerticalTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_DAYS_VERTICAL=enableDaysVerticalTimetablesAction->isChecked();
-}
-
-void FetMainForm::on_enableTimeHorizontalTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_TIME_HORIZONTAL=enableTimeHorizontalTimetablesAction->isChecked();
-}
-
-void FetMainForm::on_enableTimeVerticalTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_TIME_VERTICAL=enableTimeVerticalTimetablesAction->isChecked();
-}
-
-void FetMainForm::on_enableSubgroupsTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_SUBGROUPS=enableSubgroupsTimetablesAction->isChecked();
-}
-
-void FetMainForm::on_enableGroupsTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_GROUPS=enableGroupsTimetablesAction->isChecked();
-}
-
-void FetMainForm::on_enableYearsTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_YEARS=enableYearsTimetablesAction->isChecked();
-}
-
-void FetMainForm::on_enableTeachersTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_TEACHERS=enableTeachersTimetablesAction->isChecked();
-}
-
-void FetMainForm::on_enableTeachersFreePeriodsTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_TEACHERS_FREE_PERIODS=enableTeachersFreePeriodsTimetablesAction->isChecked();
-}
-
-void FetMainForm::on_enableRoomsTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_ROOMS=enableRoomsTimetablesAction->isChecked();
-}
-
-void FetMainForm::on_enableSubjectsTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_SUBJECTS=enableSubjectsTimetablesAction->isChecked();
-}
-
-void FetMainForm::on_enableActivitiesTimetablesAction_toggled()
-{
-	WRITE_TIMETABLES_ACTIVITIES=enableActivitiesTimetablesAction->isChecked();
-}
-///
 
 void FetMainForm::replyFinished(QNetworkReply* networkReply)
 {
@@ -4193,24 +4093,6 @@ void FetMainForm::on_settingsRestoreDefaultsAction_triggered()
 	WRITE_TIMETABLES_SUBJECTS=true;
 	WRITE_TIMETABLES_ACTIVITIES=true;
 	//
-	enableConflictsTimetableAction->setChecked(WRITE_TIMETABLE_CONFLICTS);
-
-	enableStatisticsTimetablesAction->setChecked(WRITE_TIMETABLES_STATISTICS);
-	enableXmlTimetablesAction->setChecked(WRITE_TIMETABLES_XML);
-	enableDaysHorizontalTimetablesAction->setChecked(WRITE_TIMETABLES_DAYS_HORIZONTAL);
-	enableDaysVerticalTimetablesAction->setChecked(WRITE_TIMETABLES_DAYS_VERTICAL);
-	enableTimeHorizontalTimetablesAction->setChecked(WRITE_TIMETABLES_TIME_HORIZONTAL);
-	enableTimeVerticalTimetablesAction->setChecked(WRITE_TIMETABLES_TIME_VERTICAL);
-
-	enableSubgroupsTimetablesAction->setChecked(WRITE_TIMETABLES_SUBGROUPS);
-	enableGroupsTimetablesAction->setChecked(WRITE_TIMETABLES_GROUPS);
-	enableYearsTimetablesAction->setChecked(WRITE_TIMETABLES_YEARS);
-	enableTeachersTimetablesAction->setChecked(WRITE_TIMETABLES_TEACHERS);
-	enableTeachersFreePeriodsTimetablesAction->setChecked(WRITE_TIMETABLES_TEACHERS_FREE_PERIODS);
-	enableRoomsTimetablesAction->setChecked(WRITE_TIMETABLES_ROOMS);
-	enableSubjectsTimetablesAction->setChecked(WRITE_TIMETABLES_SUBJECTS);
-	enableActivitiesTimetablesAction->setChecked(WRITE_TIMETABLES_ACTIVITIES);
-	///
 	
 	////////confirmations
 	CONFIRM_ACTIVITY_PLANNING=true;

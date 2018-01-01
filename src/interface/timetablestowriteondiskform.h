@@ -4,7 +4,7 @@
 //
 //
 // Author: Lalescu Liviu <Please see http://lalescu.ro/liviu/ for details about contacting Liviu Lalescu (in particular, you can find here the e-mail address)>
-// Copyright (C) 2003 Liviu Lalescu <http://lalescu.ro/liviu/>
+// Copyright (C) 2016 Liviu Lalescu <http://lalescu.ro/liviu/>
 //
 /***************************************************************************
  *                                                                         *
@@ -15,23 +15,22 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef SPREADCONFIRMATIONFORM_H
-#define SPREADCONFIRMATIONFORM_H
+#ifndef TIMETABLESTOWRITEONDISKFORM_H
+#define TIMETABLESTOWRITEONDISKFORM_H
 
-#include "ui_spreadconfirmationform_template.h"
+#include "ui_timetablestowriteondiskform_template.h"
 
-class SpreadConfirmationForm: public QDialog, Ui::SpreadConfirmationForm_template
+class TimetablesToWriteOnDiskForm:public QDialog, Ui::TimetablesToWriteOnDiskForm_template
 {
 	Q_OBJECT
 
 public:
-	bool dontShowAgain;
+	TimetablesToWriteOnDiskForm(QWidget* parent);
+	~TimetablesToWriteOnDiskForm();
 	
-	SpreadConfirmationForm(QWidget* parent);
-	~SpreadConfirmationForm();
-
 public slots:
-	void dontShowAgainCheckBoxToggled();
+	void wasAccepted();
+	void wasCanceled();
 };
 
 #endif

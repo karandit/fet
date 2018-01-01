@@ -18,8 +18,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef SPARSE_ITEM_MODEL_H
-#define SPARSE_ITEM_MODEL_H
+#ifndef SPARSEITEMMODEL_H
+#define SPARSEITEMMODEL_H
 
 #include <QAbstractItemModel>
 #include <QHash>

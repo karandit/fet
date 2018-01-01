@@ -18,8 +18,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef SPARSE_TABLE_VIEW_H
-#define SPARSE_TABLE_VIEW_H
+#ifndef SPARSETABLEVIEW_H
+#define SPARSETABLEVIEW_H
 
 #include <QTableView>
 

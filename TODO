@@ -1828,12 +1828,12 @@ When adding a constraint, a useful feature would be to check if an identical con
 
 Removing identical constraints reduces the clutter, and perhaps also speeds up the timetable generation?
 
-118---------------------------------------------------------
+118-------1-->DONE------------------------------------------
 From k1aas:
 
 The new printing feature in 5.17.0 is very nice. Here are a few requests:
 
-1. I can't find a selection to center the text in the boxes. It would be nice to have the text displayed as on the screen in the 'View students/teachers timetable'.
+DONE starting with Qt 5.6 or even Qt 5.5 --> 1. I can't find a selection to center the text in the boxes. It would be nice to have the text displayed as on the screen in the 'View students/teachers timetable'. <-- DONE
 
 2. Schedules are much easier to read if they are colour-coded. How about a range of selectable colours per teacher or per subject, and having these colours then inserted in the print file? See my attachment.
 
@@ -1841,7 +1841,7 @@ Klaas
 
 Answer by Volker Dirr, on the first point:
 
-1. It's already included in the FET sources. Sadly it is a Qt bug.
+1. It's already included in the FET sources. Sadly it is a Qt bug. --> Qt bug solved in Qt 5.6 or even Qt 5.5.
 
 119---------------------------------------------------------
 From Yush Yuen:
@@ -4607,5 +4607,3 @@ all the teachers that are not occupied in a particular period.
 So it is basically a Free Teacher timetable printout, but it does not have
 any comments like "Must come earlier" or "Single gap", it just displays the
 names of all the teachers who are not working in that period.
-
-I would like this to be part of the mainstream FET if possible.

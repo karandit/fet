@@ -15,8 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef REMOVE_REDUNDANT_FORM_H
-#define REMOVE_REDUNDANT_FORM_H
+#ifndef REMOVEREDUNDANTFORM_H
+#define REMOVEREDUNDANTFORM_H
 
 #include "ui_removeredundantform_template.h"
 

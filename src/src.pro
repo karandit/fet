@@ -429,7 +429,9 @@ SOURCES += \
 	interface/sparseitemmodel.cpp \
 	\
 	interface/timetableprintform.cpp \
-	interface/statisticsprintform.cpp
+	interface/statisticsprintform.cpp \
+	\
+	interface/timetablestowriteondiskform.cpp
 
 HEADERS += \
 	engine/timetableexport.h \
@@ -865,7 +867,9 @@ HEADERS += \
 	interface/sparseitemmodel.h \
 	\
 	interface/timetableprintform.h \
-	interface/statisticsprintform.h
+	interface/statisticsprintform.h \
+	\
+	interface/timetablestowriteondiskform.h
 
 FORMS += \
 	interface/fetmainform_template.ui \
@@ -1262,7 +1266,9 @@ FORMS += \
 	interface/commentsform_template.ui \
 	interface/splityearform_template.ui \
 	\
-	interface/activityplanningconfirmationform_template.ui
+	interface/activityplanningconfirmationform_template.ui \
+	\
+	interface/timetablestowriteondiskform_template.ui
 
 TRANSLATIONS += \
 	../translations/fet_ar.ts \

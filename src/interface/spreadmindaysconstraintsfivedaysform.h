@@ -15,8 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef SPREAD_MIN_DAYS_CONSTRAINTS_FIVE_DAYS_FORM_H
-#define SPREAD_MIN_DAYS_CONSTRAINTS_FIVE_DAYS_FORM_H
+#ifndef SPREADMINDAYSCONSTRAINTSFIVEDAYSFORM_H
+#define SPREADMINDAYSCONSTRAINTSFIVEDAYSFORM_H
 
 #include "ui_spreadmindaysconstraintsfivedaysform_template.h"
 
