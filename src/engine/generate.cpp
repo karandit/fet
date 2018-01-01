@@ -4074,7 +4074,8 @@ impossiblenotoverlapping:
 					ok=false;
 				else if(h+act->duration > h2)
 					ok=false;
-				else if(d==d2){
+				else{
+					assert(d2==d);
 					int kk;
 					for(kk=h+act->duration; kk<gt.rules.nHoursPerDay; kk++)
 						if(!breakDayHour(d,kk))
@@ -4115,14 +4116,15 @@ impossiblenotoverlapping:
 			double perc=inverseConstrTwoActivitiesConsecutivePercentages[ai].at(i);
 			if(c.times[ai2]!=UNALLOCATED_TIME){
 				int d2=c.times[ai2]%gt.rules.nDaysPerWeek;
-				int h2=c.times[ai2]/gt.rules.nDaysPerWeek;				
+				int h2=c.times[ai2]/gt.rules.nDaysPerWeek;
 				bool ok=true;
 				
 				if(d2!=d)
 					ok=false;
 				else if(h2+gt.rules.internalActivitiesList[ai2].duration > h)
 					ok=false;
-				else if(d==d2){
+				else{
+					assert(d2==d);
 					int kk;
 					for(kk=h2+gt.rules.internalActivitiesList[ai2].duration; kk<gt.rules.nHoursPerDay; kk++)
 						if(!breakDayHour(d,kk))

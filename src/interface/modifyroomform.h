@@ -28,7 +28,6 @@ class ModifyRoomForm : public QDialog, Ui::ModifyRoomForm_template {
 	Q_OBJECT
 	
 	QString _initialRoomName;
-	QString _initialRoomType;
 	QString _initialRoomBuilding;
 	int _initialRoomCapacity;
 public: 

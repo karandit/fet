@@ -1,4 +1,4 @@
-This is FET version 5.29.1
+This is FET version 5.29.2
 
 
 Program description:
@@ -14,9 +14,9 @@ Program description:
 
 Requirements:
 
-	FET is created in the following environment: openSUSE Leap 42.1 GNU/Linux distribution, Linux 4.1.15, Xfce 4.12,
+	FET is created in the following environment: openSUSE Leap 42.1 GNU/Linux distribution, Linux 4.1.20, Xfce 4.12,
 	Midnight Commander 4.8.15, KDiff3 0.9.98, Qt 5.6.0, gcc 5.3.1, g++ 5.3.1, make 4.0, sed 4.2.2,
-	Valgrind 3.10.1, Coverity Scan 7.7.0.4, Cppcheck 1.72, other great free tools.
+	Valgrind 3.10.1, Coverity Scan 7.7.0.4, Cppcheck 1.73, other great free tools.
 	FET can be run on any platform supported by the free software Qt (GNU/Linux, Windows, Mac OS X).
 
 	GNU/Linux, Mac OS X:
@@ -40,9 +40,10 @@ Getting - compiling - installing GNU tools: make, gcc and g++ (or gcc-g++, or gc
 
 	GNU/Linux, Mac OS X: Most probably, your platform has these installed by default or available on the internet
 	as precompiled packages. If you don't have them, please install them using YaST (on openSUSE), Adept Manager
-	(on Ubuntu or Kubuntu) or other package manager.
+	(on Ubuntu) or other package manager.
 	To verify that you have the correct packages, write "make --version", "gcc --version" and
 	"g++ --version".
+	Advice from a user on Ubuntu: "sudo apt-get install build-essential" installs build libraries commonly used.
 
 	Windows: you need a Qt compatible C++ compiler.
 	Maybe an easy option is the MinGW compiler, available inside the Qt or on the Qt download page. You may

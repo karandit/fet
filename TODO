@@ -4542,7 +4542,7 @@ add a QSet and a QList together. But this will require more memory
 allocation and operation. I am not sure.
 
 248---------------------------------------------------------
-From alex (on forum):
+From Vangelis Karafillidis (on forum):
 
 Is there ANY way to achieve a constraint like: "Min hours daily with an activity tag for a students set"? The polar
 opposite (max hours) is available in FET, but what about MIN HOURS? I was thinking of the equivalent of inserting
@@ -4585,7 +4585,7 @@ not to.
 copy/paste the HTML code to a doc file.
 
 250---------------------------------------------------------
-From alex (on forum):
+From Vangelis Karafillidis (on forum):
 
 After generating a timetable and pressing the "Teachers" tab, the generated timetable appears in a teachers-days-horizontal-like
 form. Of course we can lock and unlock activities on this type of timetable. I wonder if it's easy (for you) to add an alternative form.
@@ -4594,7 +4594,7 @@ timetable at once. What do you think?
 
 Liviu: The table might be too large.
 
-alex: I think that it would be easier if this teachers-time-horizontal-like timetable had just the necessary information and nothing more.
+Vangelis: I think that it would be easier if this teachers-time-horizontal-like timetable had just the necessary information and nothing more.
 I.e. just the teachers' names and the student groups (and the locked/unlocked indication). This would result in a far more "compact" timetable
 than including information such as subject titles and tags.
 
@@ -4607,3 +4607,30 @@ all the teachers that are not occupied in a particular period.
 So it is basically a Free Teacher timetable printout, but it does not have
 any comments like "Must come earlier" or "Single gap", it just displays the
 names of all the teachers who are not working in that period.
+
+252---------------------------------------------------------
+From Vangelis Karafillidis:
+
+Constraint teacher(s) max span per day (max hours + gaps per day).
+
+Also for this he showed how to use tricks using activities occupy max time slots from selection.
+
+253---------------------------------------------------------
+From Benahmed Abdelkrim (on forum):
+
+Par fois quand on entre les activité, en se rend compte ensuite qu'on a oublié d'utiliser les étiquettes. Et on se trouve dans obligation de mentioné les activités une par une, ce qui fait perdre un temps précieux . Peut on donc actuellement montioné d'un seul coup un ensemble d'activités choisi?
+Sometimes when you enter the activity, then realizes we forgot to use the tags (labels). And we are in obligation to mentione the activities one by one, which wastes valuable time. Can we therefore now Montione suddenly a selected set of activities?
+
+Liviu:
+
+I am not sure I understand. You mean you want to modify more activities at once? I can add this in the TODO list, if you want, just let me know. But I don't think I will implement soon.
+
+Benahmed Abdelkrim:
+
+oui, absolument, vous pouvez l'ajouter dans le fichier TODO, car cette fonction à mon avis est très utile, vue le temps quelle permet de gagner.
+   a maintes reprises et après production d'un tableau par FET, et après vérification de celui-ci, on se rends compte qu'on est obligé de faire appel a une étiquettes(tags) pour réaliser une séparation dans le temps d'un ensemble d'activités.
+  donc cette nouvelle fonction si elle voit le jour, permet de modifier les étiquettes(tags) d'un seul coup, et non pas comme elle actuellement une par une.
+
+   yes, absolutely, you can add it to the TODO file because this feature in my opinion is very useful for any time saves.
+    has repeatedly and on production of a table by FET, and after checking it, we realize that we are obliged to call a labels (tags) to make a separation in time of a set activities.
+   So this new feature if it is created, we can change the labels (tags) at one time, and not as it is currently one by one.

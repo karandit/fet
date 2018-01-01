@@ -129,7 +129,7 @@ void Export::exportCSV(QWidget* parent){
 	if(INPUT_FILENAME_XML=="")
 		s2="unnamed";
 	else{
-		s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+		s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 		if(s2.right(4)==".fet")
 			s2=s2.left(s2.length()-4);
@@ -438,7 +438,7 @@ LastWarningsDialogE::~LastWarningsDialogE()
 
 
 bool Export::exportCSVActivityTags(QWidget* parent, QString& lastWarnings, const QString textquote, const bool head, const QString setSeparator, QMessageBox::StandardButton& msgBoxButton){
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -468,7 +468,7 @@ bool Export::exportCSVActivityTags(QWidget* parent, QString& lastWarnings, const
 	foreach(ActivityTag* a, gt.rules.activityTagsList){
 		tosExport<<textquote<<protectCSV(a->name)<<textquote<<endl;
 		if(!checkSetSeparator(a->name, setSeparator))
-			lastWarnings+=Export::tr("Warning! Import of activities will fail, because %1 include set separator +.").arg(a->name)+"\n";
+			lastWarnings+=Export::tr("Warning! Import of activities will fail, because %1 includes set separator +.").arg(a->name)+"\n";
 	}
 
 	lastWarnings+=Export::tr("%1 activity tags exported.").arg(gt.rules.activityTagsList.size())+"\n";
@@ -483,7 +483,7 @@ bool Export::exportCSVActivityTags(QWidget* parent, QString& lastWarnings, const
 
 
 bool Export::exportCSVRoomsAndBuildings(QWidget* parent, QString& lastWarnings, const QString textquote, const QString fieldSeparator, const bool head, QMessageBox::StandardButton& msgBoxButton){
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -537,7 +537,7 @@ bool Export::exportCSVRoomsAndBuildings(QWidget* parent, QString& lastWarnings, 
 
 
 bool Export::exportCSVSubjects(QWidget* parent, QString& lastWarnings, const QString textquote, const bool head, QMessageBox::StandardButton& msgBoxButton){
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -580,7 +580,7 @@ bool Export::exportCSVSubjects(QWidget* parent, QString& lastWarnings, const QSt
 
 
 bool Export::exportCSVTeachers(QWidget* parent, QString& lastWarnings, const QString textquote, const bool head, const QString setSeparator, QMessageBox::StandardButton& msgBoxButton){
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -610,7 +610,7 @@ bool Export::exportCSVTeachers(QWidget* parent, QString& lastWarnings, const QSt
 	foreach(Teacher* t, gt.rules.teachersList){
 		tosExport<<textquote<<protectCSV(t->name)<<textquote<<endl;
 		if(!checkSetSeparator(t->name, setSeparator))
-			lastWarnings+=Export::tr("Warning! Import of activities will fail, because %1 include set separator +.").arg(t->name)+"\n";
+			lastWarnings+=Export::tr("Warning! Import of activities will fail, because %1 includes set separator +.").arg(t->name)+"\n";
 	}
 
 	lastWarnings+=Export::tr("%1 teachers exported.").arg(gt.rules.teachersList.size())+"\n";
@@ -625,7 +625,7 @@ bool Export::exportCSVTeachers(QWidget* parent, QString& lastWarnings, const QSt
 
 
 bool Export::exportCSVStudents(QWidget* parent, QString& lastWarnings, const QString textquote, const QString fieldSeparator, const bool head, const QString setSeparator, QMessageBox::StandardButton& msgBoxButton){
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -663,7 +663,7 @@ bool Export::exportCSVStudents(QWidget* parent, QString& lastWarnings, const QSt
 		tosExport<<textquote<<protectCSV(sty->name)<<textquote<<fieldSeparator
 					<<CustomFETString::number(sty->numberOfStudents)<<fieldSeparator<<fieldSeparator<<fieldSeparator<<fieldSeparator<<endl;
 		if(!checkSetSeparator(sty->name, setSeparator))
-			lastWarnings+=Export::tr("Warning! Import of activities will fail, because %1 include set separator +.").arg(sty->name)+"\n";
+			lastWarnings+=Export::tr("Warning! Import of activities will fail, because %1 includes set separator +.").arg(sty->name)+"\n";
 		foreach(StudentsGroup* stg, sty->groupsList){
 			ig++;
 			tosExport	<<textquote<<protectCSV(sty->name)<<textquote<<fieldSeparator
@@ -671,7 +671,7 @@ bool Export::exportCSVStudents(QWidget* parent, QString& lastWarnings, const QSt
 					<<textquote<<protectCSV(stg->name)<<textquote<<fieldSeparator
 					<<CustomFETString::number(stg->numberOfStudents)<<fieldSeparator<<fieldSeparator<<endl;
 			if(!checkSetSeparator(stg->name, setSeparator))
-				lastWarnings+=Export::tr("Warning! Import of activities will fail, because %1 include set separator +.").arg(stg->name)+"\n";
+				lastWarnings+=Export::tr("Warning! Import of activities will fail, because %1 includes set separator +.").arg(stg->name)+"\n";
 			foreach(StudentsSubgroup* sts, stg->subgroupsList){
 				is++;
 				tosExport	<<textquote<<protectCSV(sty->name)<<textquote<<fieldSeparator
@@ -681,7 +681,7 @@ bool Export::exportCSVStudents(QWidget* parent, QString& lastWarnings, const QSt
 						<<textquote<<protectCSV(sts->name)<<textquote<<fieldSeparator
 						<<CustomFETString::number(sts->numberOfStudents)<<endl;
 				if(!checkSetSeparator(sts->name, setSeparator))
-					lastWarnings+=Export::tr("Warning! Import of activities will fail, because %1 include set separator +.").arg(sts->name)+"\n";
+					lastWarnings+=Export::tr("Warning! Import of activities will fail, because %1 includes set separator +.").arg(sts->name)+"\n";
 			}
 		}
 	}
@@ -700,7 +700,7 @@ bool Export::exportCSVStudents(QWidget* parent, QString& lastWarnings, const QSt
 
 
 bool Export::exportCSVActivities(QWidget* parent, QString& lastWarnings, const QString textquote, const QString fieldSeparator, const bool head, QMessageBox::StandardButton& msgBoxButton){
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -974,7 +974,7 @@ bool Export::exportCSVActivities(QWidget* parent, QString& lastWarnings, const Q
 
 
 bool Export::exportCSVActivitiesStatistic(QWidget* parent, QString& lastWarnings, const QString textquote, const QString fieldSeparator, const bool head, QMessageBox::StandardButton& msgBoxButton){
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -1054,7 +1054,7 @@ bool Export::exportCSVActivitiesStatistic(QWidget* parent, QString& lastWarnings
 
 
 bool Export::exportCSVTimetable(QWidget* parent, QString& lastWarnings, const QString textquote, const QString fieldSeparator, const bool head, QMessageBox::StandardButton& msgBoxButton){
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);

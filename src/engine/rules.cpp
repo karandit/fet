@@ -1117,6 +1117,12 @@ bool Rules::modifyTeacher(const QString& initialTeacherName, const QString& fina
 		}
 	}
 	assert(t==1);
+	
+	if(tnatHash.contains(initialTeacherName)){
+		QSet<ConstraintTeacherNotAvailableTimes*> cs=tnatHash.value(initialTeacherName);
+		tnatHash.remove(initialTeacherName);
+		tnatHash.insert(finalTeacherName, cs);
+	}
 
 	this->internalStructureComputed=false;
 	setRulesModifiedAndOtherThings(this);
@@ -2004,6 +2010,14 @@ bool Rules::modifyStudentsSet(const QString& initialStudentsSetName, const QStri
 		permanentStudentsHash.remove(initialStudentsSetName);
 		permanentStudentsHash.insert(studentsSet->name, studentsSet);
 	}
+
+	if(initialStudentsSetName!=finalStudentsSetName){
+		if(ssnatHash.contains(initialStudentsSetName)){
+			QSet<ConstraintStudentsSetNotAvailableTimes*> cs=ssnatHash.value(initialStudentsSetName);
+			ssnatHash.remove(initialStudentsSetName);
+			ssnatHash.insert(finalStudentsSetName, cs);
+		}
+	}
 	
 	this->internalStructureComputed=false;
 	setRulesModifiedAndOtherThings(this);
@@ -2143,6 +2157,13 @@ bool Rules::modifyStudentsSets(const QHash<QString, QString>& oldAndNewStudentsS
 		assert(permanentStudentsHash.contains(i.key()));
 		permanentStudentsHash.remove(i.key());
 		permanentStudentsHash.insert(studentsSet->name, studentsSet);
+
+		assert(i.key()!=i.value());
+		if(ssnatHash.contains(i.key())){
+			QSet<ConstraintStudentsSetNotAvailableTimes*> cs=ssnatHash.value(i.key());
+			ssnatHash.remove(i.key());
+			ssnatHash.insert(i.value(), cs);
+		}
 	}
 	
 	this->internalStructureComputed=false;
@@ -5023,7 +5044,7 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 									xmlReader.raiseError(str);
 									okStudents=false;
 
-									int t=1;
+									//int t=1;
 									
 									/*str=tr("Could not read file - XML parse error at line %1, column %2:\n%3", "The error description is %3")
 									 .arg(xmlReader.lineNumber()).arg(xmlReader.columnNumber()).arg(str);
@@ -5037,8 +5058,8 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 										okStudents=false;
 									}*/
 					
-									if(t==0)
-										skipDuplicatedStudentsSets=true;
+									/*if(t==0)
+										skipDuplicatedStudentsSets=true;*/
 								}
 							}
 						
@@ -5096,7 +5117,7 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 												haveError=true;
 											}
 								
-											int t=1;
+											//int t=1;
 											if(haveError){
 												xmlReader.raiseError(str);
 												okStudents=false;
@@ -5114,8 +5135,8 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 												}*/
 											}
 					
-											if(t==0)
-												skipDuplicatedStudentsSets=true;
+											//if(t==0)
+											//	skipDuplicatedStudentsSets=true;
 										}
 									}
 									
@@ -5202,7 +5223,7 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 														}
 													}
 								
-													int t=1;
+													//int t=1;
 													if(haveError){
 														xmlReader.raiseError(str);
 														okStudents=false;
@@ -5220,8 +5241,8 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 														}*/
 													}
 							
-													if(t==0)
-														skipDuplicatedStudentsSets=true;
+													//if(t==0)
+													//	skipDuplicatedStudentsSets=true;
 												}
 											}
 											

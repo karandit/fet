@@ -12452,7 +12452,8 @@ double ConstraintTwoActivitiesConsecutive::fitness(Solution& c, Rules& r, QList<
 			nbroken=1;
 		else if(fh+r.internalActivitiesList[this->firstActivityIndex].duration>sh)
 			nbroken=1;
-		else if(fd==sd){
+		else{
+			assert(fd==sd);
 			int h;
 			int d=fd;
 			assert(d==sd);
@@ -12460,7 +12461,7 @@ double ConstraintTwoActivitiesConsecutive::fitness(Solution& c, Rules& r, QList<
 				if(!breakDayHour[d][h])
 					break;
 					
-			assert(h<=sh);	
+			assert(h<=sh);
 				
 			if(h!=sh)
 				nbroken=1;

@@ -1859,5 +1859,10 @@ Versions 5.29.0 - 5.29.v
 	- Added a new Indian example file, by Jijo Jose.
 	- Added two new Namibian example files, by Bobby.
 - Version 5.29.1
-	- The selection of the categories of timetables to be written on disk after generation is now improved (suggested by Alexandre R. Soares).
+	- The method of selection of the categories of timetables to be written on disk after generation is now improved (suggested by Alexandre R. Soares).
 	- Brazilian Portuguese translation update, by Alexandre R. Soares.
+- Version 5.29.2
+	- Crash bugs fixed - the program crashed when renaming teachers/students and removing their attached constraints not available times
+	(reported by Wizard).
+	- Brazilian Portuguese translation update, by Alexandre R. Soares. It is now complete.
+	- Code cleanup (improvements found by Volker Dirr using Cppcheck 1.73).
