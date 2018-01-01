@@ -38,6 +38,10 @@ public slots:
 	void addBuilding();
 	void removeBuilding();
 	void buildingChanged(int index);
+
+	void moveBuildingUp();
+	void moveBuildingDown();
+
 	void sortBuildings();
 	void modifyBuilding();
 	void filterChanged();

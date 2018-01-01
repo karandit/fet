@@ -49,6 +49,10 @@ TeachersForm::TeachersForm(QWidget* parent): QDialog(parent)
 	connect(renameTeacherPushButton, SIGNAL(clicked()), this, SLOT(renameTeacher()));
 	connect(closePushButton, SIGNAL(clicked()), this, SLOT(close()));
 	connect(addTeacherPushButton, SIGNAL(clicked()), this, SLOT(addTeacher()));
+
+	connect(moveTeacherUpPushButton, SIGNAL(clicked()), this, SLOT(moveTeacherUp()));
+	connect(moveTeacherDownPushButton, SIGNAL(clicked()), this, SLOT(moveTeacherDown()));
+
 	connect(sortTeachersPushButton, SIGNAL(clicked()), this, SLOT(sortTeachers()));
 	connect(removeTeacherPushButton, SIGNAL(clicked()), this, SLOT(removeTeacher()));
 	connect(teachersListWidget, SIGNAL(currentRowChanged(int)), this, SLOT(teacherChanged(int)));
@@ -177,6 +181,64 @@ void TeachersForm::renameTeacher()
 			teacherChanged(teachersListWidget->currentRow());
 		}
 	}
+}
+
+void TeachersForm::moveTeacherUp()
+{
+	if(teachersListWidget->count()<=1)
+		return;
+	int i=teachersListWidget->currentRow();
+	if(i<0 || i>=teachersListWidget->count())
+		return;
+	if(i==0)
+		return;
+		
+	QString s1=teachersListWidget->item(i)->text();
+	QString s2=teachersListWidget->item(i-1)->text();
+	
+	Teacher* at1=gt.rules.teachersList.at(i);
+	Teacher* at2=gt.rules.teachersList.at(i-1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	teachersListWidget->item(i)->setText(s2);
+	teachersListWidget->item(i-1)->setText(s1);
+	
+	gt.rules.teachersList[i]=at2;
+	gt.rules.teachersList[i-1]=at1;
+	
+	teachersListWidget->setCurrentRow(i-1);
+	teacherChanged(i-1);
+}
+
+void TeachersForm::moveTeacherDown()
+{
+	if(teachersListWidget->count()<=1)
+		return;
+	int i=teachersListWidget->currentRow();
+	if(i<0 || i>=teachersListWidget->count())
+		return;
+	if(i==teachersListWidget->count()-1)
+		return;
+		
+	QString s1=teachersListWidget->item(i)->text();
+	QString s2=teachersListWidget->item(i+1)->text();
+	
+	Teacher* at1=gt.rules.teachersList.at(i);
+	Teacher* at2=gt.rules.teachersList.at(i+1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	teachersListWidget->item(i)->setText(s2);
+	teachersListWidget->item(i+1)->setText(s1);
+	
+	gt.rules.teachersList[i]=at2;
+	gt.rules.teachersList[i+1]=at1;
+	
+	teachersListWidget->setCurrentRow(i+1);
+	teacherChanged(i+1);
 }
 
 void TeachersForm::sortTeachers()

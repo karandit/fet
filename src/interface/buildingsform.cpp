@@ -51,6 +51,10 @@ BuildingsForm::BuildingsForm(QWidget* parent): QDialog(parent)
 	connect(buildingsListWidget, SIGNAL(currentRowChanged(int)), this, SLOT(buildingChanged(int)));
 	connect(closePushButton, SIGNAL(clicked()), this, SLOT(close()));
 	connect(modifyBuildingPushButton, SIGNAL(clicked()), this, SLOT(modifyBuilding()));
+
+	connect(moveBuildingUpPushButton, SIGNAL(clicked()), this, SLOT(moveBuildingUp()));
+	connect(moveBuildingDownPushButton, SIGNAL(clicked()), this, SLOT(moveBuildingDown()));
+
 	connect(sortBuildingsPushButton, SIGNAL(clicked()), this, SLOT(sortBuildings()));
 	connect(buildingsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(modifyBuilding()));
 
@@ -157,6 +161,64 @@ void BuildingsForm::buildingChanged(int index)
 	assert(building!=NULL);
 	s=building->getDetailedDescriptionWithConstraints(gt.rules);
 	currentBuildingTextEdit->setPlainText(s);
+}
+
+void BuildingsForm::moveBuildingUp()
+{
+	if(buildingsListWidget->count()<=1)
+		return;
+	int i=buildingsListWidget->currentRow();
+	if(i<0 || i>=buildingsListWidget->count())
+		return;
+	if(i==0)
+		return;
+		
+	QString s1=buildingsListWidget->item(i)->text();
+	QString s2=buildingsListWidget->item(i-1)->text();
+	
+	Building* bu1=gt.rules.buildingsList.at(i);
+	Building* bu2=gt.rules.buildingsList.at(i-1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	buildingsListWidget->item(i)->setText(s2);
+	buildingsListWidget->item(i-1)->setText(s1);
+	
+	gt.rules.buildingsList[i]=bu2;
+	gt.rules.buildingsList[i-1]=bu1;
+	
+	buildingsListWidget->setCurrentRow(i-1);
+	buildingChanged(i-1);
+}
+
+void BuildingsForm::moveBuildingDown()
+{
+	if(buildingsListWidget->count()<=1)
+		return;
+	int i=buildingsListWidget->currentRow();
+	if(i<0 || i>=buildingsListWidget->count())
+		return;
+	if(i==buildingsListWidget->count()-1)
+		return;
+		
+	QString s1=buildingsListWidget->item(i)->text();
+	QString s2=buildingsListWidget->item(i+1)->text();
+	
+	Building* bu1=gt.rules.buildingsList.at(i);
+	Building* bu2=gt.rules.buildingsList.at(i+1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	buildingsListWidget->item(i)->setText(s2);
+	buildingsListWidget->item(i+1)->setText(s1);
+	
+	gt.rules.buildingsList[i]=bu2;
+	gt.rules.buildingsList[i+1]=bu1;
+	
+	buildingsListWidget->setCurrentRow(i+1);
+	buildingChanged(i+1);
 }
 
 void BuildingsForm::sortBuildings()

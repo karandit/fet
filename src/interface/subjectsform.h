@@ -32,6 +32,10 @@ public slots:
 	void addSubject();
 	void removeSubject();
 	void renameSubject();
+	
+	void moveSubjectUp();
+	void moveSubjectDown();
+	
 	void sortSubjects();
 	
 	void subjectChanged(int index);

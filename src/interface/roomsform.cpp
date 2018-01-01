@@ -50,6 +50,10 @@ RoomsForm::RoomsForm(QWidget* parent): QDialog(parent)
 	connect(roomsListWidget, SIGNAL(currentRowChanged(int)), this, SLOT(roomChanged(int)));
 	connect(closePushButton, SIGNAL(clicked()), this, SLOT(close()));
 	connect(modifyRoomPushButton, SIGNAL(clicked()), this, SLOT(modifyRoom()));
+
+	connect(moveRoomUpPushButton, SIGNAL(clicked()), this, SLOT(moveRoomUp()));
+	connect(moveRoomDownPushButton, SIGNAL(clicked()), this, SLOT(moveRoomDown()));
+
 	connect(sortRoomsPushButton, SIGNAL(clicked()), this, SLOT(sortRooms()));
 	connect(roomsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(modifyRoom()));
 
@@ -156,6 +160,64 @@ void RoomsForm::roomChanged(int index)
 	assert(room!=NULL);
 	s=room->getDetailedDescriptionWithConstraints(gt.rules);
 	currentRoomTextEdit->setPlainText(s);
+}
+
+void RoomsForm::moveRoomUp()
+{
+	if(roomsListWidget->count()<=1)
+		return;
+	int i=roomsListWidget->currentRow();
+	if(i<0 || i>=roomsListWidget->count())
+		return;
+	if(i==0)
+		return;
+		
+	QString s1=roomsListWidget->item(i)->text();
+	QString s2=roomsListWidget->item(i-1)->text();
+	
+	Room* rm1=gt.rules.roomsList.at(i);
+	Room* rm2=gt.rules.roomsList.at(i-1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	roomsListWidget->item(i)->setText(s2);
+	roomsListWidget->item(i-1)->setText(s1);
+	
+	gt.rules.roomsList[i]=rm2;
+	gt.rules.roomsList[i-1]=rm1;
+	
+	roomsListWidget->setCurrentRow(i-1);
+	roomChanged(i-1);
+}
+
+void RoomsForm::moveRoomDown()
+{
+	if(roomsListWidget->count()<=1)
+		return;
+	int i=roomsListWidget->currentRow();
+	if(i<0 || i>=roomsListWidget->count())
+		return;
+	if(i==roomsListWidget->count()-1)
+		return;
+		
+	QString s1=roomsListWidget->item(i)->text();
+	QString s2=roomsListWidget->item(i+1)->text();
+	
+	Room* rm1=gt.rules.roomsList.at(i);
+	Room* rm2=gt.rules.roomsList.at(i+1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	roomsListWidget->item(i)->setText(s2);
+	roomsListWidget->item(i+1)->setText(s1);
+	
+	gt.rules.roomsList[i]=rm2;
+	gt.rules.roomsList[i+1]=rm1;
+	
+	roomsListWidget->setCurrentRow(i+1);
+	roomChanged(i+1);
 }
 
 void RoomsForm::sortRooms()

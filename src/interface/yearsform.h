@@ -31,6 +31,10 @@ public slots:
 	void addYear();
 	void removeYear();
 	void modifyYear();
+
+	void moveYearUp();
+	void moveYearDown();
+
 	void sortYears();
 	void yearChanged();
 	

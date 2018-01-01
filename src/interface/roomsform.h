@@ -37,6 +37,10 @@ public slots:
 	void addRoom();
 	void removeRoom();
 	void modifyRoom();
+
+	void moveRoomUp();
+	void moveRoomDown();
+
 	void sortRooms();
 	void roomChanged(int index);
 	void filterChanged();

@@ -161,6 +161,10 @@ AllTimeConstraintsForm::AllTimeConstraintsForm(QWidget* parent): QDialog(parent)
 	connect(modifyConstraintPushButton, SIGNAL(clicked()), this, SLOT(modifyConstraint()));
 	connect(constraintsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(modifyConstraint()));
 	connect(filterCheckBox, SIGNAL(toggled(bool)), this, SLOT(filter(bool)));
+
+	connect(moveTimeConstraintUpPushButton, SIGNAL(clicked()), this, SLOT(moveTimeConstraintUp()));
+	connect(moveTimeConstraintDownPushButton, SIGNAL(clicked()), this, SLOT(moveTimeConstraintDown()));
+
 	connect(sortedCheckBox, SIGNAL(toggled(bool)), this, SLOT(sortedChanged(bool)));
 	connect(activatePushButton, SIGNAL(clicked()), this, SLOT(activateConstraint()));
 	connect(deactivatePushButton, SIGNAL(clicked()), this, SLOT(deactivateConstraint()));
@@ -288,6 +292,118 @@ bool AllTimeConstraintsForm::filterOk(TimeConstraint* ctr)
 			
 		return ok;
 	}
+}
+
+void AllTimeConstraintsForm::moveTimeConstraintUp()
+{
+	if(filterCheckBox->isChecked()){
+		QMessageBox::information(this, tr("FET information"), tr("To move a time constraint, the 'Filter' check box must not be checked."));
+		return;
+	}
+	if(sortedCheckBox->isChecked()){
+		QMessageBox::information(this, tr("FET information"), tr("To move a time constraint, the 'Sorted' check box must not be checked."));
+		return;
+	}
+	
+	if(constraintsListWidget->count()<=1)
+		return;
+	int i=constraintsListWidget->currentRow();
+	if(i<0 || i>=constraintsListWidget->count())
+		return;
+	if(i==0)
+		return;
+		
+	QString s1=constraintsListWidget->item(i)->text();
+	QString s2=constraintsListWidget->item(i-1)->text();
+	
+	assert(gt.rules.timeConstraintsList.count()==visibleTimeConstraintsList.count());
+	TimeConstraint* tc1=gt.rules.timeConstraintsList.at(i);
+	assert(tc1==visibleTimeConstraintsList.at(i));
+	TimeConstraint* tc2=gt.rules.timeConstraintsList.at(i-1);
+	assert(tc2==visibleTimeConstraintsList.at(i-1));
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	constraintsListWidget->item(i)->setText(s2);
+	constraintsListWidget->item(i-1)->setText(s1);
+	
+	gt.rules.timeConstraintsList[i]=tc2;
+	gt.rules.timeConstraintsList[i-1]=tc1;
+	
+	visibleTimeConstraintsList[i]=tc2;
+	visibleTimeConstraintsList[i-1]=tc1;
+	
+	if(USE_GUI_COLORS){
+		if(tc2->active)
+			constraintsListWidget->item(i)->setBackground(constraintsListWidget->palette().base());
+		else
+			constraintsListWidget->item(i)->setBackground(constraintsListWidget->palette().alternateBase());
+
+		if(tc1->active)
+			constraintsListWidget->item(i-1)->setBackground(constraintsListWidget->palette().base());
+		else
+			constraintsListWidget->item(i-1)->setBackground(constraintsListWidget->palette().alternateBase());
+	}
+
+	constraintsListWidget->setCurrentRow(i-1);
+	constraintChanged(/*i-1*/);
+}
+
+void AllTimeConstraintsForm::moveTimeConstraintDown()
+{
+	if(filterCheckBox->isChecked()){
+		QMessageBox::information(this, tr("FET information"), tr("To move a time constraint, the 'Filter' check box must not be checked."));
+		return;
+	}
+	if(sortedCheckBox->isChecked()){
+		QMessageBox::information(this, tr("FET information"), tr("To move a time constraint, the 'Sorted' check box must not be checked."));
+		return;
+	}
+	
+	if(constraintsListWidget->count()<=1)
+		return;
+	int i=constraintsListWidget->currentRow();
+	if(i<0 || i>=constraintsListWidget->count())
+		return;
+	if(i==constraintsListWidget->count()-1)
+		return;
+		
+	QString s1=constraintsListWidget->item(i)->text();
+	QString s2=constraintsListWidget->item(i+1)->text();
+	
+	assert(gt.rules.timeConstraintsList.count()==visibleTimeConstraintsList.count());
+	TimeConstraint* tc1=gt.rules.timeConstraintsList.at(i);
+	assert(tc1==visibleTimeConstraintsList.at(i));
+	TimeConstraint* tc2=gt.rules.timeConstraintsList.at(i+1);
+	assert(tc2==visibleTimeConstraintsList.at(i+1));
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	constraintsListWidget->item(i)->setText(s2);
+	constraintsListWidget->item(i+1)->setText(s1);
+	
+	gt.rules.timeConstraintsList[i]=tc2;
+	gt.rules.timeConstraintsList[i+1]=tc1;
+	
+	visibleTimeConstraintsList[i]=tc2;
+	visibleTimeConstraintsList[i+1]=tc1;
+	
+	if(USE_GUI_COLORS){
+		if(tc2->active)
+			constraintsListWidget->item(i)->setBackground(constraintsListWidget->palette().base());
+		else
+			constraintsListWidget->item(i)->setBackground(constraintsListWidget->palette().alternateBase());
+
+		if(tc1->active)
+			constraintsListWidget->item(i+1)->setBackground(constraintsListWidget->palette().base());
+		else
+			constraintsListWidget->item(i+1)->setBackground(constraintsListWidget->palette().alternateBase());
+	}
+
+	constraintsListWidget->setCurrentRow(i+1);
+	constraintChanged(/*i+1*/);
 }
 
 void AllTimeConstraintsForm::sortedChanged(bool checked)

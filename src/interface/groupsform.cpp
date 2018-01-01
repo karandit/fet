@@ -57,6 +57,10 @@ GroupsForm::GroupsForm(QWidget* parent): QDialog(parent)
 	connect(closePushButton, SIGNAL(clicked()), this, SLOT(close()));
 	connect(groupsListWidget, SIGNAL(currentTextChanged(const QString&)), this, SLOT(groupChanged(const QString&)));
 	connect(modifyGroupPushButton, SIGNAL(clicked()), this, SLOT(modifyGroup()));
+
+	connect(moveGroupUpPushButton, SIGNAL(clicked()), this, SLOT(moveGroupUp()));
+	connect(moveGroupDownPushButton, SIGNAL(clicked()), this, SLOT(moveGroupDown()));
+
 	connect(sortGroupsPushButton, SIGNAL(clicked()), this, SLOT(sortGroups()));
 	connect(activateStudentsPushButton, SIGNAL(clicked()), this, SLOT(activateStudents()));
 	connect(deactivateStudentsPushButton, SIGNAL(clicked()), this, SLOT(deactivateStudents()));
@@ -285,6 +289,72 @@ void GroupsForm::groupChanged(const QString &groupName)
 	}
 	StudentsGroup* sg=(StudentsGroup*)ss;
 	groupTextEdit->setPlainText(sg->getDetailedDescriptionWithConstraints(gt.rules));
+}
+
+void GroupsForm::moveGroupUp()
+{
+	if(groupsListWidget->count()<=1)
+		return;
+	int i=groupsListWidget->currentRow();
+	if(i<0 || i>=groupsListWidget->count())
+		return;
+	if(i==0)
+		return;
+		
+	QString s1=groupsListWidget->item(i)->text();
+	QString s2=groupsListWidget->item(i-1)->text();
+	
+	assert(yearsListWidget->currentRow()>=0);
+	assert(yearsListWidget->currentRow()<gt.rules.yearsList.count());
+	StudentsYear* sy=gt.rules.yearsList.at(yearsListWidget->currentRow());
+	
+	StudentsGroup* sg1=sy->groupsList.at(i);
+	StudentsGroup* sg2=sy->groupsList.at(i-1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	groupsListWidget->item(i)->setText(s2);
+	groupsListWidget->item(i-1)->setText(s1);
+	
+	sy->groupsList[i]=sg2;
+	sy->groupsList[i-1]=sg1;
+	
+	groupsListWidget->setCurrentRow(i-1);
+	groupChanged(/*i-1*/s1);
+}
+
+void GroupsForm::moveGroupDown()
+{
+	if(groupsListWidget->count()<=1)
+		return;
+	int i=groupsListWidget->currentRow();
+	if(i<0 || i>=groupsListWidget->count())
+		return;
+	if(i==groupsListWidget->count()-1)
+		return;
+		
+	QString s1=groupsListWidget->item(i)->text();
+	QString s2=groupsListWidget->item(i+1)->text();
+	
+	assert(yearsListWidget->currentRow()>=0);
+	assert(yearsListWidget->currentRow()<gt.rules.yearsList.count());
+	StudentsYear* sy=gt.rules.yearsList.at(yearsListWidget->currentRow());
+	
+	StudentsGroup* sg1=sy->groupsList.at(i);
+	StudentsGroup* sg2=sy->groupsList.at(i+1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	groupsListWidget->item(i)->setText(s2);
+	groupsListWidget->item(i+1)->setText(s1);
+	
+	sy->groupsList[i]=sg2;
+	sy->groupsList[i+1]=sg1;
+	
+	groupsListWidget->setCurrentRow(i+1);
+	groupChanged(/*i+1*/s1);
 }
 
 void GroupsForm::sortGroups()

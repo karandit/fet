@@ -84,6 +84,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="moveTimeConstraintUpPushButton">
+       <property name="text">
+        <string comment="It means move the item up in the list">Up</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="activatePushButton">
        <property name="text">
         <string comment="Refers to activating a time constraint">Activate</string>
@@ -112,6 +119,13 @@
       <widget class="QCheckBox" name="sortedCheckBox">
        <property name="text">
         <string comment="It refers to time constraints">Sorted</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="moveTimeConstraintDownPushButton">
+       <property name="text">
+        <string comment="It means move the item down in the list">Down</string>
        </property>
       </widget>
      </item>

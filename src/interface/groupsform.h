@@ -32,6 +32,9 @@ public slots:
 	void removeGroup();
 	void purgeGroup();
 	void modifyGroup();
+
+	void moveGroupUp();
+	void moveGroupDown();
 	
 	void sortGroups();
 	

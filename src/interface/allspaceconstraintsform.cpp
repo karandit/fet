@@ -113,6 +113,10 @@ AllSpaceConstraintsForm::AllSpaceConstraintsForm(QWidget* parent): QDialog(paren
 	connect(modifyConstraintPushButton, SIGNAL(clicked()), this, SLOT(modifyConstraint()));
 	connect(constraintsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(modifyConstraint()));
 	connect(filterCheckBox, SIGNAL(toggled(bool)), this, SLOT(filter(bool)));
+
+	connect(moveSpaceConstraintUpPushButton, SIGNAL(clicked()), this, SLOT(moveSpaceConstraintUp()));
+	connect(moveSpaceConstraintDownPushButton, SIGNAL(clicked()), this, SLOT(moveSpaceConstraintDown()));
+
 	connect(sortedCheckBox, SIGNAL(toggled(bool)), this, SLOT(sortedChanged(bool)));
 	connect(activatePushButton, SIGNAL(clicked()), this, SLOT(activateConstraint()));
 	connect(deactivatePushButton, SIGNAL(clicked()), this, SLOT(deactivateConstraint()));
@@ -240,6 +244,118 @@ bool AllSpaceConstraintsForm::filterOk(SpaceConstraint* ctr)
 			
 		return ok;
 	}
+}
+
+void AllSpaceConstraintsForm::moveSpaceConstraintUp()
+{
+	if(filterCheckBox->isChecked()){
+		QMessageBox::information(this, tr("FET information"), tr("To move a space constraint, the 'Filter' check box must not be checked."));
+		return;
+	}
+	if(sortedCheckBox->isChecked()){
+		QMessageBox::information(this, tr("FET information"), tr("To move a space constraint, the 'Sorted' check box must not be checked."));
+		return;
+	}
+	
+	if(constraintsListWidget->count()<=1)
+		return;
+	int i=constraintsListWidget->currentRow();
+	if(i<0 || i>=constraintsListWidget->count())
+		return;
+	if(i==0)
+		return;
+		
+	QString s1=constraintsListWidget->item(i)->text();
+	QString s2=constraintsListWidget->item(i-1)->text();
+	
+	assert(gt.rules.spaceConstraintsList.count()==visibleSpaceConstraintsList.count());
+	SpaceConstraint* sc1=gt.rules.spaceConstraintsList.at(i);
+	assert(sc1==visibleSpaceConstraintsList.at(i));
+	SpaceConstraint* sc2=gt.rules.spaceConstraintsList.at(i-1);
+	assert(sc2==visibleSpaceConstraintsList.at(i-1));
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	constraintsListWidget->item(i)->setText(s2);
+	constraintsListWidget->item(i-1)->setText(s1);
+	
+	gt.rules.spaceConstraintsList[i]=sc2;
+	gt.rules.spaceConstraintsList[i-1]=sc1;
+	
+	visibleSpaceConstraintsList[i]=sc2;
+	visibleSpaceConstraintsList[i-1]=sc1;
+	
+	if(USE_GUI_COLORS){
+		if(sc2->active)
+			constraintsListWidget->item(i)->setBackground(constraintsListWidget->palette().base());
+		else
+			constraintsListWidget->item(i)->setBackground(constraintsListWidget->palette().alternateBase());
+
+		if(sc1->active)
+			constraintsListWidget->item(i-1)->setBackground(constraintsListWidget->palette().base());
+		else
+			constraintsListWidget->item(i-1)->setBackground(constraintsListWidget->palette().alternateBase());
+	}
+
+	constraintsListWidget->setCurrentRow(i-1);
+	constraintChanged(/*i-1*/);
+}
+
+void AllSpaceConstraintsForm::moveSpaceConstraintDown()
+{
+	if(filterCheckBox->isChecked()){
+		QMessageBox::information(this, tr("FET information"), tr("To move a space constraint, the 'Filter' check box must not be checked."));
+		return;
+	}
+	if(sortedCheckBox->isChecked()){
+		QMessageBox::information(this, tr("FET information"), tr("To move a space constraint, the 'Sorted' check box must not be checked."));
+		return;
+	}
+	
+	if(constraintsListWidget->count()<=1)
+		return;
+	int i=constraintsListWidget->currentRow();
+	if(i<0 || i>=constraintsListWidget->count())
+		return;
+	if(i==constraintsListWidget->count()-1)
+		return;
+		
+	QString s1=constraintsListWidget->item(i)->text();
+	QString s2=constraintsListWidget->item(i+1)->text();
+	
+	assert(gt.rules.spaceConstraintsList.count()==visibleSpaceConstraintsList.count());
+	SpaceConstraint* sc1=gt.rules.spaceConstraintsList.at(i);
+	assert(sc1==visibleSpaceConstraintsList.at(i));
+	SpaceConstraint* sc2=gt.rules.spaceConstraintsList.at(i+1);
+	assert(sc2==visibleSpaceConstraintsList.at(i+1));
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	constraintsListWidget->item(i)->setText(s2);
+	constraintsListWidget->item(i+1)->setText(s1);
+	
+	gt.rules.spaceConstraintsList[i]=sc2;
+	gt.rules.spaceConstraintsList[i+1]=sc1;
+	
+	visibleSpaceConstraintsList[i]=sc2;
+	visibleSpaceConstraintsList[i+1]=sc1;
+	
+	if(USE_GUI_COLORS){
+		if(sc2->active)
+			constraintsListWidget->item(i)->setBackground(constraintsListWidget->palette().base());
+		else
+			constraintsListWidget->item(i)->setBackground(constraintsListWidget->palette().alternateBase());
+
+		if(sc1->active)
+			constraintsListWidget->item(i+1)->setBackground(constraintsListWidget->palette().base());
+		else
+			constraintsListWidget->item(i+1)->setBackground(constraintsListWidget->palette().alternateBase());
+	}
+
+	constraintsListWidget->setCurrentRow(i+1);
+	constraintChanged(/*i+1*/);
 }
 
 void AllSpaceConstraintsForm::sortedChanged(bool checked)

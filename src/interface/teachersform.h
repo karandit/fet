@@ -32,6 +32,10 @@ public slots:
 	void addTeacher();
 	void removeTeacher();
 	void renameTeacher();
+
+	void moveTeacherUp();
+	void moveTeacherDown();
+
 	void sortTeachers();
 	
 	void teacherChanged(int index);

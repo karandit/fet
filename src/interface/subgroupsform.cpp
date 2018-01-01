@@ -62,6 +62,10 @@ SubgroupsForm::SubgroupsForm(QWidget* parent): QDialog(parent)
 	connect(closePushButton, SIGNAL(clicked()), this, SLOT(close()));
 	connect(subgroupsListWidget, SIGNAL(currentTextChanged(const QString&)), this, SLOT(subgroupChanged(const QString&)));
 	connect(modifySubgroupPushButton, SIGNAL(clicked()), this, SLOT(modifySubgroup()));
+
+	connect(moveSubgroupUpPushButton, SIGNAL(clicked()), this, SLOT(moveSubgroupUp()));
+	connect(moveSubgroupDownPushButton, SIGNAL(clicked()), this, SLOT(moveSubgroupDown()));
+
 	connect(sortSubgroupsPushButton, SIGNAL(clicked()), this, SLOT(sortSubgroups()));
 	connect(activateStudentsPushButton, SIGNAL(clicked()), this, SLOT(activateStudents()));
 	connect(deactivateStudentsPushButton, SIGNAL(clicked()), this, SLOT(deactivateStudents()));
@@ -352,6 +356,80 @@ void SubgroupsForm::subgroupChanged(const QString &subgroupName)
 	}
 	StudentsSubgroup* s=(StudentsSubgroup*)ss;
 	subgroupTextEdit->setPlainText(s->getDetailedDescriptionWithConstraints(gt.rules));
+}
+
+void SubgroupsForm::moveSubgroupUp()
+{
+	if(subgroupsListWidget->count()<=1)
+		return;
+	int i=subgroupsListWidget->currentRow();
+	if(i<0 || i>=subgroupsListWidget->count())
+		return;
+	if(i==0)
+		return;
+		
+	QString s1=subgroupsListWidget->item(i)->text();
+	QString s2=subgroupsListWidget->item(i-1)->text();
+	
+	assert(yearsListWidget->currentRow()>=0);
+	assert(yearsListWidget->currentRow()<gt.rules.yearsList.count());
+	StudentsYear* sy=gt.rules.yearsList.at(yearsListWidget->currentRow());
+	
+	assert(groupsListWidget->currentRow()>=0);
+	assert(groupsListWidget->currentRow()<sy->groupsList.count());
+	StudentsGroup* sg=sy->groupsList.at(groupsListWidget->currentRow());
+	
+	StudentsSubgroup* ss1=sg->subgroupsList.at(i);
+	StudentsSubgroup* ss2=sg->subgroupsList.at(i-1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	subgroupsListWidget->item(i)->setText(s2);
+	subgroupsListWidget->item(i-1)->setText(s1);
+	
+	sg->subgroupsList[i]=ss2;
+	sg->subgroupsList[i-1]=ss1;
+	
+	subgroupsListWidget->setCurrentRow(i-1);
+	subgroupChanged(/*i-1*/s1);
+}
+
+void SubgroupsForm::moveSubgroupDown()
+{
+	if(subgroupsListWidget->count()<=1)
+		return;
+	int i=subgroupsListWidget->currentRow();
+	if(i<0 || i>=subgroupsListWidget->count())
+		return;
+	if(i==subgroupsListWidget->count()-1)
+		return;
+		
+	QString s1=subgroupsListWidget->item(i)->text();
+	QString s2=subgroupsListWidget->item(i+1)->text();
+	
+	assert(yearsListWidget->currentRow()>=0);
+	assert(yearsListWidget->currentRow()<gt.rules.yearsList.count());
+	StudentsYear* sy=gt.rules.yearsList.at(yearsListWidget->currentRow());
+	
+	assert(groupsListWidget->currentRow()>=0);
+	assert(groupsListWidget->currentRow()<sy->groupsList.count());
+	StudentsGroup* sg=sy->groupsList.at(groupsListWidget->currentRow());
+	
+	StudentsSubgroup* ss1=sg->subgroupsList.at(i);
+	StudentsSubgroup* ss2=sg->subgroupsList.at(i+1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	subgroupsListWidget->item(i)->setText(s2);
+	subgroupsListWidget->item(i+1)->setText(s1);
+	
+	sg->subgroupsList[i]=ss2;
+	sg->subgroupsList[i+1]=ss1;
+	
+	subgroupsListWidget->setCurrentRow(i+1);
+	subgroupChanged(/*i+1*/s1);
 }
 
 void SubgroupsForm::sortSubgroups()

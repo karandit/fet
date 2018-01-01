@@ -53,6 +53,10 @@ ActivityTagsForm::ActivityTagsForm(QWidget* parent): QDialog(parent)
 	connect(addActivityTagPushButton, SIGNAL(clicked()), this, SLOT(addActivityTag()));
 	connect(removeActivityTagPushButton, SIGNAL(clicked()), this, SLOT(removeActivityTag()));
 	connect(renameActivityTagPushButton, SIGNAL(clicked()), this, SLOT(renameActivityTag()));
+
+	connect(moveActivityTagUpPushButton, SIGNAL(clicked()), this, SLOT(moveActivityTagUp()));
+	connect(moveActivityTagDownPushButton, SIGNAL(clicked()), this, SLOT(moveActivityTagDown()));
+
 	connect(sortActivityTagsPushButton, SIGNAL(clicked()), this, SLOT(sortActivityTags()));
 	connect(activityTagsListWidget, SIGNAL(currentRowChanged(int)), this, SLOT(activityTagChanged(int)));
 	connect(activateActivityTagPushButton, SIGNAL(clicked()), this, SLOT(activateActivityTag()));
@@ -182,6 +186,64 @@ void ActivityTagsForm::renameActivityTag()
 			activityTagChanged(activityTagsListWidget->currentRow());
 		}
 	}
+}
+
+void ActivityTagsForm::moveActivityTagUp()
+{
+	if(activityTagsListWidget->count()<=1)
+		return;
+	int i=activityTagsListWidget->currentRow();
+	if(i<0 || i>=activityTagsListWidget->count())
+		return;
+	if(i==0)
+		return;
+		
+	QString s1=activityTagsListWidget->item(i)->text();
+	QString s2=activityTagsListWidget->item(i-1)->text();
+	
+	ActivityTag* at1=gt.rules.activityTagsList.at(i);
+	ActivityTag* at2=gt.rules.activityTagsList.at(i-1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	activityTagsListWidget->item(i)->setText(s2);
+	activityTagsListWidget->item(i-1)->setText(s1);
+	
+	gt.rules.activityTagsList[i]=at2;
+	gt.rules.activityTagsList[i-1]=at1;
+	
+	activityTagsListWidget->setCurrentRow(i-1);
+	activityTagChanged(i-1);
+}
+
+void ActivityTagsForm::moveActivityTagDown()
+{
+	if(activityTagsListWidget->count()<=1)
+		return;
+	int i=activityTagsListWidget->currentRow();
+	if(i<0 || i>=activityTagsListWidget->count())
+		return;
+	if(i==activityTagsListWidget->count()-1)
+		return;
+		
+	QString s1=activityTagsListWidget->item(i)->text();
+	QString s2=activityTagsListWidget->item(i+1)->text();
+	
+	ActivityTag* at1=gt.rules.activityTagsList.at(i);
+	ActivityTag* at2=gt.rules.activityTagsList.at(i+1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	activityTagsListWidget->item(i)->setText(s2);
+	activityTagsListWidget->item(i+1)->setText(s1);
+	
+	gt.rules.activityTagsList[i]=at2;
+	gt.rules.activityTagsList[i+1]=at1;
+	
+	activityTagsListWidget->setCurrentRow(i+1);
+	activityTagChanged(i+1);
 }
 
 void ActivityTagsForm::sortActivityTags()

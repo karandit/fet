@@ -46,7 +46,7 @@ void HelpFaqForm::setText()
 	
 	s+=tr("Frequently asked questions.");
 	s+="\n\n";
-	s+=tr("Last modified on %1.").arg(tr("21 December 2014"));
+	s+=tr("Last modified on %1.").arg(tr("7 February 2016"));
 	
 	s+="\n\n";
 	s+="--------------------";
@@ -1009,6 +1009,17 @@ void HelpFaqForm::setText()
 	s+=" ";
 	s+=tr("In such cases (individual students as FET subgroups), remember that a smaller number of total subgroups means faster generation time, so"
 		" you might want to consider a single subgroup for two or more students who have the exact same activities and constraints.");
+
+	s+="\n\n";
+	s+="--------------------";
+	s+="\n\n";
+	
+	s+=tr("Q: Does the order of constraints have influence on their importance while generating the timetable?");
+	s+="\n\n";
+	s+=tr("A:", "Answer");
+	s+=" ";
+	s+=tr("The order of the constraints is only important to the interaction with the user. It is only the weight percentage which counts while"
+		" generating the timetable. Note however that you may get different timetables for different constraints order.");
 
 	plainTextEdit->setPlainText(s);
 }

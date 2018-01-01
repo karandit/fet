@@ -78,6 +78,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="moveSpaceConstraintUpPushButton">
+       <property name="text">
+        <string comment="It means move the item up in the list">Up</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="activatePushButton">
        <property name="text">
         <string comment="Refers to activating a space constraint">Activate</string>
@@ -106,6 +113,13 @@
       <widget class="QCheckBox" name="sortedCheckBox">
        <property name="text">
         <string comment="It refers to space constraints">Sorted</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="moveSpaceConstraintDownPushButton">
+       <property name="text">
+        <string comment="It means move the item down in the list">Down</string>
        </property>
       </widget>
      </item>

@@ -54,6 +54,10 @@ public slots:
 	void modifyConstraint();
 	void removeConstraint();
 	void filter(bool active);
+
+	void moveSpaceConstraintUp();
+	void moveSpaceConstraintDown();
+
 	void sortedChanged(bool checked);
 
 	//void sortConstraintsByComments();

@@ -32,6 +32,10 @@ public slots:
 	void removeSubgroup();
 	void purgeSubgroup();
 	void modifySubgroup();
+
+	void moveSubgroupUp();
+	void moveSubgroupDown();
+
 	void sortSubgroups();
 	void yearChanged(const QString &yearName);
 	void groupChanged(const QString &groupName);

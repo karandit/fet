@@ -54,6 +54,10 @@ YearsForm::YearsForm(QWidget* parent): QDialog(parent)
 	connect(removeYearPushButton, SIGNAL(clicked()), this, SLOT(removeYear()));
 	connect(yearsListWidget, SIGNAL(currentRowChanged(int)), this, SLOT(yearChanged()));
 	connect(modifyYearPushButton, SIGNAL(clicked()), this, SLOT(modifyYear()));
+
+	connect(moveYearUpPushButton, SIGNAL(clicked()), this, SLOT(moveYearUp()));
+	connect(moveYearDownPushButton, SIGNAL(clicked()), this, SLOT(moveYearDown()));
+
 	connect(sortYearsPushButton, SIGNAL(clicked()), this, SLOT(sortYears()));
 	connect(activateStudentsPushButton, SIGNAL(clicked()), this, SLOT(activateStudents()));
 	connect(deactivateStudentsPushButton, SIGNAL(clicked()), this, SLOT(deactivateStudents()));
@@ -144,6 +148,64 @@ void YearsForm::yearChanged()
 	}
 	StudentsYear* sty=gt.rules.yearsList.at(yearsListWidget->currentRow());
 	detailsTextEdit->setPlainText(sty->getDetailedDescriptionWithConstraints(gt.rules));
+}
+
+void YearsForm::moveYearUp()
+{
+	if(yearsListWidget->count()<=1)
+		return;
+	int i=yearsListWidget->currentRow();
+	if(i<0 || i>=yearsListWidget->count())
+		return;
+	if(i==0)
+		return;
+		
+	QString s1=yearsListWidget->item(i)->text();
+	QString s2=yearsListWidget->item(i-1)->text();
+	
+	StudentsYear* sy1=gt.rules.yearsList.at(i);
+	StudentsYear* sy2=gt.rules.yearsList.at(i-1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	yearsListWidget->item(i)->setText(s2);
+	yearsListWidget->item(i-1)->setText(s1);
+	
+	gt.rules.yearsList[i]=sy2;
+	gt.rules.yearsList[i-1]=sy1;
+	
+	yearsListWidget->setCurrentRow(i-1);
+	yearChanged(/*i-1*/);
+}
+
+void YearsForm::moveYearDown()
+{
+	if(yearsListWidget->count()<=1)
+		return;
+	int i=yearsListWidget->currentRow();
+	if(i<0 || i>=yearsListWidget->count())
+		return;
+	if(i==yearsListWidget->count()-1)
+		return;
+		
+	QString s1=yearsListWidget->item(i)->text();
+	QString s2=yearsListWidget->item(i+1)->text();
+	
+	StudentsYear* sy1=gt.rules.yearsList.at(i);
+	StudentsYear* sy2=gt.rules.yearsList.at(i+1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	yearsListWidget->item(i)->setText(s2);
+	yearsListWidget->item(i+1)->setText(s1);
+	
+	gt.rules.yearsList[i]=sy2;
+	gt.rules.yearsList[i+1]=sy1;
+	
+	yearsListWidget->setCurrentRow(i+1);
+	yearChanged(/*i+1*/);
 }
 
 void YearsForm::sortYears()

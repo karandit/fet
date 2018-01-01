@@ -33,6 +33,10 @@ public slots:
 	void addActivityTag();
 	void removeActivityTag();
 	void renameActivityTag();
+
+	void moveActivityTagUp();
+	void moveActivityTagDown();
+
 	void sortActivityTags();
 	
 	void activityTagChanged(int index);

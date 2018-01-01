@@ -52,6 +52,10 @@ SubjectsForm::SubjectsForm(QWidget* parent): QDialog(parent)
 	connect(addSubjectPushButton, SIGNAL(clicked()), this, SLOT(addSubject()));
 	connect(removeSubjectPushButton, SIGNAL(clicked()), this, SLOT(removeSubject()));
 	connect(renameSubjectPushButton, SIGNAL(clicked()), this, SLOT(renameSubject()));
+
+	connect(moveSubjectUpPushButton, SIGNAL(clicked()), this, SLOT(moveSubjectUp()));
+	connect(moveSubjectDownPushButton, SIGNAL(clicked()), this, SLOT(moveSubjectDown()));
+
 	connect(sortSubjectsPushButton, SIGNAL(clicked()), this, SLOT(sortSubjects()));
 	connect(subjectsListWidget, SIGNAL(currentRowChanged(int)), this, SLOT(subjectChanged(int)));
 	connect(activateSubjectPushButton, SIGNAL(clicked()), this, SLOT(activateSubject()));
@@ -180,6 +184,64 @@ void SubjectsForm::renameSubject()
 			subjectChanged(subjectsListWidget->currentRow());
 		}
 	}
+}
+
+void SubjectsForm::moveSubjectUp()
+{
+	if(subjectsListWidget->count()<=1)
+		return;
+	int i=subjectsListWidget->currentRow();
+	if(i<0 || i>=subjectsListWidget->count())
+		return;
+	if(i==0)
+		return;
+		
+	QString s1=subjectsListWidget->item(i)->text();
+	QString s2=subjectsListWidget->item(i-1)->text();
+	
+	Subject* sbj1=gt.rules.subjectsList.at(i);
+	Subject* sbj2=gt.rules.subjectsList.at(i-1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	subjectsListWidget->item(i)->setText(s2);
+	subjectsListWidget->item(i-1)->setText(s1);
+	
+	gt.rules.subjectsList[i]=sbj2;
+	gt.rules.subjectsList[i-1]=sbj1;
+	
+	subjectsListWidget->setCurrentRow(i-1);
+	subjectChanged(i-1);
+}
+
+void SubjectsForm::moveSubjectDown()
+{
+	if(subjectsListWidget->count()<=1)
+		return;
+	int i=subjectsListWidget->currentRow();
+	if(i<0 || i>=subjectsListWidget->count())
+		return;
+	if(i==subjectsListWidget->count()-1)
+		return;
+		
+	QString s1=subjectsListWidget->item(i)->text();
+	QString s2=subjectsListWidget->item(i+1)->text();
+	
+	Subject* sbj1=gt.rules.subjectsList.at(i);
+	Subject* sbj2=gt.rules.subjectsList.at(i+1);
+	
+	gt.rules.internalStructureComputed=false;
+	setRulesModifiedAndOtherThings(&gt.rules);
+	
+	subjectsListWidget->item(i)->setText(s2);
+	subjectsListWidget->item(i+1)->setText(s1);
+	
+	gt.rules.subjectsList[i]=sbj2;
+	gt.rules.subjectsList[i+1]=sbj1;
+	
+	subjectsListWidget->setCurrentRow(i+1);
+	subjectChanged(i+1);
 }
 
 void SubjectsForm::sortSubjects()

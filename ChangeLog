@@ -1843,3 +1843,7 @@ Versions 5.28.0 - 5.28.v
 	- Updated the Arabic translation, by Silver.
 - Version 5.28.5
 	- Bug fix: not allowing the file name to end with white space(s), as this may lead to errors (reported by Volker Dirr).
+- Version 5.28.6
+	- The user can now change the order of the teachers, students, subjects, activity tags, buildings, rooms, time constraints, and space constraints
+	from the interface (suggested by Volker Dirr).
+	- Added a new Indian example file, by Sudharshan K M and Nataraj Urs H D.

@@ -776,8 +776,9 @@ But we try also that teachers who work two days per week in the afternoon to hav
 47---------------------------------------------------------
 From T. Renganathan:
 
-2) You can give a provision for the user to perform his own sorting of years,
-teachers, etc., for e.g., using dragging and dropping.
+DONE since FET-5.28.6 on 7 February 2016 --> 2) You can give a provision for the user
+to perform his own sorting of years, teachers, etc., for e.g., using dragging and dropping. <-- DONE
+(DONE in a bit different manner, with two buttons, 'Move up' and 'Move down').
  
 3) You can include a provision for multiple selection of subjects, teachers,
 activities, etc., for example using Ctrl or Shift key. This will especially be useful for deleting
