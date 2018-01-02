@@ -4700,3 +4700,9 @@ From Benahmed Abdelkrim (on forum):
 FET can really import and export almost all data. except constraints. if this function can be done with FET, it will help save a lot of valuable time, and also allow a FET to communicate with other software..
 
 Liviu: It is a bit weird to export the constraints - what format to choose?
+
+259---------------------------------------------------------
+From Benahmed Abdelkrim (on forum):
+
+write directly into cells Activity planning, especially for the activities which are not divided(not split).
+for the activities that are divided, we can momentarily kept the weight by fefaut (95%), and later change it if we want.
