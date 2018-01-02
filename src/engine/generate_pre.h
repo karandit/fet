@@ -368,6 +368,9 @@ bool checkMinDays100Percent(QWidget* parent);
 bool checkMinDaysConsecutiveIfSameDay(QWidget* parent);
 
 
+bool checkMaxHoursForActivityDuration(QWidget* parent);
+
+
 ///////BEGIN teachers interval max days per week
 extern double teachersIntervalMaxDaysPerWeekPercentages1[MAX_TEACHERS];
 extern int teachersIntervalMaxDaysPerWeekMaxDays1[MAX_TEACHERS];

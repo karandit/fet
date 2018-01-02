@@ -748,6 +748,11 @@ bool processTimeSpaceConstraints(QWidget* parent, QTextStream* initialOrderStrea
 	t=computeStudentsActivityTagMaxHoursContinuously(parent);
 	if(!t)
 		return false;
+		
+	//after max hours daily/continuously without/with an activity tag
+	t=checkMaxHoursForActivityDuration(parent);
+	if(!t)
+		return false;
 
 	t=computeSubgroupsMinHoursDaily(parent);
 	if(!t)
@@ -1730,6 +1735,292 @@ bool computeStudentsActivityTagMaxHoursContinuously(QWidget* parent)
 									return false;
 							}
 						}
+					}
+				}
+			}
+		}
+	}
+	
+	return ok;
+}
+
+bool checkMaxHoursForActivityDuration(QWidget* parent)
+{
+	bool ok=true;
+
+	for(int i=0; i<gt.rules.nInternalActivities; i++){
+		Activity* act=&gt.rules.internalActivitiesList[i];
+		
+		//teachers
+		foreach(int tch, act->iTeachersList){
+			if(teachersMaxHoursDailyPercentages1[tch]==100.0){
+				int m=teachersMaxHoursDailyMaxHours1[tch];
+				if(act->duration > m){
+					ok=false;
+
+					int t=GeneratePreIrreconcilableMessage::mediumConfirmation(parent, GeneratePreTranslate::tr("FET warning"),
+					 GeneratePreTranslate::tr("Cannot optimize, because you have activity id = %1 with duration = %2 and"
+					 " a constraint teacher(s) max %3 hours daily with weight = 100% for the teacher %4. The activity's duration is"
+					 " higher than the teacher's max hours daily. Please correct and try again.")
+					 .arg(act->id)
+					 .arg(act->duration)
+					 .arg(m)
+					 .arg(gt.rules.internalTeachersList[tch]->name),
+					 GeneratePreTranslate::tr("Skip rest"), GeneratePreTranslate::tr("See next"), QString(),
+					 1, 0 );
+				 	
+					if(t==0)
+						return false;
+				}
+			}
+			if(teachersMaxHoursDailyPercentages2[tch]==100.0){
+				int m=teachersMaxHoursDailyMaxHours2[tch];
+				if(act->duration > m){
+					ok=false;
+
+					int t=GeneratePreIrreconcilableMessage::mediumConfirmation(parent, GeneratePreTranslate::tr("FET warning"),
+					 GeneratePreTranslate::tr("Cannot optimize, because you have activity id = %1 with duration = %2 and"
+					 " a constraint teacher(s) max %3 hours daily with weight = 100% for the teacher %4. The activity's duration is"
+					 " higher than the teacher's max hours daily. Please correct and try again.")
+					 .arg(act->id)
+					 .arg(act->duration)
+					 .arg(m)
+					 .arg(gt.rules.internalTeachersList[tch]->name),
+					 GeneratePreTranslate::tr("Skip rest"), GeneratePreTranslate::tr("See next"), QString(),
+					 1, 0 );
+				 	
+					if(t==0)
+						return false;
+				}
+			}
+
+			if(teachersMaxHoursContinuouslyPercentages1[tch]==100.0){
+				int m=teachersMaxHoursContinuouslyMaxHours1[tch];
+				if(act->duration > m){
+					ok=false;
+
+					int t=GeneratePreIrreconcilableMessage::mediumConfirmation(parent, GeneratePreTranslate::tr("FET warning"),
+					 GeneratePreTranslate::tr("Cannot optimize, because you have activity id = %1 with duration = %2 and"
+					 " a constraint teacher(s) max %3 hours continuously with weight = 100% for the teacher %4. The activity's duration is"
+					 " higher than the teacher's max hours continuously. Please correct and try again.")
+					 .arg(act->id)
+					 .arg(act->duration)
+					 .arg(m)
+					 .arg(gt.rules.internalTeachersList[tch]->name),
+					 GeneratePreTranslate::tr("Skip rest"), GeneratePreTranslate::tr("See next"), QString(),
+					 1, 0 );
+				 	
+					if(t==0)
+						return false;
+				}
+			}
+			if(teachersMaxHoursContinuouslyPercentages2[tch]==100.0){
+				int m=teachersMaxHoursContinuouslyMaxHours2[tch];
+				if(act->duration > m){
+					ok=false;
+
+					int t=GeneratePreIrreconcilableMessage::mediumConfirmation(parent, GeneratePreTranslate::tr("FET warning"),
+					 GeneratePreTranslate::tr("Cannot optimize, because you have activity id = %1 with duration = %2 and"
+					 " a constraint teacher(s) max %3 hours continuously with weight = 100% for the teacher %4. The activity's duration is"
+					 " higher than the teacher's max hours continuously. Please correct and try again.")
+					 .arg(act->id)
+					 .arg(act->duration)
+					 .arg(m)
+					 .arg(gt.rules.internalTeachersList[tch]->name),
+					 GeneratePreTranslate::tr("Skip rest"), GeneratePreTranslate::tr("See next"), QString(),
+					 1, 0 );
+				 	
+					if(t==0)
+						return false;
+				}
+			}
+
+			for(int j=0; j<teachersActivityTagMaxHoursDailyMaxHours[tch].count(); j++){
+				if(teachersActivityTagMaxHoursDailyPercentage[tch].at(j)==100.0){
+					int m=teachersActivityTagMaxHoursDailyMaxHours[tch].at(j);
+					int at=teachersActivityTagMaxHoursDailyActivityTag[tch].at(j);
+					if(act->iActivityTagsSet.contains(at) && act->duration > m){
+						ok=false;
+	
+						int t=GeneratePreIrreconcilableMessage::mediumConfirmation(parent, GeneratePreTranslate::tr("FET warning"),
+						 GeneratePreTranslate::tr("Cannot optimize, because you have activity id = %1 with duration = %2 and"
+						 " a constraint teacher(s) activity tag max %3 hours daily with weight = 100% for the teacher %4 and activity tag %5."
+						 " The activity's duration is higher than the teacher's max hours daily with this activity tag (which the activity contains)."
+						 " Please correct and try again.")
+						 .arg(act->id)
+						 .arg(act->duration)
+						 .arg(m)
+						 .arg(gt.rules.internalTeachersList[tch]->name)
+						 .arg(gt.rules.activityTagsList[at]->name),
+						 GeneratePreTranslate::tr("Skip rest"), GeneratePreTranslate::tr("See next"), QString(),
+						 1, 0 );
+				 	
+						if(t==0)
+							return false;
+					}
+				}
+			}
+
+			for(int j=0; j<teachersActivityTagMaxHoursContinuouslyMaxHours[tch].count(); j++){
+				if(teachersActivityTagMaxHoursContinuouslyPercentage[tch].at(j)==100.0){
+					int m=teachersActivityTagMaxHoursContinuouslyMaxHours[tch].at(j);
+					int at=teachersActivityTagMaxHoursContinuouslyActivityTag[tch].at(j);
+					if(act->iActivityTagsSet.contains(at) && act->duration > m){
+						ok=false;
+	
+						int t=GeneratePreIrreconcilableMessage::mediumConfirmation(parent, GeneratePreTranslate::tr("FET warning"),
+						 GeneratePreTranslate::tr("Cannot optimize, because you have activity id = %1 with duration = %2 and"
+						 " a constraint teacher(s) activity tag max %3 hours continuously with weight = 100% for the teacher %4 and activity tag %5."
+						 " The activity's duration is higher than the teacher's max hours continuously with this activity tag (which the activity contains)."
+						 " Please correct and try again.")
+						 .arg(act->id)
+						 .arg(act->duration)
+						 .arg(m)
+						 .arg(gt.rules.internalTeachersList[tch]->name)
+						 .arg(gt.rules.activityTagsList[at]->name),
+						 GeneratePreTranslate::tr("Skip rest"), GeneratePreTranslate::tr("See next"), QString(),
+						 1, 0 );
+				 	
+						if(t==0)
+							return false;
+					}
+				}
+			}
+		}
+
+		//students
+		foreach(int sbg, act->iSubgroupsList){
+			if(subgroupsMaxHoursDailyPercentages1[sbg]==100.0){
+				int m=subgroupsMaxHoursDailyMaxHours1[sbg];
+				if(act->duration > m){
+					ok=false;
+
+					int t=GeneratePreIrreconcilableMessage::mediumConfirmation(parent, GeneratePreTranslate::tr("FET warning"),
+					 GeneratePreTranslate::tr("Cannot optimize, because you have activity id = %1 with duration = %2 and"
+					 " a constraint students (set) max %3 hours daily with weight = 100% for the subgroup %4. The activity's duration is"
+					 " higher than the subgroup's max hours daily. Please correct and try again.")
+					 .arg(act->id)
+					 .arg(act->duration)
+					 .arg(m)
+					 .arg(gt.rules.internalSubgroupsList[sbg]->name),
+					 GeneratePreTranslate::tr("Skip rest"), GeneratePreTranslate::tr("See next"), QString(),
+					 1, 0 );
+				 	
+					if(t==0)
+						return false;
+				}
+			}
+
+			if(subgroupsMaxHoursDailyPercentages2[sbg]==100.0){
+				int m=subgroupsMaxHoursDailyMaxHours2[sbg];
+				if(act->duration > m){
+					ok=false;
+
+					int t=GeneratePreIrreconcilableMessage::mediumConfirmation(parent, GeneratePreTranslate::tr("FET warning"),
+					 GeneratePreTranslate::tr("Cannot optimize, because you have activity id = %1 with duration = %2 and"
+					 " a constraint students (set) max %3 hours daily with weight = 100% for the subgroup %4. The activity's duration is"
+					 " higher than the subgroup's max hours daily. Please correct and try again.")
+					 .arg(act->id)
+					 .arg(act->duration)
+					 .arg(m)
+					 .arg(gt.rules.internalSubgroupsList[sbg]->name),
+					 GeneratePreTranslate::tr("Skip rest"), GeneratePreTranslate::tr("See next"), QString(),
+					 1, 0 );
+				 	
+					if(t==0)
+						return false;
+				}
+			}
+		
+			if(subgroupsMaxHoursContinuouslyPercentages1[sbg]==100.0){
+				int m=subgroupsMaxHoursContinuouslyMaxHours1[sbg];
+				if(act->duration > m){
+					ok=false;
+
+					int t=GeneratePreIrreconcilableMessage::mediumConfirmation(parent, GeneratePreTranslate::tr("FET warning"),
+					 GeneratePreTranslate::tr("Cannot optimize, because you have activity id = %1 with duration = %2 and"
+					 " a constraint students (set) max %3 hours continuously with weight = 100% for the subgroup %4. The activity's duration is"
+					 " higher than the subgroup's max hours continuously. Please correct and try again.")
+					 .arg(act->id)
+					 .arg(act->duration)
+					 .arg(m)
+					 .arg(gt.rules.internalSubgroupsList[sbg]->name),
+					 GeneratePreTranslate::tr("Skip rest"), GeneratePreTranslate::tr("See next"), QString(),
+					 1, 0 );
+				 	
+					if(t==0)
+						return false;
+				}
+			}
+			if(subgroupsMaxHoursContinuouslyPercentages2[sbg]==100.0){
+				int m=subgroupsMaxHoursContinuouslyMaxHours2[sbg];
+				if(act->duration > m){
+					ok=false;
+
+					int t=GeneratePreIrreconcilableMessage::mediumConfirmation(parent, GeneratePreTranslate::tr("FET warning"),
+					 GeneratePreTranslate::tr("Cannot optimize, because you have activity id = %1 with duration = %2 and"
+					 " a constraint students (set) max %3 hours continuously with weight = 100% for the subgroup %4. The activity's duration is"
+					 " higher than the subgroup's max hours continuously. Please correct and try again.")
+					 .arg(act->id)
+					 .arg(act->duration)
+					 .arg(m)
+					 .arg(gt.rules.internalSubgroupsList[sbg]->name),
+					 GeneratePreTranslate::tr("Skip rest"), GeneratePreTranslate::tr("See next"), QString(),
+					 1, 0 );
+				 	
+					if(t==0)
+						return false;
+				}
+			}
+		
+			for(int j=0; j<subgroupsActivityTagMaxHoursDailyMaxHours[sbg].count(); j++){
+				if(subgroupsActivityTagMaxHoursDailyPercentage[sbg].at(j)==100.0){
+					int m=subgroupsActivityTagMaxHoursDailyMaxHours[sbg].at(j);
+					int at=subgroupsActivityTagMaxHoursDailyActivityTag[sbg].at(j);
+					if(act->iActivityTagsSet.contains(at) && act->duration > m){
+						ok=false;
+	
+						int t=GeneratePreIrreconcilableMessage::mediumConfirmation(parent, GeneratePreTranslate::tr("FET warning"),
+						 GeneratePreTranslate::tr("Cannot optimize, because you have activity id = %1 with duration = %2 and"
+						 " a constraint students (set) activity tag max %3 hours daily with weight = 100% for the subgroup %4 and activity tag %5."
+						 " The activity's duration is higher than the subgroup's max hours daily with this activity tag (which the activity contains)."
+						 " Please correct and try again.")
+						 .arg(act->id)
+						 .arg(act->duration)
+						 .arg(m)
+						 .arg(gt.rules.internalSubgroupsList[sbg]->name)
+						 .arg(gt.rules.activityTagsList[at]->name),
+						 GeneratePreTranslate::tr("Skip rest"), GeneratePreTranslate::tr("See next"), QString(),
+						 1, 0 );
+				 	
+						if(t==0)
+							return false;
+					}
+				}
+			}
+
+			for(int j=0; j<subgroupsActivityTagMaxHoursContinuouslyMaxHours[sbg].count(); j++){
+				if(subgroupsActivityTagMaxHoursContinuouslyPercentage[sbg].at(j)==100.0){
+					int m=subgroupsActivityTagMaxHoursContinuouslyMaxHours[sbg].at(j);
+					int at=subgroupsActivityTagMaxHoursContinuouslyActivityTag[sbg].at(j);
+					if(act->iActivityTagsSet.contains(at) && act->duration > m){
+						ok=false;
+	
+						int t=GeneratePreIrreconcilableMessage::mediumConfirmation(parent, GeneratePreTranslate::tr("FET warning"),
+						 GeneratePreTranslate::tr("Cannot optimize, because you have activity id = %1 with duration = %2 and"
+						 " a constraint students (set) activity tag max %3 hours continuously with weight = 100% for the subgroup %4 and activity tag %5."
+						 " The activity's duration is higher than the subgroup's max hours continuously with this activity tag (which the activity contains)."
+						 " Please correct and try again.")
+						 .arg(act->id)
+						 .arg(act->duration)
+						 .arg(m)
+						 .arg(gt.rules.internalSubgroupsList[sbg]->name)
+						 .arg(gt.rules.activityTagsList[at]->name),
+						 GeneratePreTranslate::tr("Skip rest"), GeneratePreTranslate::tr("See next"), QString(),
+						 1, 0 );
+				 	
+						if(t==0)
+							return false;
 					}
 				}
 			}

@@ -1891,3 +1891,6 @@ Versions 5.30.0 - 5.30.v
 	- Added 12 new example files from Namibia, by Bobby Wise.
 - Version 5.30.1
 	- Interface improvement: the shortcut buttons on the main form are better arranged (suggested by math user).
+- Version 5.30.2
+	- Added more checks before the generation start (suggested by Léo-Paul Roch and Volker Dirr).
+	- Very rare bug fixed (probably never met in practice).

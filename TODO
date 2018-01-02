@@ -4770,3 +4770,15 @@ Like that, the user does not have to change the values manually after each gener
 From Volker Dirr:
 
 Generating a difficult timetable shows 28 h... . Should it show 1 d 4 h... ?
+
+267---------------------------------------------------------
+From daltinkurt (on forum):
+
+A constraint min days between activities, with force consecutive if same day = true. Can (should) two activities if on the same day span over a break?
+
+268---------------------------------------------------------
+From Volker Dirr:
+
+maybe we can add a check for this:
+
+teacher max hours per day is lower than activity duration.

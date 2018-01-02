@@ -12799,6 +12799,7 @@ TimeConstraint* Rules::readActivitiesPreferredTimes(QXmlStreamReader& xmlReader,
 	assert(xmlReader.isStartElement() && xmlReader.name()=="ConstraintActivitiesPreferredTimes");
 
 	ConstraintActivitiesPreferredStartingTimes* cn=new ConstraintActivitiesPreferredStartingTimes();
+	cn->duration=-1;
 	cn->nPreferredStartingTimes_L=0;
 	int i;
 	/*for(i=0; i<MAX_N_CONSTRAINT_ACTIVITIES_PREFERRED_STARTING_TIMES; i++){

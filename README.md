@@ -1,4 +1,4 @@
-This is FET version 5.30.1
+This is FET version 5.30.2
 
 
 Program description:
@@ -16,7 +16,7 @@ Requirements:
 
 	FET is created in the following environment: openSUSE Leap 42.1 GNU/Linux distribution, Linux 4.1.27, Xfce 4.12,
 	Midnight Commander 4.8.15, KDiff3 0.9.98, Qt 5.7.0, gcc 6.1.1, g++ 6.1.1, make 4.0, sed 4.2.2,
-	Valgrind 3.10.1, Coverity Scan 7.7.0.4, Cppcheck 1.74, other great free tools.
+	Valgrind 3.10.1, Coverity Scan 8.5.0.1, Cppcheck 1.74, other great free tools.
 	FET can be run on any platform supported by the free software Qt (GNU/Linux, Windows, Mac OS X).
 
 	GNU/Linux, Mac OS X:
@@ -202,6 +202,11 @@ Installing FET:
 
 	GNU/Linux, and maybe Mac OS X:
 	Type "make install" with root permissions.
+	
+	Mac OS X: A user reported that one can obtain a universal Mac OS X executable with:
+	$ cd /"pathto"/Qt/5.5/clang_64/bin/
+	$ ./macdeployqt /"pathto"/fet.app
+	(with Qt 5.5)
 
 	Windows:
 	Move the FET directory to a place of your choice.
