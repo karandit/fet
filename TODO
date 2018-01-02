@@ -674,7 +674,7 @@ with "Assign room" and choose a room.
 40---------------------------------------------------------
 From Naji
 
-Hopefully, FET's team can enhanced it to be able to export the xml data to database, that will facilitates the 
+Hopefully, FET's team can enhanced it to be able to export the xml data to database, that will facilitates the
 output of the data and enables programmers to engage it with their programs.
 
 41---------------------------------------------------------
@@ -4634,3 +4634,69 @@ oui, absolument, vous pouvez l'ajouter dans le fichier TODO, car cette fonction 
    yes, absolutely, you can add it to the TODO file because this feature in my opinion is very useful for any time saves.
     has repeatedly and on production of a table by FET, and after checking it, we realize that we are obliged to call a labels (tags) to make a separation in time of a set activities.
    So this new feature if it is created, we can change the labels (tags) at one time, and not as it is currently one by one.
+
+254---------------------------------------------------------
+From Benahmed Abdelkrim (on forum):
+
+ j'ai deux suggestions:
+            la première:
+   pourquoi ne ajouter dans le dossier fet-results, un fichier qui permet de savoir les horaires des salles vide?
+  ce fichier va aider a mieux contrôler l'énergie électrique en éteignant la lumière le temps que ces salles soit vides.
+  la deuxième:
+               cette opération qui ce fait maintenant de façon manuelle. peut on la rendre automatique via un logicielle lié a FET?
+
+I have two suggestions:
+  the first:
+                why not add in the folder fet-results, file that lets you know the times of empty rooms? as the file: Teachers Free Periods
+                This file will help better control the electric power by turning off the light as long as these rooms is empty.
+  the second:
+                   this operation that now done manually. can we make it automatic via a software related to FET?       
+
+Volker Dirr:
+
+about first suggestion:
+Rooms Free Periods: In my opinion only needed if you want to swap a room. I think i can add it if Liviu agree.
+On the other hand you can already do it today with TiTiTo (selecting empty rooms; swap rooms; ...)
+Also: in my opinion your suggestion doesn't help saving electric power. Only if you are able to control electric from distance or if there is a guy that always run through all rooms.
+We save electric power very easy: We simply print the room table and put it on the door. So every teacher ans students can see if nobody will use the room in the next hour(s) and so they can turn off the light.
+
+about second suggestion:
+i am not sure about what exactly you are talking. about printing free rooms table? see previous answer. Or about swapping a room? see previous answer? Or do you talk about something different?
+
+255---------------------------------------------------------
+From math user (on forum):
+
+It would be great if "teachers", "subjects", ... would be customizable (settings). For universities "lecturers" and so on.
+
+256---------------------------------------------------------
+From ChicagoPianoTuner:
+
+I have a feature request for FET: in the timetables menu after a successful
+generation, there is a button to "lock/unlock" all activities when I'm
+looking at a particular subgroup or teacher or room. If I click it, all
+activities lock, and clicking again unlocks. I would prefer two separate
+buttons, one for lock and one for unlock. The reason is sometimes I have 4
+subgroups where they share many activities (but not all activities), and I
+want to lock all activities for that particular group (or year) but cannot
+do it all at once.
+
+Liviu:
+
+Unfortunately, there is not enough space in that dialog.
+
+257---------------------------------------------------------
+From MING-KIAN JONATHAN CEDRIC LEE KIM GNOK and Volker Dirr:
+
+All the users to start FET by double-clicking a .fet file (so that the FET executable won't complain:
+"To start FET in interface mode, please do not give any command-line parameters to the FET executable.").
+We could open in such a case the first file given as a command-line parameter to the FET executable.
+
+Liviu:
+It is bad to mix the version accepting command-line parameters (fet-cl) with the one not accepting them (fet).
+
+258---------------------------------------------------------
+From Benahmed Abdelkrim (on forum):
+
+FET can really import and export almost all data. except constraints. if this function can be done with FET, it will help save a lot of valuable time, and also allow a FET to communicate with other software..
+
+Liviu: It is a bit weird to export the constraints - what format to choose?

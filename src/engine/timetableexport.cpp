@@ -2229,10 +2229,12 @@ void TimetableExport::writeStylesheetCss(QWidget* parent, const QString& cssfile
 
 	tos<<"/* "<<TimetableExport::tr("To do a page-break only after every second timetable, delete \"page-break-before: always;\" in \"table.even_table\".",
 		"Please keep fields in quotes as they are, untranslated.")<<" */\n";
+	tos<<"/* "<<TimetableExport::tr("Delete \"page-break-before: always;\" in \"table.even_table\" and in \"table.odd_table\" to skip page-breaks.",
+		"Please keep fields in quotes as they are, untranslated.")<<" */\n";
 	tos<<"/* "<<TimetableExport::tr("To hide an element just write the following phrase into the element: %1 (without quotes).",
 		"%1 is a short phrase beginning and ending with quotes, and we want the user to be able to add it, but without quotes").arg("\"display:none;\"")<<" */\n\n";
 	tos<<"p.back {\n  margin-top: 4ex;\n  margin-bottom: 5ex;\n}\n\n";
-	tos<<"table {\n  text-align: center;\n}\n\n";
+	tos<<"table {\n  text-align: center;\n  page-break-inside: avoid;\n}\n\n";
 	tos<<"table.odd_table {\n  page-break-before: always;\n}\n\n";
 	tos<<"table.even_table {\n  page-break-before: always;\n}\n\n";
 	tos<<"table.detailed {\n  margin-left:auto; margin-right:auto;\n  text-align: center;\n  border: 0px;\n  border-spacing: 0;\n  border-collapse: collapse;\n}\n\n";

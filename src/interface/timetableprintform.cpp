@@ -1013,6 +1013,7 @@ QString TimetablePrintForm::updateHtmlPrintString(bool printAll){
 	tmp+="      table {\n";
 	tmp+="        font-size: "+QString::number(fontSizeTable->value())+"pt;\n";
 	tmp+="        padding-top: "+QString::number(tablePadding->value())+"px;\n";
+	tmp+="        page-break-inside: avoid;\n";
 	tmp+="      }\n";
 	tmp+="      th {\n";
 	tmp+="        text-align: center;\n"; //currently no effect because of a qt bug (compare http://bugreports.qt.nokia.com/browse/QTBUG-2730 )

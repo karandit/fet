@@ -1869,3 +1869,6 @@ Versions 5.29.0 - 5.29.v
 - Version 5.29.3
 	- Code cleanup.
 	- Corrected two minor typos in the source code (reported by Alexandre R. Soares).
+- Version 5.29.4
+	- Updated the sources to gcc-6.1.1 (but the Windows version still uses MinGW 4.9.2).
+	- The code in the HTML timetables tries to avoid page breaks in the tables (suggested by Benahmed Abdelkrim, implemented by Volker Dirr).
