@@ -1889,3 +1889,5 @@ Versions 5.30.0 - 5.30.v
 	- Added the teachers' qualification to teach certain subjects, and the statistics to show where the qualification of a teacher for a subject is not respected
 	 (suggested by Volker Dirr and implemented by Liviu Lalescu).
 	- Added 12 new example files from Namibia, by Bobby Wise.
+- Version 5.30.1
+	- Interface improvement: the shortcut buttons on the main form are better arranged (suggested by math user).

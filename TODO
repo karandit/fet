@@ -4722,3 +4722,51 @@ but only an unordered list will be "bad" to read/check.
 so there should be a not only a simple list.
 there should be a filter to check faster.
 so filter all activities by subject, teacher or students set.
+
+262---------------------------------------------------------
+From Volker Dirr:
+
+add a new column in "fet -> Statistics -> Teachers Statistics"
+the column get the name "teachers qualification".
+so the user can see the the data that he entered.
+
+and:
+
+add a new column in "fet -> Statistics -> Subjects Statistics"
+the column get the name "teachers qualification".
+so the user can see the the data that he entered (indirectly).
+
+263---------------------------------------------------------
+From math user (on forum):
+
+math user: It would be great if components / subactivities always get the same room (option).
+
+Liviu: You have the constraint activities occupy max 1 different rooms.
+
+math user: Yes, that is exactly how I have solved it. But I have to enter a condition for each activity
+(lots of conditions). Therefore a (global) setting "same room for all components of an activity" would be nice.
+
+264---------------------------------------------------------
+From Volker Dirr:
+
+at the end of the generating algorithm, so after all activities are
+placed (but before locking the activities?!) there should be a simple
+algorithm that cares about rooms "bugs". this algorithm must not be
+perfect, it should only fix "bad" stuff.
+1) check if there is an activity without a room, even if it is got a space
+constraint with weight less then 100%
+2) if there is an activity with a room, it should check if it is
+possible to place a smaller room to this activity
+3) maybe repeat step 2 a few times to get a better result. (the result
+might not be perfect, but it is ok.)
+
+265---------------------------------------------------------
+From math user (on forum):
+
+It would be great if the user could change the default values for width and height (disabled and 8ex) in the settings: enable/disable and enter values (default: 8 and 8).
+Like that, the user does not have to change the values manually after each generation.
+
+266---------------------------------------------------------
+From Volker Dirr:
+
+Generating a difficult timetable shows 28 h... . Should it show 1 d 4 h... ?
