@@ -619,6 +619,16 @@ void ActivityPlanningForm::computeActivitiesForDeletion(const QString& teacherNa
 }
 
 void ActivityPlanningForm::activitiesTableHorizontalHeaderClicked(int column){
+	if(swapAxis->checkState()==Qt::Checked){
+		if(column<0 || column>=statisticValues.allStudentsNames.count()){
+			return;
+		}
+	}
+	else{
+		if(column<0 || column>=statisticValues.allSubjectsNames.count()){
+			return;
+		}
+	}
 	if(RBActivity->isChecked()){
 		if(swapAxis->checkState()==Qt::Checked){
 			ActivitiesForm form(this, "", statisticValues.allStudentsNames[column], "", "");
@@ -647,7 +657,7 @@ void ActivityPlanningForm::activitiesTableHorizontalHeaderClicked(int column){
 		} else {
 			AddActivityForm addActivityForm(this, "", "", statisticValues.allSubjectsNames[column], "");
 			setParentAndOtherThings(&addActivityForm, this);
-			addActivityForm.exec();	
+			addActivityForm.exec();
 		}
 	} else if(RBModify->isChecked()) {
 		//Normaly there are to many activities. So just entering the activity form
@@ -793,6 +803,16 @@ void ActivityPlanningForm::activitiesTableHorizontalHeaderClicked(int column){
 }
 
 void ActivityPlanningForm::activitiesTableVerticalHeaderClicked(int row){
+	if(swapAxis->checkState()==Qt::Checked){
+		if(row<0 || row>=statisticValues.allSubjectsNames.count()){
+			return;
+		}
+	}
+	else{
+		if(row<0 || row>=statisticValues.allStudentsNames.count()){
+			return;
+		}
+	}
 	if(RBActivity->isChecked()){
 		if(swapAxis->checkState()==Qt::Checked){
 			ActivitiesForm form(this, "", "", statisticValues.allSubjectsNames[row], "");
@@ -1292,6 +1312,9 @@ void ActivityPlanningForm::TeachersCellEntered(int row, int column){
 //mouseTracking (end 3/3)
 
 void ActivityPlanningForm::teachersTableHorizontalHeaderClicked(int column){
+	if(column<0 || column>=statisticValues.allTeachersNames.count()){
+		return;
+	}
 	if(RBActivity->isChecked()){
 		ActivitiesForm form(this, statisticValues.allTeachersNames[column], "", "", "");
 		setParentAndOtherThings(&form, this);

@@ -1872,3 +1872,6 @@ Versions 5.29.0 - 5.29.v
 - Version 5.29.4
 	- Updated the sources to gcc-6.1.1 (but the Windows version still uses MinGW 4.9.2).
 	- The code in the HTML timetables tries to avoid page breaks in the tables (suggested by Benahmed Abdelkrim, implemented by Volker Dirr).
+- Version 5.29.5
+	- Updated to Qt 5.6.1.
+	- Rare crash bug fix in the activity planning form (reported by Benahmed Abdelkrim).

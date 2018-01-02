@@ -136,7 +136,7 @@ void Import::prearrangement(){
 }
 
 
-//TODO: add this into the first function!? form to full?!
+//TODO: add this into the first function!? form too full?!
 ChooseFieldsDialog::ChooseFieldsDialog(QWidget *parent): QDialog(parent)
 {
 	assert(fields.size()>0);
@@ -862,7 +862,7 @@ int Import::readFields(QWidget* parent){
 		progress.setValue(crt);
 		QString line = in.readLine();
 		lineNumber++;
-        crt+=line.length();
+		crt+=line.length();
 		if(progress.wasCanceled()){
 			progress.setValue(size);
 			QMessageBox::warning(parent, "FET", Import::tr("Loading canceled by user."));
