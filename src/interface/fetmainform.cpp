@@ -217,6 +217,7 @@ using namespace std;
 #include <QMap>
 #include <QWidget>
 #include <QList>
+#include <QHash>
 
 #include <QDesktopServices>
 #include <QUrl>
@@ -500,6 +501,8 @@ FetMainForm::FetMainForm()
 	shortcutDataAdvancedMenu->addAction(dataStudentsStatisticsAction);
 	shortcutDataAdvancedMenu->addSeparator();
 	shortcutDataAdvancedMenu->addAction(dataActivitiesRoomsStatisticsAction);
+	shortcutDataAdvancedMenu->addSeparator();
+	shortcutDataAdvancedMenu->addAction(dataTeachersSubjectsQualificationsStatisticsAction);
 	
 	//2014-07-01
 	shortcutTimetableLockingMenu=new QMenu();
@@ -601,6 +604,11 @@ FetMainForm::FetMainForm()
 	
 	settingsPrintActivityTagsAction->setCheckable(true);
 	settingsPrintActivityTagsAction->setChecked(TIMETABLE_HTML_PRINT_ACTIVITY_TAGS);
+
+	settingsPrintDetailedTimetablesAction->setCheckable(true);
+	settingsPrintDetailedTimetablesAction->setChecked(PRINT_DETAILED_HTML_TIMETABLES);
+	settingsPrintDetailedTeachersFreePeriodsTimetablesAction->setCheckable(true);
+	settingsPrintDetailedTeachersFreePeriodsTimetablesAction->setChecked(PRINT_DETAILED_HTML_TEACHERS_FREE_PERIODS);
 
 	settingsPrintNotAvailableSlotsAction->setCheckable(true);
 	settingsPrintNotAvailableSlotsAction->setChecked(PRINT_NOT_AVAILABLE_TIME_SLOTS);
@@ -895,7 +903,7 @@ void FetMainForm::replyFinished(QNetworkReply* networkReply)
 			if(internetVersion!=FET_VERSION){
 				QString s=tr("Another version: %1, is available on the FET homepage: %2", "%1 is new version, %2 is FET homepage").arg(internetVersion).arg("http://lalescu.ro/liviu/fet/");
 				s+=QString("\n\n");
-				s+=("You have to manually download and install.")+QString(" ")+tr("You may need to hit Refresh in your web browser.")+QString("\n\n")+tr("Would you like to open the FET homepage now?");
+				s+=tr("You have to manually download and install.")+QString(" ")+tr("You may need to hit Refresh in your web browser.")+QString("\n\n")+tr("Would you like to open the FET homepage now?");
 				if(!additionalComments.isEmpty()){
 					s+=QString("\n\n");
 					s+=tr("Additional comments: %1").arg(additionalComments);
@@ -1909,6 +1917,51 @@ void FetMainForm::on_dataActivitiesRoomsStatisticsAction_triggered()
 	ActivitiesRoomsStatisticsForm form(this);
 	setParentAndOtherThings(&form, this);
 	form.exec();
+}
+
+void FetMainForm::on_dataTeachersSubjectsQualificationsStatisticsAction_triggered()
+{
+	QHash<QString, Teacher*> teachersHash;
+	
+	foreach(Teacher* tch, gt.rules.teachersList)
+		teachersHash.insert(tch->name, tch);
+		
+	bool unqualifiedExist=false;
+
+	QString s=tr("The teachers who are not qualified to teach a certain activity (in activities order):");
+	s+="\n\n";
+	
+	bool begin=true;
+
+	foreach(Activity* act, gt.rules.activitiesList){
+		bool alreadyAdded=false;
+		QString subject=act->subjectName;
+		foreach(QString teacher, act->teachersNames){
+			Teacher* tch=teachersHash.value(teacher, NULL);
+			assert(tch!=NULL);
+			if(!tch->qualifiedSubjectsHash.contains(subject)){
+				unqualifiedExist=true;
+				if(!alreadyAdded){
+					if(!begin)
+						s+="\n";
+					else
+						begin=false;
+					s+=tr("For activity: %1").arg(act->getDescription(gt.rules));
+					s+="\n";
+					alreadyAdded=true;
+				}
+				s+=QString(4, ' ');
+				s+=tr("Teacher %1 is not qualified to teach subject %2.").arg(teacher).arg(subject);
+				s+="\n";
+			}
+		}
+	}
+
+	if(!unqualifiedExist)
+		s=tr("All the teachers are qualified to teach their activities.");
+	s+="\n";
+
+	LongTextMessageBox::largeInformation(this, tr("FET information"), s);
 }
 
 void FetMainForm::on_helpSettingsAction_triggered()
@@ -4028,6 +4081,10 @@ void FetMainForm::on_settingsRestoreDefaultsAction_triggered()
 	s+="\n";
 	s+=tr("47")+QString(". ")+tr("Show warning for subgroups with the same activities will be %1", "%1 is true or false").arg(tr("true"));
 	s+="\n";
+	s+=tr("48")+QString(". ")+tr("Print detailed timetables will be %1", "%1 is true or false").arg(tr("true"));
+	s+="\n";
+	s+=tr("49")+QString(". ")+tr("Print detailed teachers' free periods timetables will be %1", "%1 is true or false").arg(tr("true"));
+	s+="\n";
 	
 	switch( LongTextMessageBox::largeConfirmation( this, tr("FET confirmation"), s,
 	 tr("&Yes"), tr("&No"), QString(), 0 , 1 ) ) {
@@ -4162,6 +4219,11 @@ void FetMainForm::on_settingsRestoreDefaultsAction_triggered()
 	
 	settingsPrintActivityTagsAction->setChecked(true);
 	TIMETABLE_HTML_PRINT_ACTIVITY_TAGS=true;
+	
+	settingsPrintDetailedTimetablesAction->setChecked(true);
+	PRINT_DETAILED_HTML_TIMETABLES=true;
+	settingsPrintDetailedTeachersFreePeriodsTimetablesAction->setChecked(true);
+	PRINT_DETAILED_HTML_TEACHERS_FREE_PERIODS=true;
 
 	settingsPrintNotAvailableSlotsAction->setChecked(true);
 	PRINT_NOT_AVAILABLE_TIME_SLOTS=true;
@@ -4194,6 +4256,16 @@ void FetMainForm::on_settingsTimetableHtmlLevelAction_triggered()
 void FetMainForm::on_settingsPrintActivityTagsAction_toggled()
 {
 	TIMETABLE_HTML_PRINT_ACTIVITY_TAGS=settingsPrintActivityTagsAction->isChecked();
+}
+
+void FetMainForm::on_settingsPrintDetailedTimetablesAction_toggled()
+{
+	PRINT_DETAILED_HTML_TIMETABLES=settingsPrintDetailedTimetablesAction->isChecked();
+}
+
+void FetMainForm::on_settingsPrintDetailedTeachersFreePeriodsTimetablesAction_toggled()
+{
+	PRINT_DETAILED_HTML_TEACHERS_FREE_PERIODS=settingsPrintDetailedTeachersFreePeriodsTimetablesAction->isChecked();
 }
 
 void FetMainForm::on_settingsPrintNotAvailableSlotsAction_toggled()

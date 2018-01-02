@@ -326,37 +326,37 @@ void StudentsStatisticsForm::checkBoxesModified()
 {
 	bool complete=showCompleteStructureCheckBox->isChecked();
 	
-	QSet<QString> studs;
+	QSet<QString> setOfStudents;
 
-	studs.clear();
+	setOfStudents.clear();
 	int nStudentsSets=0;
 	foreach(StudentsYear* year, gt.rules.yearsList){
 		bool sy=true;
 		if(!complete){
-			if(studs.contains(year->name))
+			if(setOfStudents.contains(year->name))
 				sy=false;
 			else
-				studs.insert(year->name);
+				setOfStudents.insert(year->name);
 		}
 		if(showYearsCheckBox->isChecked() && sy)
 			nStudentsSets++;
 		foreach(StudentsGroup* group, year->groupsList){
 			bool sg=true;
 			if(!complete){
-				if(studs.contains(group->name))
+				if(setOfStudents.contains(group->name))
 					sg=false;
 				else
-					studs.insert(group->name);
+					setOfStudents.insert(group->name);
 			}
 			if(showGroupsCheckBox->isChecked() && sg)
 				nStudentsSets++;
 			foreach(StudentsSubgroup* subgroup, group->subgroupsList){
 				bool ss=true;
 				if(!complete){
-					if(studs.contains(subgroup->name))
+					if(setOfStudents.contains(subgroup->name))
 						ss=false;
 					else
-						studs.insert(subgroup->name);
+						setOfStudents.insert(subgroup->name);
 				}
 				if(showSubgroupsCheckBox->isChecked() && ss)
 					nStudentsSets++;
@@ -375,16 +375,16 @@ void StudentsStatisticsForm::checkBoxesModified()
 	
 	tableWidget->setHorizontalHeaderLabels(columns);
 	
-	studs.clear();
+	setOfStudents.clear();
 	
 	int currentStudentsSet=-1;
 	foreach(StudentsYear* year, gt.rules.yearsList){
 		bool sy=true;
 		if(!complete){
-			if(studs.contains(year->name))
+			if(setOfStudents.contains(year->name))
 				sy=false;
 			else
-				studs.insert(year->name);
+				setOfStudents.insert(year->name);
 		}
 
 		if(showYearsCheckBox->isChecked() && sy){
@@ -395,10 +395,10 @@ void StudentsStatisticsForm::checkBoxesModified()
 		foreach(StudentsGroup* group, year->groupsList){
 			bool sg=true;
 			if(!complete){
-				if(studs.contains(group->name))
+				if(setOfStudents.contains(group->name))
 					sg=false;
 				else
-					studs.insert(group->name);
+					setOfStudents.insert(group->name);
 			}
 
 			if(showGroupsCheckBox->isChecked() && sg){
@@ -409,10 +409,10 @@ void StudentsStatisticsForm::checkBoxesModified()
 			foreach(StudentsSubgroup* subgroup, group->subgroupsList){
 				bool ss=true;
 				if(!complete){
-					if(studs.contains(subgroup->name))
+					if(setOfStudents.contains(subgroup->name))
 						ss=false;
 					else
-						studs.insert(subgroup->name);
+						setOfStudents.insert(subgroup->name);
 				}
 
 				if(showSubgroupsCheckBox->isChecked() && ss){

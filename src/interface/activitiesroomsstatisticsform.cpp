@@ -53,6 +53,9 @@ ActivitiesRoomsStatisticsForm::ActivitiesRoomsStatisticsForm(QWidget* parent): Q
 		QSet<QString> currentActivityTagsSet=act->activityTagsNames.toSet();
 	
 		foreach(SpaceConstraint* genericConstraint, gt.rules.spaceConstraintsList){
+			if(!genericConstraint->active)
+				continue;
+		
 			if(genericConstraint->type==CONSTRAINT_STUDENTS_SET_HOME_ROOM){
 				ConstraintStudentsSetHomeRoom* ctr=(ConstraintStudentsSetHomeRoom*)genericConstraint;
 				

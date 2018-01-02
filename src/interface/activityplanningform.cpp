@@ -91,6 +91,7 @@ const QString showActivityTagsState="/show-activity-tags-check-box-state";
 const QString showDuplicatesState="/show-duplicates-check-box-state";
 const QString hideEmptyLinesState="/hide-empty-lines-check-box-state";
 const QString swapAxisState="/swap-axes-check-box-state";
+const QString hideFullTeachersState="/hide-full-teachers-state";
 
 //maybe put following in timetable_defs.h? (start)
 const int IS_YEAR = 1;
@@ -108,22 +109,21 @@ static FetStatistics statisticValues;			//maybe TODO: do it more local
 static QList<bool> studentsDuplicates;		//maybe TODO: do it more local
 static QList<int> yearORgroupORsubgroup;	//maybe TODO: do it more local
 
-//TODO: activate teachersTargetNumberOfHours again! it is usefull! seach teachersTargetNumberOfHours. Just 2 lines to delete!
-//TODO: need to setDefaultValue for the QHashs ? (sum/number of hours) (also in statisticsexport?) look like it is unneeded.
+//TODO: need to setDefaultValue for the QHash-s ? (sum/number of hours) (also in statisticsexport?) looks like it is unneeded.
 //TODO: check with toggled
 //TODO: retry mouseTracking (still in source. search "mouseTracking"). check: move mouse one last visibile line. is header always highlighted, under all operating systems?!
 //TODO: update if a new teacher, subject or year/group/subgroup is added - or better: just disalow that?!
 //      write a "updateBasic"-function with source from constructor if you want to update/care about teacher, subject and students
 //TODO: add a new row in teachers table with "comments" - of course saving data is needed to be useful
 //MAYBE TODO: display "related" activities. so display all activities of a subgroup also in its related year and group. Problem: Memory and speed!
-//            ! i don't like this feature, because using this activitiestable will be much more difficult, because it mean each cell contains (normaly) more then 1 activity!
+//            ! I don't like this feature, because using this activities table will be much more difficult, because it mean each cell contains (normaly) more than 1 activity!
 //            ! So all shortcuts (especialy delete, add and modify) will be useless!
-//            ! The table will be very full, so you will loose clear view!
+//            ! The table will be very full, so you will lose clear view!
 
-static QList<int> teachersTargetNumberOfHours;		//TODO: do this global, this must/should be saved in fet file! Do it in teachers.h ?!
+static QList<int> teachersTargetNumberOfHours;
+static QList<Teacher*> teachersList;
 
 PlanningCommunicationSpinBox planningCommunicationSpinBox;
-
 
 StartActivityPlanning::StartActivityPlanning()
 {
@@ -136,6 +136,7 @@ StartActivityPlanning::~StartActivityPlanning()
 void StartActivityPlanning::startActivityPlanning(QWidget* parent){
 	assert(gt.rules.initialized);
 	teachersTargetNumberOfHours.clear();
+	teachersList.clear();
 	
 	statisticValues.allStudentsNames.clear();
 	studentsDuplicates.clear();
@@ -176,8 +177,9 @@ void StartActivityPlanning::startActivityPlanning(QWidget* parent){
 	
 	statisticValues.allTeachersNames.clear();				// just needed, because i don't need to care about correct iTeacherList if i do it this way.
 	foreach(Teacher* t, gt.rules.teachersList){		//  So i don't need gt.rules.computeInternalStructure();
-		statisticValues.allTeachersNames<<t->name;
-		teachersTargetNumberOfHours<<0;
+		statisticValues.allTeachersNames << t->name;
+		teachersTargetNumberOfHours << t->targetNumberOfHours;
+		teachersList<<t;
 	}
 
 	statisticValues.allSubjectsNames.clear();				// just done, because i always want to do it the same way + it is faster
@@ -203,7 +205,6 @@ void StartActivityPlanning::startActivityPlanning(QWidget* parent){
 	statisticValues.subjectsTotalNumberOfHours.clear();
 	statisticValues.subjectsTotalNumberOfHours4.clear();
 }
-
 
 // this is very similar to statisticsexport.cpp. so please also check there if you change something here!
 ActivityPlanningForm::ActivityPlanningForm(QWidget *parent): QDialog(parent)
@@ -270,8 +271,7 @@ ActivityPlanningForm::ActivityPlanningForm(QWidget *parent): QDialog(parent)
 	showDuplicates->setChecked(false);
 	hideEmptyLines=new QCheckBox(tr("Hide empty lines", "Please keep translation short"));
 	hideEmptyLines->setChecked(false);
-	hideUsedTeachers=new QCheckBox(tr("Hide full teachers", "This field is for the moment not shown in FET, but we translate it for maybe future versions. "
-		"It refers to teachers who have their number of hours fulfilled. Please keep translation short"));
+	hideUsedTeachers=new QCheckBox(tr("Hide full teachers", "It refers to teachers who have their number of hours fulfilled. Please keep translation short"));
 	hideUsedTeachers->setChecked(false); //important to not hide teachers without activities, if target number of hours is deactivated
 	swapAxis=new QCheckBox(tr("Swap axes", "Please keep translation short"));
 	swapAxis->setChecked(false);
@@ -388,6 +388,8 @@ ActivityPlanningForm::ActivityPlanningForm(QWidget *parent): QDialog(parent)
 		hideEmptyLines->setChecked(settings.value(this->metaObject()->className()+hideEmptyLinesState).toBool());
 	if(settings.contains(this->metaObject()->className()+swapAxisState))
 		swapAxis->setChecked(settings.value(this->metaObject()->className()+swapAxisState).toBool());
+	if(settings.contains(this->metaObject()->className()+hideFullTeachersState))
+		hideUsedTeachers->setChecked(settings.value(this->metaObject()->className()+hideFullTeachersState).toBool());
 	
 	//connect(activitiesTableView, SIGNAL(cellClicked(int, int)), this, SLOT(activitiesCellSelected(int, int)));
 	connect(activitiesTableView, SIGNAL(activated(const QModelIndex&)), this, SLOT(activitiesCellSelected(const QModelIndex&)));
@@ -399,7 +401,7 @@ ActivityPlanningForm::ActivityPlanningForm(QWidget *parent): QDialog(parent)
 
 	//mouseTracking (start 2/3)
 	/*
-	connect(activitiesTable, SIGNAL(cellEntered(int, int)), this, SLOT(ActivtiesCellEntered(int, int)));
+	connect(activitiesTable, SIGNAL(cellEntered(int, int)), this, SLOT(ActivitiesCellEntered(int, int)));
 	connect(teachersTable, SIGNAL(cellEntered(int, int)), this, SLOT(TeachersCellEntered(int, int)));
 	*/
 	//mouseTracking (end 2/3)
@@ -459,6 +461,7 @@ ActivityPlanningForm::~ActivityPlanningForm()
 	settings.setValue(this->metaObject()->className()+showDuplicatesState, showDuplicates->isChecked());
 	settings.setValue(this->metaObject()->className()+hideEmptyLinesState, hideEmptyLines->isChecked());
 	settings.setValue(this->metaObject()->className()+swapAxisState, swapAxis->isChecked());
+	settings.setValue(this->metaObject()->className()+hideFullTeachersState, hideUsedTeachers->isChecked());
 }
 
 void ActivityPlanningForm::showHide()
@@ -1427,10 +1430,12 @@ void ActivityPlanningForm::teachersCellSelected(const QModelIndex& index){
 	int itcol=index.column();
 	if(itrow==0){
 		bool ok=false;
-		int targetHours=QInputDialog::getInt(this, tr("FET question"), tr("Please enter the target number of hours:",
-			"This field is for the moment inactive in FET, but we translate it for possible future use")+" ", teachersTargetNumberOfHours.at(itcol), 0, gt.rules.nHoursPerDay*gt.rules.nDaysPerWeek, 1, &ok);
+		int targetHours=QInputDialog::getInt(this, tr("FET question"), tr("Please enter the target number of hours:")+" ",
+		 teachersTargetNumberOfHours.at(itcol), 0, gt.rules.nHoursPerDay*gt.rules.nDaysPerWeek, 1, &ok);
 		if(ok){
 			teachersTargetNumberOfHours[itcol]=targetHours;
+			
+			teachersList.at(itcol)->targetNumberOfHours=targetHours;
 			/*useless, because i also need to remove the table head item and i don't know how, so i redo the whole table
 			teachersTable->removeCellWidget(0, itcol);
 			QTableWidgetItem* newItem2=new QTableWidgetItem(CustomFETString::number(teachersTargetNumberOfHours.at(itcol)));
@@ -1450,6 +1455,10 @@ void ActivityPlanningForm::teachersCellSelected(const QModelIndex& index){
 			
 			//currently using not fast, but safe calculation
 			updateTables_Teachers();
+			updateTablesVisual(0);
+			
+			gt.rules.internalStructureComputed=false;
+			setRulesModifiedAndOtherThings(&gt.rules);
 		}
 	} else {
 		if(RBActivity->isChecked()){
@@ -1716,7 +1725,6 @@ void ActivityPlanningForm::updateTables_Students_Subjects(){	//similar to statis
 	activitiesTableView->allTableChanged();
 }
 
-
 void ActivityPlanningForm::updateTables_Teachers(){	//similar to statisticsexport.cpp
 	QMultiHash <QString, int> teachersActivities;
 	
@@ -1753,7 +1761,7 @@ void ActivityPlanningForm::updateTables_Teachers(){	//similar to statisticsexpor
 		if(teachersTargetNumberOfHours.at(teacher)!=0){
 			if(statisticValues.teachersTotalNumberOfHours.value(statisticValues.allTeachersNames.at(teacher))>teachersTargetNumberOfHours.at(teacher)){
 				prefixString1="+";
-			} else if(statisticValues.teachersTotalNumberOfHours.value(statisticValues.allTeachersNames.at(teacher))==teachersTargetNumberOfHours.at(teacher)){
+			}else if(statisticValues.teachersTotalNumberOfHours.value(statisticValues.allTeachersNames.at(teacher))==teachersTargetNumberOfHours.at(teacher)){
 				prefixString1="=";
 			}
 			if(statisticValues.teachersTotalNumberOfHours2.value(statisticValues.allTeachersNames.at(teacher))>teachersTargetNumberOfHours.at(teacher)){
@@ -1773,7 +1781,7 @@ void ActivityPlanningForm::updateTables_Teachers(){	//similar to statisticsexpor
 	teachersTableView->model.resize(3, statisticValues.allTeachersNames.count());
 	
 	QStringList vLabels;
-	vLabels<<tr("Target", "Please keep translation short. This field is for the moment inactive in FET, we keep it for possible future use")
+	vLabels<<tr("Target", "Please keep translation short.")
 		<<tr("Subjects", "Please keep translation short")
 		<<tr("Students", "Please keep translation short");
 
@@ -1876,8 +1884,8 @@ void ActivityPlanningForm::updateTables_Teachers(){	//similar to statisticsexpor
 	}
 	
 	//teachersTargetNumberOfHours; Delete this lines! (start)
-	teachersTableView->hideRow(0);
-	hideUsedTeachers->hide();
+	//teachersTableView->hideRow(0);
+	//hideUsedTeachers->hide();
 	//teachersTargetNumberOfHours; Delete this lines! (end)
 	
 	teachersTableView->allTableChanged();
@@ -1989,7 +1997,9 @@ void ActivityPlanningForm::updateTablesVisual(int unneeded){
 	
 	for(int teacher=0; teacher<statisticValues.allTeachersNames.count(); teacher++){
 		bool show=true;
-		if((teachersTargetNumberOfHours.at(teacher)-statisticValues.teachersTotalNumberOfHours.value(statisticValues.allTeachersNames.at(teacher)))==0 && (teachersTargetNumberOfHours.at(teacher)-statisticValues.teachersTotalNumberOfHours2.value(statisticValues.allTeachersNames.at(teacher)))==0 && hideUsedTeachers->checkState()==Qt::Checked){
+		if((teachersTargetNumberOfHours.at(teacher)-statisticValues.teachersTotalNumberOfHours.value(statisticValues.allTeachersNames.at(teacher)))==0
+		 /*&& (teachersTargetNumberOfHours.at(teacher)-statisticValues.teachersTotalNumberOfHours2.value(statisticValues.allTeachersNames.at(teacher)))==0*/
+		 && hideUsedTeachers->checkState()==Qt::Checked){
 			show=false;
 		}
 		if(show)
@@ -2098,7 +2108,6 @@ void PlanningCommunicationSpinBox::increaseValue()
 		
 	emit(valueChanged(value));
 }
-
 
 void PlanningChanged::increasePlanningCommunicationSpinBox()
 {

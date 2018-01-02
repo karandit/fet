@@ -1848,7 +1848,7 @@ Versions 5.28.0 - 5.28.6
 	from the interface (suggested by Volker Dirr).
 	- Added a new Indian example file, by Sudharshan K M and Nataraj Urs H D.
 ---------------------------------------------------------------------------------
-Versions 5.29.0 - 5.29.v
+Versions 5.29.0 - 5.29.6
 - Version 5.29.0
 	- Updated to Qt 5.6.0.
 	- Added the possibility of automatic coloring of the HTML timetables, using the HTML level 7 in the "Settings/Timetables" menu.
@@ -1877,3 +1877,15 @@ Versions 5.29.0 - 5.29.v
 	- Rare crash bug fix in the activity planning form (reported by Benahmed Abdelkrim).
 - Version 5.29.6
 	- Updated to Qt 5.7.0 (thus, the Windows version now uses MinGW 5.3.0).
+---------------------------------------------------------------------------------
+Versions 5.30.0 - 5.30.v
+- Version 5.30.0
+	- Bug fix: the 'Activities rooms statistics' did not work correctly: it considered even inactive constraints (reported by math user).
+	- Added the possibility of selecting whether to print the detailed or the less detailed HTML timetables for the groups and years (suggested by math user,
+	implemented by Volker Dirr and Liviu Lalescu).
+	- Added the possibility of selecting whether to print the detailed or the less detailed HTML timetables for the free periods of the teachers (suggested by
+	Volker Dirr and implemented by Volker Dirr and Liviu Lalescu).
+	- Added the target number of hours for teachers (suggested by Volker Dirr and implemented by Volker Dirr and Liviu Lalescu).
+	- Added the teachers' qualification to teach certain subjects, and the statistics to show where the qualification of a teacher for a subject is not respected
+	 (suggested by Volker Dirr and implemented by Liviu Lalescu).
+	- Added 12 new example files from Namibia, by Bobby Wise.

@@ -32,6 +32,9 @@ public slots:
 	void addTeacher();
 	void removeTeacher();
 	void renameTeacher();
+	
+	void targetNumberOfHours();
+	void qualifiedSubjects();
 
 	void moveTeacherUp();
 	void moveTeacherDown();

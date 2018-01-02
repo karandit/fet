@@ -1,4 +1,4 @@
-This is FET version 5.29.6
+This is FET version 5.30.0
 
 
 Program description:
@@ -236,7 +236,8 @@ Running FET:
 	 [--writetimetablesrooms=wt13] [--writetimetablessubjects=wt14] [--writetimetablesactivities=wt15]
 	 [--printactivitytags=a] [--printnotavailable=u] [--printbreak=b] [--dividetimeaxisbydays=v] [--duplicateverticalheaders=e]
 	 [--printsimultaneousactivities=w] [--randomseedx=rx --randomseedy=ry] [--warnifusingnotperfectconstraints=s]
-	 [--warnifusingstudentsminhoursdailywithallowemptydays=p] [--warnsubgroupswiththesameactivities=ssa] [--verbose=r]",
+	 [--warnifusingstudentsminhoursdailywithallowemptydays=p] [--warnsubgroupswiththesameactivities=ssa]
+	 [--printdetailedtimetables=pdt] [--printdetailedteachersfreeperiodstimetables=pdtfp] [--verbose=r]",
 	where	x is the input file, for instance "data.fet"
 			d is the path to results directory, without trailing slash or backslash (default is current working path).
 				Make sure you have write permissions there.
@@ -265,6 +266,8 @@ Running FET:
 				students min hours daily with allow empty days (default true).
 			ssa is either true or false, represents whether you want a message box to be show, with a warning, if your input file contains subgroups which have
 				the same activities (default true).
+			pdt is either true or false, represents whether you want to show the detailed (true) or less detailed (false) years and groups timetables (default true).
+			pdtfp is either true or false, represents whether you want to show the detailed (true) or less detailed (false) teachers free periods timetables (default true).
 			r is either true or false, represents whether you want additional generation messages and other messages to be shown on the command line (default false).
 
 	Alternatively, you can run "fet-cl --version [--outputdir=d]" to get the current FET version.

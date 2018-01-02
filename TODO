@@ -1120,7 +1120,7 @@ modifying in settings the default min days constraint (for add activity).
 because we nearly always use 100%, not 95%.
 
 modifing later all to 100% isn't the best, because there are a few
-activities with min n day = 0%.
+activities with min days = 0%.
 
 62------------------------DONE-----------------------------
 From Frans:
@@ -1956,9 +1956,7 @@ From Volker Dirr and Bobby Wise:
 
 Bobby:
 
-1) Good morning Liviu,
-
-I have a situation where a school has 3 Grade 11 classes. 11a, 11b and 11c.
+1) I have a situation where a school has 3 Grade 11 classes. 11a, 11b and 11c.
 
 All the classes have compulsory subjects: 7 Periods of English, 7 periods of
 second language (Afrikaans, French and German) and 8 periods of Mathematics.
@@ -3154,7 +3152,7 @@ I think it would be useful to introduce aliases for years, groups and subgroups.
 
 Volker:
 
-Maybe i missunderstood, but it sound to me like you are talking about the names that are generated automatilcy. You can simply rename them (by "modify") if you want (no problems with years and groups. be carefull with subgroups, because you must do it several times!)
+Maybe i missunderstood, but it sound to me like you are talking about the names that are generated automatically. You can simply rename them (by "modify") if you want (no problems with years and groups. be carefull with subgroups, because you must do it several times!)
 
 liquid:
 
@@ -4706,3 +4704,21 @@ From Benahmed Abdelkrim (on forum):
 
 write directly into cells Activity planning, especially for the activities which are not divided(not split).
 for the activities that are divided, we can momentarily kept the weight by fefaut (95%), and later change it if we want.
+
+260---------------------------------------------------------
+From Volker Dirr:
+
+Add teachers target number of hours.
+
+Add teachers teaching qualification.
+
+261---------------------------------------------------------
+From Volker Dirr:
+
+a second rooms statistic:
+
+print all activities with the (maybe) used rooms.
+but only an unordered list will be "bad" to read/check.
+so there should be a not only a simple list.
+there should be a filter to check faster.
+so filter all activities by subject, teacher or students set.

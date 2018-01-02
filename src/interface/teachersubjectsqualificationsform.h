@@ -1,8 +1,8 @@
 /***************************************************************************
-                          teacherstatisticsform.h  -  description
+                          teachersubjectsqualificationsform.h  -  description
                              -------------------
-    begin                : March 25, 2006
-    copyright            : (C) 2006 by Lalescu Liviu
+    begin                : 2016
+    copyright            : (C) 2016 by Lalescu Liviu
     email                : Please see http://lalescu.ro/liviu/ for details about contacting Liviu Lalescu (in particular, you can find here the e-mail address)
  ***************************************************************************/
 
@@ -15,29 +15,33 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef TEACHERSSTATISTICSFORM_H
-#define TEACHERSSTATISTICSFORM_H
+#ifndef TEACHERSUBJECTSQUALIFICATIONSFORM_H
+#define TEACHERSUBJECTSQUALIFICATIONSFORM_H
 
-#include "ui_teachersstatisticsform_template.h"
+#include "ui_teachersubjectsqualificationsform_template.h"
+#include "timetable_defs.h"
+#include "timetable.h"
+#include "fet.h"
 
-#include <QDialog>
+class Teacher;
 
-class TeachersStatisticsForm : public QDialog, Ui::TeachersStatisticsForm_template  {
+class TeacherSubjectsQualificationsForm : public QDialog, Ui::TeacherSubjectsQualificationsForm_template {
 	Q_OBJECT
-
 public:
-	QList<QString> names;
-	QList<int> subactivities;
-	QList<int> durations;
-	QList<int> targets;
-
-	QList<int> hideFullTeacher;
-
-	TeachersStatisticsForm(QWidget* parent);
-	~TeachersStatisticsForm();
+	TeacherSubjectsQualificationsForm(QWidget* parent, Teacher* teacher);
+	~TeacherSubjectsQualificationsForm();
 	
+	Teacher* _teacher;
+
 public slots:
-	void hideFullTeachersCheckBoxModified();
+	void clear();
+
+	void addSubject();
+	void removeSubject();
+	
+	void addAllSubjects();
+
+	void ok();
 };
 
 #endif

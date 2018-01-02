@@ -37,6 +37,8 @@ TeachersStatisticsForm::TeachersStatisticsForm(QWidget* parent): QDialog(parent)
 	
 	closeButton->setDefault(true);
 
+	connect(hideFullTeachersCheckBox, SIGNAL(toggled(bool)), this, SLOT(hideFullTeachersCheckBoxModified()));
+
 	connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
 	
 	tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -44,17 +46,6 @@ TeachersStatisticsForm::TeachersStatisticsForm(QWidget* parent): QDialog(parent)
 
 	centerWidgetOnScreen(this);
 	restoreFETDialogGeometry(this);
-	
-	tableWidget->clear();
-	tableWidget->setColumnCount(3);
-	tableWidget->setRowCount(gt.rules.teachersList.size());
-	
-	QStringList columns;
-	columns<<tr("Teacher");
-	columns<<tr("No. of activities");
-	columns<<tr("Duration");
-	
-	tableWidget->setHorizontalHeaderLabels(columns);
 	
 	QHash<QString, QSet<Activity*> > activitiesForTeacher;
 	
@@ -69,10 +60,6 @@ TeachersStatisticsForm::TeachersStatisticsForm(QWidget* parent): QDialog(parent)
 	for(int i=0; i<gt.rules.teachersList.size(); i++){
 		Teacher* t=gt.rules.teachersList[i];
 		
-		QTableWidgetItem* newItem=new QTableWidgetItem(t->name);
-		newItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-		tableWidget->setItem(i, 0, newItem);
-
 		int	nSubActivities=0;
 		int nHours=0;
 		
@@ -87,21 +74,69 @@ TeachersStatisticsForm::TeachersStatisticsForm(QWidget* parent): QDialog(parent)
 				assert(0);
 			}
 		}
+		
+		names.append(t->name);
+		subactivities.append(nSubActivities);
+		durations.append(nHours);
+		targets.append(t->targetNumberOfHours);
 
-		newItem=new QTableWidgetItem(CustomFETString::number(nSubActivities));
-		newItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-		tableWidget->setItem(i, 1, newItem);
-
-		newItem=new QTableWidgetItem(CustomFETString::number(nHours));
-		newItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-		tableWidget->setItem(i, 2, newItem);
+		if(nHours==t->targetNumberOfHours)
+			hideFullTeacher.append(true);
+		else
+			hideFullTeacher.append(false);
 	}
 
-	tableWidget->resizeColumnsToContents();
-	tableWidget->resizeRowsToContents();
+	hideFullTeachersCheckBoxModified();
 }
 
 TeachersStatisticsForm::~TeachersStatisticsForm()
 {
 	saveFETDialogGeometry(this);
+}
+
+void TeachersStatisticsForm::hideFullTeachersCheckBoxModified()
+{
+	tableWidget->clear();
+	
+	int n_rows=0;
+	foreach(bool b, hideFullTeacher)
+		if(!(hideFullTeachersCheckBox->isChecked() && b))
+			n_rows++;
+
+	tableWidget->setColumnCount(4);
+	tableWidget->setRowCount(n_rows);
+	
+	QStringList columns;
+	columns<<tr("Teacher");
+	columns<<tr("No. of activities");
+	columns<<tr("Duration");
+	columns<<tr("Target duration", "It means the target duration of activities for each teacher");
+	
+	tableWidget->setHorizontalHeaderLabels(columns);
+
+	int j=0;
+	for(int i=0; i<gt.rules.teachersList.count(); i++){
+		if(!(hideFullTeachersCheckBox->isChecked() && hideFullTeacher.at(i))){
+			QTableWidgetItem* newItem=new QTableWidgetItem(names.at(i));
+			newItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+			tableWidget->setItem(j, 0, newItem);
+
+			newItem=new QTableWidgetItem(CustomFETString::number(subactivities.at(i)));
+			newItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+			tableWidget->setItem(j, 1, newItem);
+	
+			newItem=new QTableWidgetItem(CustomFETString::number(durations.at(i)));
+			newItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+			tableWidget->setItem(j, 2, newItem);
+		
+			newItem=new QTableWidgetItem(CustomFETString::number(targets.at(i)));
+			newItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+			tableWidget->setItem(j, 3, newItem);
+			
+			j++;
+		}
+	}
+	
+	tableWidget->resizeColumnsToContents();
+	tableWidget->resizeRowsToContents();
 }

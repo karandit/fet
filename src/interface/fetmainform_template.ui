@@ -852,7 +852,7 @@
      <x>0</x>
      <y>0</y>
      <width>560</width>
-     <height>28</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="helpMenu">
@@ -963,6 +963,8 @@
     <addaction name="dataStudentsStatisticsAction"/>
     <addaction name="separator"/>
     <addaction name="dataActivitiesRoomsStatisticsAction"/>
+    <addaction name="separator"/>
+    <addaction name="dataTeachersSubjectsQualificationsStatisticsAction"/>
     <addaction name="separator"/>
     <addaction name="statisticsPrintAction"/>
     <addaction name="statisticsExportToDiskAction"/>
@@ -1252,6 +1254,9 @@
      </property>
      <addaction name="timetablesToWriteOnDiskAction"/>
      <addaction name="settingsTimetableHtmlLevelAction"/>
+     <addaction name="separator"/>
+     <addaction name="settingsPrintDetailedTimetablesAction"/>
+     <addaction name="settingsPrintDetailedTeachersFreePeriodsTimetablesAction"/>
      <addaction name="separator"/>
      <addaction name="settingsPrintActivityTagsAction"/>
      <addaction name="separator"/>
@@ -2345,6 +2350,12 @@
    </property>
   </action>
   <action name="settingsPrintActivityTagsAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Print activity tags in timetables</string>
    </property>
@@ -2439,6 +2450,33 @@
   <action name="timetablesToWriteOnDiskAction">
    <property name="text">
     <string comment="It means that the user selects the categories of timetables to be written on disk after the generation (soft conflicts, XML, days horizontal, time vertical, subgroups, teachers, etc.)">Categories of timetables to be written on disk</string>
+   </property>
+  </action>
+  <action name="settingsPrintDetailedTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Print detailed timetables</string>
+   </property>
+  </action>
+  <action name="settingsPrintDetailedTeachersFreePeriodsTimetablesAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Print detailed teachers' free periods timetables</string>
+   </property>
+  </action>
+  <action name="dataTeachersSubjectsQualificationsStatisticsAction">
+   <property name="text">
+    <string comment="It means the statistics for the teachers - check the teacher's subject qualification">Teachers subjects qualifications statistics</string>
    </property>
   </action>
  </widget>

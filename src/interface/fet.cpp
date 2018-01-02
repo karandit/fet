@@ -191,7 +191,8 @@ void usage(QTextStream* out, const QString& error)
 		"[--writetimetablesactivities=wt15] "
 		"[--printactivitytags=a] [--printnotavailable=u] [--printbreak=b] [--dividetimeaxisbydays=v] [--duplicateverticalheaders=e] "
 		"[--printsimultaneousactivities=w] [--randomseedx=rx --randomseedy=ry] [--warnifusingnotperfectconstraints=s] "
-		"[--warnifusingstudentsminhoursdailywithallowemptydays=p] [--warnifusinggroupactivitiesininitialorder=g] [--warnsubgroupswiththesameactivities=ssa] [--verbose=r]\",\n"
+		"[--warnifusingstudentsminhoursdailywithallowemptydays=p] [--warnifusinggroupactivitiesininitialorder=g] [--warnsubgroupswiththesameactivities=ssa]\n"
+		"[--printdetailedtimetables=pdt] [--printdetailedteachersfreeperiodstimetables=pdtfp] [--verbose=r]\",\n"
 		"where:\nx is the input file, for instance \"data.fet\"\n"
 		"d is the path to results directory, without trailing slash or backslash (default is current working path). "
 		"Make sure you have write permissions there.\n"
@@ -220,9 +221,10 @@ void usage(QTextStream* out, const QString& error)
 		"g is either true or false, represents whether you want a message box to be shown, with a warning, if the input file contains nonstandard timetable "
 		"generation options to group activities in the initial order (default true).\n"
 		"ssa is either true or false, represents whether you want a message box to be show, with a warning, if your input file contains subgroups which have "
-		"the same activities (default true)."
-		"r is either true or false, represents whether you want additional generation messages and other messages to be shown on the command line (default false)."
-		"\n"
+		"the same activities (default true).\n"
+		"pdt is either true or false, represents whether you want to show the detailed (true) or less detailed (false) years and groups timetables (default true).\n"
+		"pdtfp is either true or false, represents whether you want to show the detailed (true) or less detailed (false) teachers free periods timetables (default true).\n"
+		"r is either true or false, represents whether you want additional generation messages and other messages to be shown on the command line (default false).\n"
 		"Alternatively, you can run \"fet-cl --version [--outputdir=d]\" to get the current FET version. "
 		"where:\nd is the path to results directory, without trailing slash or backslash (default is current working path). "
 		"Make sure you have write permissions there.\n"
@@ -306,6 +308,8 @@ void readSimulationParameters()
 	
 	TIMETABLE_HTML_LEVEL=newSettings.value("html-level", "2").toInt();
 	TIMETABLE_HTML_PRINT_ACTIVITY_TAGS=newSettings.value("print-activity-tags", "true").toBool();
+	PRINT_DETAILED_HTML_TIMETABLES=newSettings.value("print-detailed-timetables", "true").toBool();
+	PRINT_DETAILED_HTML_TEACHERS_FREE_PERIODS=newSettings.value("print-detailed-teachers-free-periods-timetables", "true").toBool();
 	PRINT_ACTIVITIES_WITH_SAME_STARTING_TIME=newSettings.value("print-activities-with-same-starting-time", "false").toBool();
 	PRINT_NOT_AVAILABLE_TIME_SLOTS=newSettings.value("print-not-available", "true").toBool();
 	PRINT_BREAK_TIME_SLOTS=newSettings.value("print-break", "true").toBool();
@@ -378,6 +382,8 @@ void writeSimulationParameters()
 	settings.setValue("check-for-updates", checkForUpdates);
 	settings.setValue("html-level", TIMETABLE_HTML_LEVEL);
 	settings.setValue("print-activity-tags", TIMETABLE_HTML_PRINT_ACTIVITY_TAGS);
+	settings.setValue("print-detailed-timetables", PRINT_DETAILED_HTML_TIMETABLES);
+	settings.setValue("print-detailed-teachers-free-periods-timetables", PRINT_DETAILED_HTML_TEACHERS_FREE_PERIODS);
 	settings.setValue("print-activities-with-same-starting-time", PRINT_ACTIVITIES_WITH_SAME_STARTING_TIME);
 	settings.setValue("divide-html-timetables-with-time-axis-by-days", DIVIDE_HTML_TIMETABLES_WITH_TIME_AXIS_BY_DAYS);
 	settings.setValue("timetables-repeat-vertical-names", TIMETABLE_HTML_REPEAT_NAMES);
@@ -799,7 +805,11 @@ int main(int argc, char **argv)
 		TIMETABLE_HTML_LEVEL=2;
 		
 		TIMETABLE_HTML_PRINT_ACTIVITY_TAGS=true;
-		
+
+		PRINT_DETAILED_HTML_TIMETABLES=true;
+
+		PRINT_DETAILED_HTML_TEACHERS_FREE_PERIODS=true;
+
 		FET_LANGUAGE="en_US";
 		
 		PRINT_NOT_AVAILABLE_TIME_SLOTS=true;
@@ -856,6 +866,14 @@ int main(int argc, char **argv)
 			else if(s.left(20)=="--printactivitytags="){
 				if(s.right(5)=="false")
 					TIMETABLE_HTML_PRINT_ACTIVITY_TAGS=false;
+			}
+			else if(s.left(26)=="--printdetailedtimetables="){
+				if(s.right(5)=="false")
+					PRINT_DETAILED_HTML_TIMETABLES=false;
+			}
+			else if(s.left(45)=="--printdetailedteachersfreeperiodstimetables="){
+				if(s.right(5)=="false")
+					PRINT_DETAILED_HTML_TEACHERS_FREE_PERIODS=false;
 			}
 			else if(s.left(11)=="--language=")
 				FET_LANGUAGE=s.right(s.length()-11);

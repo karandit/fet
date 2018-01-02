@@ -151,6 +151,7 @@ public slots:
 	void on_dataSubgroupsAction_triggered();
 	void on_dataStudentsStatisticsAction_triggered();
 	void on_dataActivitiesRoomsStatisticsAction_triggered();
+	void on_dataTeachersSubjectsQualificationsStatisticsAction_triggered();
 	void on_dataHelpOnStatisticsAction_triggered();
 	
 	void on_helpSettingsAction_triggered();
@@ -355,6 +356,8 @@ public slots:
 
 	void on_settingsTimetableHtmlLevelAction_triggered();
 	void on_settingsPrintActivityTagsAction_toggled();
+	void on_settingsPrintDetailedTimetablesAction_toggled();
+	void on_settingsPrintDetailedTeachersFreePeriodsTimetablesAction_toggled();
 	void on_settingsPrintNotAvailableSlotsAction_toggled();
 	void on_settingsPrintBreakSlotsAction_toggled();
 

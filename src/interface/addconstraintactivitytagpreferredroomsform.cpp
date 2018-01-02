@@ -17,8 +17,6 @@
 
 #include <QMessageBox>
 
-
-
 #include "longtextmessagebox.h"
 
 #include "addconstraintactivitytagpreferredroomsform.h"

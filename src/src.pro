@@ -431,7 +431,9 @@ SOURCES += \
 	interface/timetableprintform.cpp \
 	interface/statisticsprintform.cpp \
 	\
-	interface/timetablestowriteondiskform.cpp
+	interface/timetablestowriteondiskform.cpp \
+	\
+	interface/teachersubjectsqualificationsform.cpp
 
 HEADERS += \
 	engine/timetableexport.h \
@@ -869,7 +871,9 @@ HEADERS += \
 	interface/timetableprintform.h \
 	interface/statisticsprintform.h \
 	\
-	interface/timetablestowriteondiskform.h
+	interface/timetablestowriteondiskform.h \
+	\
+	interface/teachersubjectsqualificationsform.h
 
 FORMS += \
 	interface/fetmainform_template.ui \
@@ -1268,7 +1272,9 @@ FORMS += \
 	\
 	interface/activityplanningconfirmationform_template.ui \
 	\
-	interface/timetablestowriteondiskform_template.ui
+	interface/timetablestowriteondiskform_template.ui \
+	\
+	interface/teachersubjectsqualificationsform_template.ui
 
 TRANSLATIONS += \
 	../translations/fet_ar.ts \
