@@ -20,6 +20,7 @@
 
 Building::Building()
 {
+	comments=QString("");
 }
 
 Building::~Building()
@@ -31,13 +32,16 @@ void Building::computeInternalStructure(Rules& r)
 	Q_UNUSED(r);
 }
 
-/*
 QString Building::getDescription()
 {
-	QString s=tr("N:%1", "Name of the building").arg(this->name);
-
-	return s;
-}*/
+	QString s=tr("N:%1", "The name of the building").arg(name);
+	
+	QString end=QString("");
+	if(!comments.isEmpty())
+		end=", "+tr("C: %1", "Comments").arg(comments);
+	
+	return s+end;
+}
 
 QString Building::getDetailedDescription()
 {
@@ -46,6 +50,12 @@ QString Building::getDetailedDescription()
 	s+=tr("Name=%1", "The name of the building").arg(this->name);
 	s+="\n";
 
+	//Has comments?
+	if(!comments.isEmpty()){
+		s+=tr("Comments=%1").arg(comments);
+		s+="\n";
+	}
+
 	return s;
 }
 
@@ -53,6 +63,7 @@ QString Building::getXmlDescription()
 {
 	QString s="<Building>\n";
 	s+="	<Name>"+protect(this->name)+"</Name>\n";
+	s+="	<Comments>"+protect(comments)+"</Comments>\n";
 	s+="</Building>\n";
 
 	return s;

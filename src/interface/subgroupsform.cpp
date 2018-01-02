@@ -71,6 +71,8 @@ SubgroupsForm::SubgroupsForm(QWidget* parent): QDialog(parent)
 	connect(deactivateStudentsPushButton, SIGNAL(clicked()), this, SLOT(deactivateStudents()));
 	connect(subgroupsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(modifySubgroup()));
 
+	connect(commentsPushButton, SIGNAL(clicked()), this, SLOT(comments()));
+
 	centerWidgetOnScreen(this);
 	restoreFETDialogGeometry(this);
 	//restore splitter state
@@ -560,4 +562,64 @@ void SubgroupsForm::deactivateStudents()
 	QString subgroupName=subgroupsListWidget->currentItem()->text();
 	int count=gt.rules.deactivateStudents(subgroupName);
 	QMessageBox::information(this, tr("FET information"), tr("De-activated a number of %1 activities").arg(count));
+}
+
+void SubgroupsForm::comments()
+{
+	int ind=subgroupsListWidget->currentRow();
+	if(ind<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected subgroup"));
+		return;
+	}
+	
+	QString subgroupName=subgroupsListWidget->currentItem()->text();
+	
+	StudentsSet* sset=gt.rules.searchStudentsSet(subgroupName);
+	assert(sset!=NULL);
+
+	QDialog getCommentsDialog(this);
+	
+	getCommentsDialog.setWindowTitle(tr("Students subgroup comments"));
+	
+	QPushButton* okPB=new QPushButton(tr("OK"));
+	okPB->setDefault(true);
+	QPushButton* cancelPB=new QPushButton(tr("Cancel"));
+	
+	connect(okPB, SIGNAL(clicked()), &getCommentsDialog, SLOT(accept()));
+	connect(cancelPB, SIGNAL(clicked()), &getCommentsDialog, SLOT(reject()));
+
+	QHBoxLayout* hl=new QHBoxLayout();
+	hl->addStretch();
+	hl->addWidget(okPB);
+	hl->addWidget(cancelPB);
+	
+	QVBoxLayout* vl=new QVBoxLayout();
+	
+	QPlainTextEdit* commentsPT=new QPlainTextEdit();
+	commentsPT->setPlainText(sset->comments);
+	commentsPT->selectAll();
+	commentsPT->setFocus();
+	
+	vl->addWidget(commentsPT);
+	vl->addLayout(hl);
+	
+	getCommentsDialog.setLayout(vl);
+	
+	const QString settingsName=QString("StudentsSubgroupCommentsDialog");
+	
+	getCommentsDialog.resize(500, 320);
+	centerWidgetOnScreen(&getCommentsDialog);
+	restoreFETDialogGeometry(&getCommentsDialog, settingsName);
+	
+	int t=getCommentsDialog.exec();
+	saveFETDialogGeometry(&getCommentsDialog, settingsName);
+	
+	if(t==QDialog::Accepted){
+		sset->comments=commentsPT->toPlainText();
+	
+		gt.rules.internalStructureComputed=false;
+		setRulesModifiedAndOtherThings(&gt.rules);
+
+		subgroupChanged(subgroupName);
+	}
 }

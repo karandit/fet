@@ -337,6 +337,7 @@ void readSimulationParameters()
 	WRITE_TIMETABLES_TEACHERS_FREE_PERIODS=newSettings.value("write-timetables-teachers-free-periods", "true").toBool();
 	WRITE_TIMETABLES_ROOMS=newSettings.value("write-timetables-rooms", "true").toBool();
 	WRITE_TIMETABLES_SUBJECTS=newSettings.value("write-timetables-subjects", "true").toBool();
+	WRITE_TIMETABLES_ACTIVITY_TAGS=newSettings.value("write-timetables-activity-tags", "true").toBool();
 	WRITE_TIMETABLES_ACTIVITIES=newSettings.value("write-timetables-activities", "true").toBool();
 
 /////////confirmations
@@ -411,6 +412,7 @@ void writeSimulationParameters()
 	settings.setValue("write-timetables-teachers-free-periods", WRITE_TIMETABLES_TEACHERS_FREE_PERIODS);
 	settings.setValue("write-timetables-rooms", WRITE_TIMETABLES_ROOMS);
 	settings.setValue("write-timetables-subjects", WRITE_TIMETABLES_SUBJECTS);
+	settings.setValue("write-timetables-activity-tags", WRITE_TIMETABLES_ACTIVITY_TAGS);
 	settings.setValue("write-timetables-activities", WRITE_TIMETABLES_ACTIVITIES);
 
 ///////////confirmations
@@ -832,6 +834,7 @@ int main(int argc, char **argv)
 		WRITE_TIMETABLES_TEACHERS_FREE_PERIODS=true;
 		WRITE_TIMETABLES_ROOMS=true;
 		WRITE_TIMETABLES_SUBJECTS=true;
+		WRITE_TIMETABLES_ACTIVITY_TAGS=true;
 		WRITE_TIMETABLES_ACTIVITIES=true;
 
 		DIVIDE_HTML_TIMETABLES_WITH_TIME_AXIS_BY_DAYS=false;
@@ -985,6 +988,10 @@ int main(int argc, char **argv)
 			else if(s.left(26)=="--writetimetablessubjects="){
 				if(s.right(5)=="false")
 					WRITE_TIMETABLES_SUBJECTS=false;
+			}
+			else if(s.left(30)=="--writetimetablesactivitytags="){
+				if(s.right(5)=="false")
+					WRITE_TIMETABLES_ACTIVITIES=false;
 			}
 			else if(s.left(28)=="--writetimetablesactivities="){
 				if(s.right(5)=="false")

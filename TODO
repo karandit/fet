@@ -1789,6 +1789,8 @@ Implement constraint "Activity needs several rooms". (I am not 100% sure if it i
 single activity or if it is also needed to get only some rooms from (a larger) selection. So maybe all current "roomS" constraints "just" need an
 option "number of used rooms from the selection". Currently it is always 1. It is needed to increase this number.)
 
+(Also suggested by Anton Anthofer)
+
 115---------------------------------------------------------
 From nouvakis:
 
@@ -2851,13 +2853,21 @@ From Tonny Chan:
 
 Please add a multiple select and then add to FET, then I need not to click the students one by one to a course.
 
-185---------------------------------------------------------
+185------------------------DONE-----------------------------
 From Volker Dirr:
 
-There should be comment to the teachers, rooms, students and activities.
+DONE since FET-5.30.3 on 22 August 2016 --> There should be comment to the teachers, rooms, students and activities.
 (Maybe even instead of using the activity constraints). These comments
 should be visible (or accessible by a pushbutton) in the constraints
 dialogs.
+
+From Anton Anthofer:
+
+- Teachers, students, subjects comments.
+
+From Liviu Lalescu:
+
+- Also for activity tags and buildings. <-- DONE
 
 186---------------------------------------------------------
 From plaldw (on forum):
@@ -3000,7 +3010,7 @@ Es ce que vous pouvez me dire comment faire ?
 192---------------------------------------------------------
 From mbarsan (on forum):
 
-We have a school with 8 periods per day, with a short break every 2 hours. 
+We have a school with 8 periods per day, with a short break every 2 hours.
 There are 3 buildings.
 Teacher may change building during those short breaks.
 So we  haven't to say to FET any duration to change buildings. This may be done at beginning of hours nn. 3, 5 and 7.
@@ -3140,7 +3150,7 @@ I hope that by using some tricks you can overcome the problems.
 See also fet-v.v.v/doc/algorithm/improve-todo-item-197.txt.
 
 198---------------------------------------------------------
-From Volker Dirr:
+From Volker Dirr (also from mouiata, on the forum):
 
 new useful constraint:
 time constraints -> teachers -> max total sum of teachers gaps per week
@@ -3173,7 +3183,7 @@ liquid:
 
 Volker:
 
-I can recommend using short names. I use everywhere shortcuts (subjects has only 1-2 characters. Teacher names 3 chacaters. Students only around 1 to 4 characters.)
+I can recommend using short names. I use everywhere shortcuts (subjects has only 1-2 characters. Teacher names 3 characters. Students only around 1 to 4 characters.)
 Of course new students "wonder" the first day about that shortcuts, but they are clever enough to understand it very fast.
 
 liquid:
@@ -3183,6 +3193,10 @@ Oh, maybe that's the right way. I was afraid that schedule could be misunderstoo
 ---
 
 liquid suggests also aliases for rooms.
+
+Also from abautu, on forum: Could you add an extra field for subjects and teachers to allow for a short name/abbreviation of it?
+For example, for a subject called "Classical literature" a short name could be "CL" or "C-101". Then the print timetable features
+would allow to print the short names (i.e. compact timetable) or long names (i.e. normal timetable).
 
 200---------------------------------------------------------
 (Added on 2014-10-12)
@@ -4388,9 +4402,9 @@ long.
 239---------------------------------------------------------
 From Volker Dirr:
 
-short the strings in conflicts.txt. they are much too long. very 
-confusing if you read that. (Maybe use shortcuts, sort them by type and 
-call the type only at the beginning of the list, ... There are many 
+Shorten the strings in conflicts.txt. They are much too long. Very
+confusing if you read that. (Maybe use shortcuts, sort them by type and
+call the type only at the beginning of the list, ... There are many
 variants to write it more clear.)
 
 240---------------------------------------------------------
@@ -4427,6 +4441,10 @@ Fixed number of days between activities (with default value equal to 1).
 
 When I have to click hundreds of times  Min and Max... constraints
 I would save a lot of time if you add this constraint.
+
+Also from abautu, on forum: A constraint "Exact N days between activities" would imply "Min N days between activities"
+AND "Max N days between activities". I use these two constraints simultaneously in order to force two activities to be
+scheduled in same week days (in an odd/even timetable).
 
 242---------------------------------------------------------
 From Lizio (on forum):
@@ -4782,3 +4800,76 @@ From Volker Dirr:
 maybe we can add a check for this:
 
 teacher max hours per day is lower than activity duration.
+
+269---------------------------------------------------------
+From Matthias Söllner:
+
+Matthias Söllner: Is there a possibility to create the csv-Export Files
+over the command line?
+
+So for example if I have a ready calculated output directory of a
+timetable, I want to generate the csv-File without gui.
+
+Volker Dirr: If we do that, we need to care about:
+a) warnings at the end (currently there is a messagebox)
+b) questions at the beginning (for text and field seperator. I think we
+should use the default ones without asking.)
+
+Liviu Lalescu: Maybe the best would be to add a command-line parameter
+to force generation of CSV timetables after a successful generation,
+and maybe add parameters for text and field separator.
+
+270---------------------------------------------------------
+From auriolar (on forum):
+
+It would be nice to be able to limit the time a teacher is in the school.
+
+I mean, having, for instance, 5 days and 6 hours/day, I would like to have teachers no more than 25 hours each week in the school gaps included.
+This asumes that the timetable is continuous each day, so if I have only class at the first hour and other at the last one, I've been 6 hours (not 2).
+
+I don't think max gaps per week will work (30-25=5), because some teachers have to be less than 25 hours, and those should have more than 5 gaps.
+
+Liviu Lalescu: It would be possible for the user to just consider the working hours for each teacher and add a corresponding max gaps per week
+for each teacher (a solution which you partially imply).
+
+271---------------------------------------------------------
+From auriolar (on forum):
+
+I think it would be a good idea to have tags for teachers, this way we could add constraints to groups of teachers instead of doing one by one.
+Maybe it could be done for rooms to.
+
+272---------------------------------------------------------
+From Bob Hairgrove (on forum):
+
+When I generate a timetable, I can successfully save it in CSV format. However, if I do not generate a timetable but open a .FET file from a previous session, it will export all of the data but without without any planned activities because "no timetable has been generated". So if I want to have CSV timetables, I have to remember to export them immediately after they have been generated.
+
+This would be a nice feature to have since there is the schedule contained in the "{Name}_activities.xml" file, and the export routine would only have to read it.
+
+Or is there a better way?
+
+Liviu Lalescu: Did you notice that there is a file name_data_and_timetable.fet in the results? You can open this file and generate on it - it will go very fast, and after that you can export the CSV results.
+
+273---------------------------DONE--------------------------
+From dmcdonald (on forum):
+
+DONE since FET-5.30.3 on 22 August 2016 --> I use activity tags for subjects (English, Mathematics, Biology, etc.), and am often asked to produce departmental timetables (showing all and only Mathematics, or all and only English, etc.)
+
+Currently I've been doing this by deactivating all activities, then activating (through Data>Tags) only those activities with a given tag (Mathematics, etc.). After generating a timetable in this way, I can print the Activities timetable to get a timetable with only those activities for a particular department.
+
+It would be ideal for me if the HTML output had an "Activity Tag" row that produced individual timetables for each activity tag (in the way that "Subjects" produces individual timetables for each subject). <-- DONE
+
+274---------------------------------------------------------
+From Benahmed Abdelkrim (on forum):
+
+Sometimes you need to see the "Activity tags" in tables produced by FET, but the tables are becoming so large; then the idea that surprises us right now is: why not allow the user to select only the "Activity tags" that wants to print ?.
+
+If this feature is created, the tables will be lightweight, and easy to read.
+
+275---------------------------------------------------------
+From Anton Anthofer:
+
+- remove the "modify subactivity" menu and move that feature into the "normal" activity menu.
+- modify the id
+- recalculate the ids
+- a complex calculation of the number of students.
+- generate very similar timetables

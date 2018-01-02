@@ -74,7 +74,7 @@
     </layout>
    </item>
    <item row="3" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QPushButton" name="moveRoomUpPushButton">
        <property name="text">
@@ -90,20 +90,31 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="sortRoomsPushButton">
+      <widget class="QPushButton" name="commentsPushButton">
        <property name="text">
-        <string>Sort</string>
+        <string>Comments</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item row="4" column="0">
-    <widget class="QPushButton" name="closePushButton">
-     <property name="text">
-      <string>Close</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="sortRoomsPushButton">
+       <property name="text">
+        <string>Sort</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closePushButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

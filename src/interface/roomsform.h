@@ -44,6 +44,8 @@ public slots:
 	void sortRooms();
 	void roomChanged(int index);
 	void filterChanged();
+	
+	void comments();
 };
 
 #endif

@@ -25,6 +25,7 @@ StudentsSet::StudentsSet()
 {
 	this->type=STUDENTS_SET;
 	this->numberOfStudents=0;
+	comments=QString("");
 }
 
 StudentsSet::~StudentsSet()
@@ -66,6 +67,7 @@ QString StudentsYear::getXmlDescription()
 	s+="<Year>\n";
 	s+="	<Name>"+protect(this->name)+"</Name>\n";
 	s+="	<Number_of_Students>"+CustomFETString::number(this->numberOfStudents)+"</Number_of_Students>\n";
+	s+="	<Comments>"+protect(comments)+"</Comments>\n";
 	for(int i=0; i<this->groupsList.size(); i++){
 		StudentsGroup* stg=this->groupsList[i];
 		s+=stg->getXmlDescription();
@@ -81,8 +83,12 @@ QString StudentsYear::getDescription()
 	s+=tr("YN:%1", "Year name").arg(this->name);
 	s+=", ";
 	s+=tr("NoS:%1", "Number of students").arg(this->numberOfStudents);
+	
+	QString end=QString("");
+	if(!comments.isEmpty())
+		end=QString(", ")+tr("C: %1", "Comments").arg(comments);
 
-	return s;
+	return s+end;
 }
 
 QString StudentsYear::getDetailedDescription()
@@ -94,6 +100,12 @@ QString StudentsYear::getDetailedDescription()
 	s+="\n";
 	s+=tr("Number of students=%1").arg(this->numberOfStudents);
 	s+="\n";
+
+	//Has comments?
+	if(!comments.isEmpty()){
+		s+=tr("Comments=%1").arg(comments);
+		s+="\n";
+	}
 
 	return s;
 }
@@ -168,6 +180,7 @@ QString StudentsGroup::getXmlDescription()
 	s+="	<Group>\n";
 	s+="		<Name>"+protect(this->name)+"</Name>\n";
 	s+="		<Number_of_Students>"+CustomFETString::number(this->numberOfStudents)+"</Number_of_Students>\n";
+	s+="		<Comments>"+protect(comments)+"</Comments>\n";
 	for(int i=0; i<this->subgroupsList.size(); i++){
 		StudentsSubgroup* sts=this->subgroupsList[i];
 		s+=sts->getXmlDescription();
@@ -184,7 +197,11 @@ QString StudentsGroup::getDescription()
 	s+=", ";
 	s+=tr("NoS:%1", "Number of students").arg(this->numberOfStudents);
 
-	return s;
+	QString end=QString("");
+	if(!comments.isEmpty())
+		end=QString(", ")+tr("C: %1", "Comments").arg(comments);
+
+	return s+end;
 }
 
 QString StudentsGroup::getDetailedDescription()
@@ -196,6 +213,12 @@ QString StudentsGroup::getDetailedDescription()
 	s+="\n";
 	s+=tr("Number of students=%1").arg(this->numberOfStudents);
 	s+="\n";
+
+	//Has comments?
+	if(!comments.isEmpty()){
+		s+=tr("Comments=%1").arg(comments);
+		s+="\n";
+	}
 
 	return s;
 }
@@ -249,6 +272,7 @@ QString StudentsSubgroup::getXmlDescription()
 	s+="		<Subgroup>\n";
 	s+="			<Name>"+protect(this->name)+"</Name>\n";
 	s+="			<Number_of_Students>"+CustomFETString::number(this->numberOfStudents)+"</Number_of_Students>\n";
+	s+="			<Comments>"+protect(comments)+"</Comments>\n";
 	s+="		</Subgroup>\n";
 
 	return s;
@@ -261,7 +285,11 @@ QString StudentsSubgroup::getDescription()
 	s+=", ";
 	s+=tr("NoS:%1", "Number of students").arg(this->numberOfStudents);
 
-	return s;
+	QString end=QString("");
+	if(!comments.isEmpty())
+		end=QString(", ")+tr("C: %1", "Comments").arg(comments);
+
+	return s+end;
 }
 
 QString StudentsSubgroup::getDetailedDescription()
@@ -273,6 +301,12 @@ QString StudentsSubgroup::getDetailedDescription()
 	s+="\n";
 	s+=tr("Number of students=%1").arg(this->numberOfStudents);
 	s+="\n";
+
+	//Has comments?
+	if(!comments.isEmpty()){
+		s+=tr("Comments=%1").arg(comments);
+		s+="\n";
+	}
 
 	return s;
 }

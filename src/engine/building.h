@@ -41,6 +41,8 @@ class Building{
 
 public:
 	QString name;
+	
+	QString comments;
 
 	Building();
 	~Building();
@@ -48,7 +50,7 @@ public:
 	void computeInternalStructure(Rules& r);
 	
 	QString getXmlDescription();
-	//QString getDescription();
+	QString getDescription();
 	QString getDetailedDescription();
 	QString getDetailedDescriptionWithConstraints(Rules& r);
 };

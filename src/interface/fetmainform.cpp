@@ -277,6 +277,7 @@ bool WRITE_TIMETABLES_TEACHERS=true;
 bool WRITE_TIMETABLES_TEACHERS_FREE_PERIODS=true;
 bool WRITE_TIMETABLES_ROOMS=true;
 bool WRITE_TIMETABLES_SUBJECTS=true;
+bool WRITE_TIMETABLES_ACTIVITY_TAGS=true;
 bool WRITE_TIMETABLES_ACTIVITIES=true;
 
 #ifndef FET_COMMAND_LINE
@@ -4075,15 +4076,18 @@ void FetMainForm::on_settingsRestoreDefaultsAction_triggered()
 	 .arg(tr("subjects")).arg(tr("true"));
 	s+="\n";
 	s+=tr("45")+QString(". ")+tr("Write on disk the %1 timetables will be %2", "%1 is a category of timetables, like XML or subgroups timetables, %2 is true or false")
+	 .arg(tr("activity tags")).arg(tr("true"));
+	s+="\n";
+	s+=tr("46")+QString(". ")+tr("Write on disk the %1 timetables will be %2", "%1 is a category of timetables, like XML or subgroups timetables, %2 is true or false")
 	 .arg(tr("activities")).arg(tr("true"));
 	s+="\n";
-	s+=tr("46")+QString(". ")+tr("Show tool tips for constraints with tables will be %1", "%1 is true or false").arg(tr("false"));
+	s+=tr("47")+QString(". ")+tr("Show tool tips for constraints with tables will be %1", "%1 is true or false").arg(tr("false"));
 	s+="\n";
-	s+=tr("47")+QString(". ")+tr("Show warning for subgroups with the same activities will be %1", "%1 is true or false").arg(tr("true"));
+	s+=tr("48")+QString(". ")+tr("Show warning for subgroups with the same activities will be %1", "%1 is true or false").arg(tr("true"));
 	s+="\n";
-	s+=tr("48")+QString(". ")+tr("Print detailed timetables will be %1", "%1 is true or false").arg(tr("true"));
+	s+=tr("49")+QString(". ")+tr("Print detailed timetables will be %1", "%1 is true or false").arg(tr("true"));
 	s+="\n";
-	s+=tr("49")+QString(". ")+tr("Print detailed teachers' free periods timetables will be %1", "%1 is true or false").arg(tr("true"));
+	s+=tr("50")+QString(". ")+tr("Print detailed teachers' free periods timetables will be %1", "%1 is true or false").arg(tr("true"));
 	s+="\n";
 	
 	switch( LongTextMessageBox::largeConfirmation( this, tr("FET confirmation"), s,
@@ -4148,6 +4152,7 @@ void FetMainForm::on_settingsRestoreDefaultsAction_triggered()
 	WRITE_TIMETABLES_TEACHERS_FREE_PERIODS=true;
 	WRITE_TIMETABLES_ROOMS=true;
 	WRITE_TIMETABLES_SUBJECTS=true;
+	WRITE_TIMETABLES_ACTIVITY_TAGS=true;
 	WRITE_TIMETABLES_ACTIVITIES=true;
 	//
 	

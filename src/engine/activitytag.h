@@ -40,11 +40,14 @@ class ActivityTag{
 
 public:
 	QString name;
+	
+	QString comments;
 
 	ActivityTag();
 	~ActivityTag();
 
 	QString getXmlDescription();
+	QString getDescription();
 	QString getDetailedDescription();
 	QString getDetailedDescriptionWithConstraints(Rules& r);
 };

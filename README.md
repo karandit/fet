@@ -1,4 +1,4 @@
-This is FET version 5.30.2
+This is FET version 5.30.3
 
 
 Program description:
@@ -16,7 +16,7 @@ Requirements:
 
 	FET is created in the following environment: openSUSE Leap 42.1 GNU/Linux distribution, Linux 4.1.27, Xfce 4.12,
 	Midnight Commander 4.8.15, KDiff3 0.9.98, Qt 5.7.0, gcc 6.1.1, g++ 6.1.1, make 4.0, sed 4.2.2,
-	Valgrind 3.10.1, Coverity Scan 8.5.0.1, Cppcheck 1.74, other great free tools.
+	Valgrind 3.10.1, Coverity Scan 8.5.0.1, Cppcheck 1.75, other great free tools.
 	FET can be run on any platform supported by the free software Qt (GNU/Linux, Windows, Mac OS X).
 
 	GNU/Linux, Mac OS X:
@@ -38,12 +38,15 @@ Download:
 
 Getting - compiling - installing GNU tools: make, gcc and g++ (or gcc-g++, or gcc-c++):
 
-	GNU/Linux, Mac OS X: Most probably, your platform has these installed by default or available on the internet
+	GNU/Linux, maybe Mac OS X: Most probably, your platform has these installed by default or available on the internet
 	as precompiled packages. If you don't have them, please install them using YaST (on openSUSE), Adept Manager
 	(on Ubuntu) or other package manager.
 	To verify that you have the correct packages, write "make --version", "gcc --version" and
 	"g++ --version".
 	Advice from a user on Ubuntu: "sudo apt-get install build-essential" installs build libraries commonly used.
+	
+	Maybe Mac OS X from a user: Install Xcode (current version is 7.3.1) from the Mac App Store.
+	(Once installed, I think you'll need to open the Xcode app to finish the installation.)
 
 	Windows: you need a Qt compatible C++ compiler.
 	Maybe an easy option is the MinGW compiler, available inside the Qt or on the Qt download page. You may
@@ -238,7 +241,7 @@ Running FET:
 	 [--writetimetableconflicts=wt1] [--writetimetablesstatistics=wt2] [--writetimetablesxml=wt3] [--writetimetablesdayshorizontal=wt4]
 	 [--writetimetablesdaysvertical=wt5] [--writetimetablestimehorizontal=wt6] [--writetimetablestimevertical=wt7] [--writetimetablessubgroups=wt8]
 	 [--writetimetablesgroups=wt9] [--writetimetablesyears=wt10] [--writetimetablesteachers=wt11] [--writetimetablesteachersfreeperiods=wt12]
-	 [--writetimetablesrooms=wt13] [--writetimetablessubjects=wt14] [--writetimetablesactivities=wt15]
+	 [--writetimetablesrooms=wt13] [--writetimetablessubjects=wt14] [--writetimetablesactivitytags=wt15] [--writetimetablesactivities=wt16]
 	 [--printactivitytags=a] [--printnotavailable=u] [--printbreak=b] [--dividetimeaxisbydays=v] [--duplicateverticalheaders=e]
 	 [--printsimultaneousactivities=w] [--randomseedx=rx --randomseedy=ry] [--warnifusingnotperfectconstraints=s]
 	 [--warnifusingstudentsminhoursdailywithallowemptydays=p] [--warnsubgroupswiththesameactivities=ssa]
@@ -251,7 +254,7 @@ Running FET:
 				(default 2, larger values have more details/facilities and larger file sizes).
 			t is one of en_US, ar, ca, cs, da, de, el, es, eu, fa, fr, gl, he, hu, id, it, lt, mk, ms, nl, pl, pt_BR, ro, ru, si, sk, sq, sr, tr, uk,
 				uz, vi, zh_CN, zh_TW (default en_US).
-			wt1 to wt15 are either true or false and represent whether you want the corresponding timetables to be written on the disk (default true).
+			wt1 to wt16 are either true or false and represent whether you want the corresponding timetables to be written on the disk (default true).
 			a is either true or false and represets if you want activity tags to be present in the final HTML timetables (default true).
 			u is either "true" or "false" and represents if you want -x- (for true) or --- (for false) in the generated timetables for the
 				not available slots (default true).

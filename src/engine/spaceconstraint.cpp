@@ -775,7 +775,7 @@ bool ConstraintActivityPreferredRoom::computeInternalStructure(QWidget* parent, 
 		
 	//this->_room = r.searchRoom(this->roomName);
 	_room=r.roomsHash.value(roomName, -1);
-	assert(_room>=0);
+	//assert(_room>=0);
 
 	if(this->_room<0){
 		SpaceConstraintIrreconcilableMessage::warning(parent, tr("FET error in data"), 
@@ -1297,6 +1297,11 @@ bool ConstraintStudentsSetHomeRoom::computeInternalStructure(QWidget* parent, Ru
 
 	//this->_room = r.searchRoom(this->roomName);
 	_room=r.roomsHash.value(roomName, -1);
+	if(this->_room<0){
+		SpaceConstraintIrreconcilableMessage::warning(parent, tr("FET error in data"), 
+			tr("Following constraint is wrong:\n%1").arg(this->getDetailedDescription(r)));
+		return false;
+	}
 	assert(this->_room>=0);
 	
 	return true;
@@ -1849,6 +1854,11 @@ bool ConstraintTeacherHomeRoom::computeInternalStructure(QWidget* parent, Rules&
 
 	//this->_room = r.searchRoom(this->roomName);
 	_room=r.roomsHash.value(roomName, -1);
+	if(this->_room<0){
+		SpaceConstraintIrreconcilableMessage::warning(parent, tr("FET error in data"), 
+			tr("Following constraint is wrong:\n%1").arg(this->getDetailedDescription(r)));
+		return false;
+	}
 	assert(this->_room>=0);
 	
 	return true;

@@ -1894,3 +1894,8 @@ Versions 5.30.0 - 5.30.v
 - Version 5.30.2
 	- Added more checks before the generation start (suggested by Léo-Paul Roch and Volker Dirr).
 	- Very rare bug fixed (probably never met in practice).
+- Version 5.30.3
+	- Generating the activity tags timetables (suggested by Darren McDonald, implemented by Volker Dirr).
+	- Added comments for teachers, students, subjects, activity tags, rooms and buildings (suggested by Volker Dirr and Anton Anthofer, implemented by Liviu Lalescu).
+	- Very rare crash bugs fixed (reported by mouiata).
+	- Added a new example file from Indonesia, by wahyuamin.

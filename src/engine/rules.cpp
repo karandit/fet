@@ -552,6 +552,43 @@ bool Rules::computeInternalStructure(QWidget* parent)
 				activitiesForSubject[internalActivitiesList[ai].subjectIndex].append(ai);
 	}
 	/////////////////////////////////////////////////////////////////
+	
+	//activities list for each activity tag - used for activity tags timetable - in order for students and teachers
+	activitiesForActivityTagList.resize(nInternalActivityTags);
+	activitiesForActivityTagSet.resize(nInternalActivityTags);
+	for(int a=0; a<nInternalActivityTags; a++){
+		activitiesForActivityTagList[a].clear();
+		activitiesForActivityTagSet[a].clear();
+	}
+
+	for(int i=0; i<this->augmentedYearsList.size(); i++){
+		StudentsYear* sty=this->augmentedYearsList[i];
+
+		for(int j=0; j<sty->groupsList.size(); j++){
+			StudentsGroup* stg=sty->groupsList[j];
+
+			for(int k=0; k<stg->subgroupsList.size(); k++){
+				StudentsSubgroup* sts=stg->subgroupsList[k];
+				
+				foreach(int ai, internalSubgroupsList[sts->indexInInternalSubgroupsList]->activitiesForSubgroup)
+					foreach(int activityTagInt, internalActivitiesList[ai].iActivityTagsSet)
+						if(!activitiesForActivityTagSet[activityTagInt].contains(ai)){
+							activitiesForActivityTagList[activityTagInt].append(ai);
+							activitiesForActivityTagSet[activityTagInt].insert(ai);
+						}
+			}
+		}
+	}
+	
+	for(int i=0; i<nInternalTeachers; i++){
+		foreach(int ai, internalTeachersList[i]->activitiesForTeacher)
+			foreach(int activityTagInt, internalActivitiesList[ai].iActivityTagsSet)
+				if(!activitiesForActivityTagSet[activityTagInt].contains(ai)){
+					activitiesForActivityTagList[activityTagInt].append(ai);
+					activitiesForActivityTagSet[activityTagInt].insert(ai);
+				}
+	}
+	/////////////////////////////////////////////////////////////////
 
 	bool ok=true;
 
@@ -4873,6 +4910,11 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 								}
 							}
 						}
+						else if(xmlReader.name()=="Comments"){
+							QString text=xmlReader.readElementText();
+							teacher->comments=text;
+							xmlReadingLog+="    Crt. teacher comments="+teacher->comments+"\n";
+						}
 						else{
 							xmlReader.skipCurrentElement();
 							xmlReaderNumberOfUnrecognizedFields++;
@@ -4922,6 +4964,11 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 							QString text=xmlReader.readElementText();
 							subject->name=text;
 							xmlReadingLog+="    Read subject name: "+subject->name+"\n";
+						}
+						else if(xmlReader.name()=="Comments"){
+							QString text=xmlReader.readElementText();
+							subject->comments=text;
+							xmlReadingLog+="    Crt. subject comments="+subject->comments+"\n";
 						}
 						else{
 							xmlReader.skipCurrentElement();
@@ -4976,6 +5023,11 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 							activityTag->name=text;
 							xmlReadingLog+="    Read activity tag name: "+activityTag->name+"\n";
 						}
+						else if(xmlReader.name()=="Comments"){
+							QString text=xmlReader.readElementText();
+							activityTag->comments=text;
+							xmlReadingLog+="    Crt. activity tag comments="+activityTag->comments+"\n";
+						}
 						else{
 							xmlReader.skipCurrentElement();
 							xmlReaderNumberOfUnrecognizedFields++;
@@ -5025,6 +5077,11 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 							QString text=xmlReader.readElementText();
 							activityTag->name=text;
 							xmlReadingLog+="    Read activity tag name: "+activityTag->name+"\n";
+						}
+						else if(xmlReader.name()=="Comments"){
+							QString text=xmlReader.readElementText();
+							activityTag->comments=text;
+							xmlReadingLog+="    Crt. activity tag comments="+activityTag->comments+"\n";
 						}
 						else{
 							xmlReader.skipCurrentElement();
@@ -5137,6 +5194,11 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 							sty->numberOfStudents=text.toInt();
 							xmlReadingLog+="    Read year number of students: "+CustomFETString::number(sty->numberOfStudents)+"\n";
 						}
+						else if(xmlReader.name()=="Comments"){
+							QString text=xmlReader.readElementText();
+							sty->comments=text;
+							xmlReadingLog+="    Crt. year comments="+sty->comments+"\n";
+						}
 						else if(xmlReader.name()=="Group"){
 							QSet<StudentsSubgroup*> allocatedSubgroups;
 						
@@ -5248,6 +5310,11 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 									stg->numberOfStudents=text.toInt();
 									xmlReadingLog+="     Read group number of students: "+CustomFETString::number(stg->numberOfStudents)+"\n";
 								}
+								else if(xmlReader.name()=="Comments"){
+									QString text=xmlReader.readElementText();
+									stg->comments=text;
+									xmlReadingLog+="    Crt. group comments="+stg->comments+"\n";
+								}
 								else if(xmlReader.name()=="Subgroup"){
 									StudentsSubgroup* sts=new StudentsSubgroup();
 									allAllocatedStudentsSets.insert(sts);
@@ -5346,6 +5413,11 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 											QString text=xmlReader.readElementText();
 											sts->numberOfStudents=text.toInt();
 											xmlReadingLog+="     Read subgroup number of students: "+CustomFETString::number(sts->numberOfStudents)+"\n";
+										}
+										else if(xmlReader.name()=="Comments"){
+											QString text=xmlReader.readElementText();
+											sts->comments=text;
+											xmlReadingLog+="    Crt. subgroup comments="+sts->comments+"\n";
 										}
 										else{
 											xmlReader.skipCurrentElement();
@@ -5789,6 +5861,11 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 							bu->name=text;
 							xmlReadingLog+="    Read building name: "+bu->name+"\n";
 						}
+						else if(xmlReader.name()=="Comments"){
+							QString text=xmlReader.readElementText();
+							bu->comments=text;
+							xmlReadingLog+="    Crt. building comments="+bu->comments+"\n";
+						}
 						else{
 							xmlReader.skipCurrentElement();
 							xmlReaderNumberOfUnrecognizedFields++;
@@ -5862,6 +5939,11 @@ bool Rules::read(QWidget* parent, const QString& fileName, bool commandLine, QSt
 							QString text=xmlReader.readElementText();
 							rm->building=text;
 							xmlReadingLog+="    Read room building:\n"+rm->building;
+						}
+						else if(xmlReader.name()=="Comments"){
+							QString text=xmlReader.readElementText();
+							rm->comments=text;
+							xmlReadingLog+="    Crt. room comments="+rm->comments+"\n";
 						}
 						else{
 							xmlReader.skipCurrentElement();

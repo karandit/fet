@@ -43,6 +43,8 @@ public slots:
 	
 	void activateStudents();
 	void deactivateStudents();
+	
+	void comments();
 };
 
 #endif

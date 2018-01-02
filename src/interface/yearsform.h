@@ -42,6 +42,8 @@ public slots:
 	void deactivateStudents();
 	
 	void divideYear();
+	
+	void comments();
 };
 
 #endif

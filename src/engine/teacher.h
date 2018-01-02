@@ -44,6 +44,8 @@ public:
 
 	QString name;
 	
+	QString comments;
+	
 	int targetNumberOfHours;
 	
 	QLinkedList<QString> qualifiedSubjectsList;
@@ -53,6 +55,7 @@ public:
 	~Teacher();
 
 	QString getXmlDescription();
+	QString getDescription();
 	QString getDetailedDescription();
 	QString getDetailedDescriptionWithConstraints(Rules& r);
 };

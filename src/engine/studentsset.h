@@ -54,6 +54,8 @@ public:
 	QString name;
 	int numberOfStudents;
 	int type;
+	
+	QString comments;
 
 	StudentsSet();
 	virtual ~StudentsSet();

@@ -21,6 +21,7 @@
 Teacher::Teacher()
 {
 	targetNumberOfHours=0;
+	comments=QString("");
 	qualifiedSubjectsList.clear();
 	qualifiedSubjectsHash.clear();
 }
@@ -38,9 +39,21 @@ QString Teacher::getXmlDescription()
 	foreach(QString sbj, qualifiedSubjectsList)
 		s+="		<Qualified_Subject>"+sbj+"</Qualified_Subject>\n";
 	s+="	</Qualified_Subjects>\n";
+	s+="	<Comments>"+protect(comments)+"</Comments>\n";
 	s+="</Teacher>\n";
 
 	return s;
+}
+
+QString Teacher::getDescription()
+{
+	QString s=tr("N:%1", "The name of the teacher").arg(name);
+	
+	QString end=QString("");
+	if(!comments.isEmpty())
+		end=", "+tr("C: %1", "Comments").arg(comments);
+	
+	return s+end;
 }
 
 QString Teacher::getDetailedDescription()
@@ -57,6 +70,12 @@ QString Teacher::getDetailedDescription()
 	s+="\n";
 	foreach(QString sbj, qualifiedSubjectsList){
 		s+=sbj;
+		s+="\n";
+	}
+
+	//Has comments?
+	if(!comments.isEmpty()){
+		s+=tr("Comments=%1").arg(comments);
 		s+="\n";
 	}
 

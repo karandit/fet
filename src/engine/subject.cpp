@@ -20,6 +20,7 @@
 
 Subject::Subject()
 {
+	comments=QString("");
 }
 
 Subject::~Subject()
@@ -30,9 +31,21 @@ QString Subject::getXmlDescription()
 {
 	QString s="<Subject>\n";
 	s+="	<Name>"+protect(this->name)+"</Name>\n";
+	s+="	<Comments>"+protect(comments)+"</Comments>\n";
 	s+="</Subject>\n";
 
 	return s;
+}
+
+QString Subject::getDescription()
+{
+	QString s=tr("N:%1", "The name of the subject").arg(name);
+	
+	QString end=QString("");
+	if(!comments.isEmpty())
+		end=", "+tr("C: %1", "Comments").arg(comments);
+	
+	return s+end;
 }
 
 QString Subject::getDetailedDescription()
@@ -41,6 +54,12 @@ QString Subject::getDetailedDescription()
 	s+="\n";
 	s+=tr("Name=%1", "The name of the subject").arg(this->name);
 	s+="\n";
+
+	//Has comments?
+	if(!comments.isEmpty()){
+		s+=tr("Comments=%1").arg(comments);
+		s+="\n";
+	}
 
 	return s;
 }

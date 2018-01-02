@@ -20,6 +20,7 @@
 
 ActivityTag::ActivityTag()
 {
+	comments=QString("");
 }
 
 ActivityTag::~ActivityTag()
@@ -30,9 +31,21 @@ QString ActivityTag::getXmlDescription()
 {
 	QString s="<Activity_Tag>\n";
 	s+="	<Name>"+protect(this->name)+"</Name>\n";
+	s+="	<Comments>"+protect(comments)+"</Comments>\n";
 	s+="</Activity_Tag>\n";
 
 	return s;
+}
+
+QString ActivityTag::getDescription()
+{
+	QString s=tr("N:%1", "The name of the activity tag").arg(name);
+	
+	QString end=QString("");
+	if(!comments.isEmpty())
+		end=", "+tr("C: %1", "Comments").arg(comments);
+	
+	return s+end;
 }
 
 QString ActivityTag::getDetailedDescription()
@@ -41,6 +54,12 @@ QString ActivityTag::getDetailedDescription()
 	s+="\n";
 	s+=tr("Name=%1", "The name of the activity tag").arg(this->name);
 	s+="\n";
+
+	//Has comments?
+	if(!comments.isEmpty()){
+		s+=tr("Comments=%1").arg(comments);
+		s+="\n";
+	}
 
 	return s;
 }

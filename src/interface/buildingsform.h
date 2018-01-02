@@ -45,6 +45,8 @@ public slots:
 	void sortBuildings();
 	void modifyBuilding();
 	void filterChanged();
+	
+	void comments();
 };
 
 #endif

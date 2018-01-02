@@ -46,7 +46,9 @@ public:
 	/**
 	If empty string, it is ignored
 	*/
-	QString building; 
+	QString building;
+	
+	QString comments;
 	
 	/**
 	Internal. If -1, it is ignored

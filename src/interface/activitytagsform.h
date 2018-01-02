@@ -44,6 +44,8 @@ public slots:
 	void activateActivityTag();
 	void deactivateActivityTag();
 	
+	void comments();
+	
 	void help();
 };
 

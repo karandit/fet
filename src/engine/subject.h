@@ -40,11 +40,14 @@ class Subject{
 	
 public:
 	QString name;
+	
+	QString comments;
 
 	Subject();
 	~Subject();
 
 	QString getXmlDescription();
+	QString getDescription();
 	QString getDetailedDescription();
 	QString getDetailedDescriptionWithConstraints(Rules& r);
 };

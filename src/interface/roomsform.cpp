@@ -57,6 +57,8 @@ RoomsForm::RoomsForm(QWidget* parent): QDialog(parent)
 	connect(sortRoomsPushButton, SIGNAL(clicked()), this, SLOT(sortRooms()));
 	connect(roomsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(modifyRoom()));
 
+	connect(commentsPushButton, SIGNAL(clicked()), this, SLOT(comments()));
+
 	centerWidgetOnScreen(this);
 	restoreFETDialogGeometry(this);
 	//restore splitter state
@@ -92,9 +94,10 @@ void RoomsForm::filterChanged()
 	for(int i=0; i<gt.rules.roomsList.size(); i++){
 		Room* rm=gt.rules.roomsList[i];
 		if(this->filterOk(rm)){
-			s=rm->getDescription();
+			//s=rm->getDescription();
+			//roomsListWidget->addItem(s);
+			roomsListWidget->addItem(rm->name);
 			visibleRoomsList.append(rm);
-			roomsListWidget->addItem(s);
 		}
 	}
 	
@@ -253,4 +256,62 @@ void RoomsForm::modifyRoom()
 
 	if(ci>=0)
 		roomsListWidget->setCurrentRow(ci);
+}
+
+void RoomsForm::comments()
+{
+	int ind=roomsListWidget->currentRow();
+	if(ind<0){
+		QMessageBox::information(this, tr("FET information"), tr("Invalid selected room"));
+		return;
+	}
+	
+	Room* rm=gt.rules.roomsList[ind];
+	assert(rm!=NULL);
+
+	QDialog getCommentsDialog(this);
+	
+	getCommentsDialog.setWindowTitle(tr("Room comments"));
+	
+	QPushButton* okPB=new QPushButton(tr("OK"));
+	okPB->setDefault(true);
+	QPushButton* cancelPB=new QPushButton(tr("Cancel"));
+	
+	connect(okPB, SIGNAL(clicked()), &getCommentsDialog, SLOT(accept()));
+	connect(cancelPB, SIGNAL(clicked()), &getCommentsDialog, SLOT(reject()));
+
+	QHBoxLayout* hl=new QHBoxLayout();
+	hl->addStretch();
+	hl->addWidget(okPB);
+	hl->addWidget(cancelPB);
+	
+	QVBoxLayout* vl=new QVBoxLayout();
+	
+	QPlainTextEdit* commentsPT=new QPlainTextEdit();
+	commentsPT->setPlainText(rm->comments);
+	commentsPT->selectAll();
+	commentsPT->setFocus();
+	
+	vl->addWidget(commentsPT);
+	vl->addLayout(hl);
+	
+	getCommentsDialog.setLayout(vl);
+	
+	const QString settingsName=QString("RoomCommentsDialog");
+	
+	getCommentsDialog.resize(500, 320);
+	centerWidgetOnScreen(&getCommentsDialog);
+	restoreFETDialogGeometry(&getCommentsDialog, settingsName);
+	
+	int t=getCommentsDialog.exec();
+	saveFETDialogGeometry(&getCommentsDialog, settingsName);
+	
+	if(t==QDialog::Accepted){
+		rm->comments=commentsPT->toPlainText();
+	
+		gt.rules.internalStructureComputed=false;
+		setRulesModifiedAndOtherThings(&gt.rules);
+
+		roomChanged(ind);
+	}
 }

@@ -214,6 +214,8 @@ public:
 	QSet<int> inactiveActivities;
 	
 	Matrix1D<QList<int> > activitiesForSubject;
+	Matrix1D<QList<int> > activitiesForActivityTagList;
+	Matrix1D<QSet<int> > activitiesForActivityTagSet;
 
 	int nInternalRooms;
 	Matrix1D<Room*> internalRoomsList;
