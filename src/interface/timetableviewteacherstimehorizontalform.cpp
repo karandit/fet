@@ -81,6 +81,9 @@ extern QSet<int> idsOfPermanentlyLockedSpace;	//care about locked activities in 
 
 extern CommunicationSpinBox communicationSpinBox;	//small hint to sync the forms
 
+extern const int MINIMUM_WIDTH_SPIN_BOX_VALUE;
+extern const int MINIMUM_HEIGHT_SPIN_BOX_VALUE;
+
 void TimetableViewTeachersTimeHorizontalDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	QStyledItemDelegate::paint(painter, option, index);
@@ -190,6 +193,14 @@ TimetableViewTeachersTimeHorizontalForm::TimetableViewTeachersTimeHorizontalForm
 ///////////
 
 	if(gt.rules.nInternalTeachers!=gt.rules.teachersList.count()){
+		assert(0); //should be taken care of by Rules - teachers_schedule_ready is false in the Rules if adding or removing teachers.
+
+		initialRecommendedHeight=10;
+
+		oldItemDelegate=teachersTimetableTable->itemDelegate();
+		newItemDelegate=new TimetableViewTeachersTimeHorizontalDelegate(NULL, 1, 1);
+		teachersTimetableTable->setItemDelegate(newItemDelegate);
+
 		QMessageBox::warning(this, tr("FET warning"), tr("Cannot display the timetable, because you added or removed some teachers. Please regenerate the timetable and then view it"));
 		return;
 	}
@@ -439,7 +450,7 @@ void TimetableViewTeachersTimeHorizontalForm::updateTeachersTimetableTable(){
 					
 					//students
 					if(act->studentsNames.count()>0){
-						s+=" ";
+						//s+=" ";
 						s+="\n";
 						s+=act->studentsNames.join(", ");
 						
@@ -451,7 +462,7 @@ void TimetableViewTeachersTimeHorizontalForm::updateTeachersTimetableTable(){
 					if(subjectsCheckBox->isChecked()){
 						if(!shortString.isEmpty()){
 							shortString+=" ";
-							shortString+="\n";
+							//shortString+="\n";
 						}
 						shortString+=act->subjectName;
 					}
@@ -466,7 +477,7 @@ void TimetableViewTeachersTimeHorizontalForm::updateTeachersTimetableTable(){
 						//Don't do the assert below, because it crashes if you change the teacher's name and view the teachers' timetable,
 						//without generating again (as reported by Yush Yuen).
 						//assert(act->teachersNames.contains(teachername));
-						s+=" ";
+						//s+=" ";
 						s+="\n";
 						s+=act->teachersNames.join(", ");
 					}
@@ -475,7 +486,7 @@ void TimetableViewTeachersTimeHorizontalForm::updateTeachersTimetableTable(){
 					if(r!=UNALLOCATED_SPACE && r!=UNSPECIFIED_ROOM){
 						//s+=" ";
 						//s+=tr("R:%1", "Room").arg(gt.rules.internalRoomsList[r]->name);
-						s+=" ";
+						//s+=" ";
 						s+="\n";
 						s+=gt.rules.internalRoomsList[r]->name;
 					}
@@ -507,7 +518,7 @@ void TimetableViewTeachersTimeHorizontalForm::updateTeachersTimetableTable(){
 					}
 					if(descr!=""){
 						descr.prepend("\n(");
-						descr.prepend(" ");
+						//descr.prepend(" ");
 						descr.append(")");
 					}
 
@@ -522,6 +533,17 @@ void TimetableViewTeachersTimeHorizontalForm::updateTeachersTimetableTable(){
 						teachersTimetableTable->item(t, d*gt.rules.nHoursPerDay+h)->setFont(font);
 					}
 					
+					if(idsOfPermanentlyLockedSpace.contains(act->id) || idsOfLockedSpace.contains(act->id)){
+						QFont font(teachersTimetableTable->item(t, d*gt.rules.nHoursPerDay+h)->font());
+						font.setItalic(true);
+						teachersTimetableTable->item(t, d*gt.rules.nHoursPerDay+h)->setFont(font);
+					}
+					else{
+						QFont font(teachersTimetableTable->item(t, d*gt.rules.nHoursPerDay+h)->font());
+						font.setItalic(false);
+						teachersTimetableTable->item(t, d*gt.rules.nHoursPerDay+h)->setFont(font);
+					}
+
 					s+=descr;
 					//added by Volker Dirr (end)
 				
@@ -617,6 +639,9 @@ void TimetableViewTeachersTimeHorizontalForm::detailActivity(QTableWidgetItem* i
 		QMessageBox::warning(this, tr("FET warning"), tr("Cannot display the timetable, because you added or removed some rooms. Please regenerate the timetable and then view it"));
 		return;
 	}
+	
+	assert(item->row()>=0);
+	assert(item->column()>=0);
 
 	int t=item->row();
 	
@@ -1057,6 +1082,8 @@ void TimetableViewTeachersTimeHorizontalForm::help()
 	
 	s+="\n\n";
 	s+=tr("A bold font cell means that the activity is locked in time, either permanently or not.");
+	s+=" ";
+	s+=tr("An italic font cell means that the activity is locked in space, either permanently or not.");
 
 	LongTextMessageBox::largeInformation(this, tr("FET help"), s);
 }
