@@ -1,4 +1,4 @@
-This is FET version 5.33.3
+This is FET version 5.34.0
 
 
 Program description:
@@ -14,16 +14,16 @@ Program description:
 
 Requirements:
 
-	FET is created in the following environment: openSUSE Leap 42.3 GNU/Linux distribution, Linux 4.4.90, Xfce 4.12,
-	Midnight Commander 4.8.19, KDiff3 0.9.98, Qt 5.9.2, gcc 7.1.1, g++ 7.1.1, make 4.0, sed 4.2.2,
-	Valgrind 3.12.0, Coverity Scan 2017.07, Cppcheck 1.81, other great free tools.
+	FET is created in the following environment: openSUSE Leap 42.3 GNU/Linux distribution, Linux 4.4.92, Xfce 4.12,
+	Midnight Commander 4.8.19, KDiff3 0.9.98, Qt 5.9.2, gcc 7.2.1, g++ 7.2.1, make 4.0, sed 4.2.2,
+	Valgrind 3.13.0, Coverity Scan 2017.07, Cppcheck 1.81, other great free tools.
 	FET can be run on any platform supported by the free software Qt (GNU/Linux, Windows, Mac OS X).
 
 	GNU/Linux, Mac OS X:
 	Software:
 		make 4.0 or similar (GNU Make)
-		gcc 7.1.1 or similar
-		g++ 7.1.1 or similar (or gcc-g++, or gcc-c++, the name may vary. This program may be included in the gcc package)
+		gcc 7.2.1 or similar
+		g++ 7.2.1 or similar (or gcc-g++, or gcc-c++, the name may vary. This program may be included in the gcc package)
 		Qt 5.9.2 or compatible (The authors also tried to maintain backwards source compatibility with Qt 4.v.v).
 
 	Windows:
@@ -245,7 +245,9 @@ Running FET:
 	 [--printactivitytags=a] [--printnotavailable=u] [--printbreak=b] [--dividetimeaxisbydays=v] [--duplicateverticalheaders=e]
 	 [--printsimultaneousactivities=w] [--randomseedx=rx --randomseedy=ry] [--warnifusingnotperfectconstraints=s]
 	 [--warnifusingstudentsminhoursdailywithallowemptydays=p] [--warnsubgroupswiththesameactivities=ssa]
-	 [--printdetailedtimetables=pdt] [--printdetailedteachersfreeperiodstimetables=pdtfp] [--verbose=r]",
+	 [--printdetailedtimetables=pdt] [--printdetailedteachersfreeperiodstimetables=pdtfp]
+	 [--exportcsv=ecsv] [--overwritecsv=ocsv] [--firstlineisheadingcsv=flhcsv] [--quotescsv=qcsv] [--fieldseparatorcsv=fscsv]
+	 [--verbose=r]",
 	where	x is the input file, for instance "data.fet"
 			d is the path to results directory, without trailing slash or backslash (default is current working path).
 				Make sure you have write permissions there.
@@ -276,6 +278,12 @@ Running FET:
 				the same activities (default true).
 			pdt is either true or false, represents whether you want to show the detailed (true) or less detailed (false) years and groups timetables (default true).
 			pdtfp is either true or false, represents whether you want to show the detailed (true) or less detailed (false) teachers free periods timetables (default true).
+			ecsv is either true or false, represents whether you want to export the CSV file and timetables (default false).
+			ocsv is either true or false, represents whether you want to overwrite old CSV files, if they exist (default false).
+			flhcsv is either true or false, represents whether you want the heading of the CSV files to be header (true) or data (false). The default value is true.
+			qcsv is one value from the set [doublequotes|singlequotes|none] (write a single value from these three exactly as it is written here). The default value
+				is doublequotes.
+			fscsv is one value from the set [comma|semicolon|verticalbar] (write a single value from these three exactly as it is written here). The default value is comma.
 			r is either true or false, represents whether you want additional generation messages and other messages to be shown on the command line (default false).
 
 	Alternatively, you can run "fet-cl --version [--outputdir=d]" to get the current FET version.
