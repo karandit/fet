@@ -338,7 +338,7 @@ void StatisticsExport::getNamesAndHours(FetStatistics *statisticValues){
 
 bool StatisticsExport::exportStatisticsStylesheetCss(QWidget* parent, QString saveTime, FetStatistics statisticValues){
 	assert(gt.rules.initialized); // && gt.rules.internalStructureComputed);
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -410,7 +410,8 @@ bool StatisticsExport::exportStatisticsStylesheetCss(QWidget* parent, QString sa
 		}
 		if(TIMETABLE_HTML_PRINT_ACTIVITY_TAGS){
 			for(int i=0; i<gt.rules.activityTagsList.size(); i++){
-				tos << "span.at_"<<statisticValues.hashActivityTagIDsStatistics.value(gt.rules.activityTagsList[i]->name)<<" { /* activity tag "<<gt.rules.activityTagsList[i]->name<<" */\n\n}\n\n";
+				if(gt.rules.activityTagsList[i]->printable)
+					tos << "span.at_"<<statisticValues.hashActivityTagIDsStatistics.value(gt.rules.activityTagsList[i]->name)<<" { /* activity tag "<<gt.rules.activityTagsList[i]->name<<" */\n\n}\n\n";
 			}
 		}
 		for(int i=0; i<gt.rules.yearsList.size(); i++){
@@ -438,7 +439,15 @@ bool StatisticsExport::exportStatisticsStylesheetCss(QWidget* parent, QString sa
 	if(TIMETABLE_HTML_LEVEL>=3){
 		tos<<"span.subject {\n\n}\n\n";
 		if(TIMETABLE_HTML_PRINT_ACTIVITY_TAGS){
-			tos<<"span.activitytag {\n\n}\n\n";
+			bool havePrintableActivityTag=false;
+			foreach(ActivityTag* at, gt.rules.activityTagsList){
+				if(at->printable){
+					havePrintableActivityTag=true;
+					break;
+				}
+			}
+			if(havePrintableActivityTag)
+				tos<<"span.activitytag {\n\n}\n\n";
 		}
 		tos<<"span.empty {\n  color: gray;\n}\n\n";
 		tos<<"td.empty {\n  border-color:silver;\n  border-right-style:none;\n  border-bottom-style:none;\n  border-left-style:dotted;\n  border-top-style:dotted;\n}\n\n";
@@ -467,7 +476,7 @@ bool StatisticsExport::exportStatisticsStylesheetCss(QWidget* parent, QString sa
 
 bool StatisticsExport::exportStatisticsIndex(QWidget* parent, QString saveTime){
 	assert(gt.rules.initialized); // && gt.rules.internalStructureComputed);
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 	
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -580,7 +589,7 @@ bool StatisticsExport::exportStatisticsIndex(QWidget* parent, QString saveTime){
 
 bool StatisticsExport::exportStatisticsTeachersSubjects(QWidget* parent, QString saveTime, FetStatistics statisticValues, int htmlLevel){
 	assert(gt.rules.initialized); // && gt.rules.internalStructureComputed);
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -744,7 +753,19 @@ QString StatisticsExport::exportStatisticsTeachersSubjectsHtml(QWidget* parent, 
 						Activity* act=gt.rules.activitiesList.at(tmpAct);
 						StringListPair slp;
 						slp.list1=act->studentsNames;
-						slp.list2=act->activityTagsNames;
+
+						slp.list2.clear();
+						if(printActivityTags){
+							foreach(QString at, act->activityTagsNames){
+								int id=statisticValues.hashActivityTagIDsStatistics.value(at, "0").toInt()-1;
+								assert(id>=0);
+								assert(id<gt.rules.activityTagsList.count());
+								if(gt.rules.activityTagsList[id]->printable)
+									slp.list2.append(at);
+							}
+						}
+						//slp.list2=act->activityTagsNames;
+
 						int dur=durationMap.value(slp, 0);
 						dur+=act->duration;
 						durationMap.insert(slp, dur);
@@ -795,18 +816,27 @@ QString StatisticsExport::exportStatisticsTeachersSubjectsHtml(QWidget* parent, 
 							}
 							if(printActivityTags){
 								for(QStringList::Iterator atn=activityTagsNames.begin(); atn!=activityTagsNames.end(); atn++){
-									switch(htmlLevel){
-										case 3 : tmpSt+=" <span class=\"activitytag\">"+protect2(*atn)+"</span>"; break;
-										case 4 : tmpSt+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\">"+protect2(*atn)+"</span></span>"; break;
-										case 5 : ;
-										case 6 : tmpSt+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\" onmouseover=\"highlight('at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"')\">"+protect2(*atn)+"</span></span>"; break;
-										default: tmpSt+=" "+protect2(*atn); break;
-									}
-									if(atn!=activityTagsNames.end()-1)
+									assert(statisticValues.hashActivityTagIDsStatistics.contains(*atn));
+									int id=statisticValues.hashActivityTagIDsStatistics.value(*atn, "0").toInt()-1;
+									assert(id>=0);
+									assert(id<statisticValues.hashActivityTagIDsStatistics.count());
+									if(gt.rules.activityTagsList[id]->printable){
+										switch(htmlLevel){
+											case 3 : tmpSt+=" <span class=\"activitytag\">"+protect2(*atn)+"</span>"; break;
+											case 4 : tmpSt+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\">"+protect2(*atn)+"</span></span>"; break;
+											case 5 : ;
+											case 6 : tmpSt+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\" onmouseover=\"highlight('at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"')\">"+protect2(*atn)+"</span></span>"; break;
+											default: tmpSt+=" "+protect2(*atn); break;
+										}
 										tmpSt+=", ";
+									}
+								}
+								if(tmpSt.endsWith(", ")){
+									tmpSt.remove(tmpSt.size()-2, 2);
 								}
 							}
-							
+							if(tmpSt=="")
+								tmpSt=" ";
 						} else
 							tmpSt=" ";
 
@@ -856,7 +886,7 @@ QString StatisticsExport::exportStatisticsTeachersSubjectsHtml(QWidget* parent, 
 
 bool StatisticsExport::exportStatisticsSubjectsTeachers(QWidget* parent, QString saveTime, FetStatistics statisticValues, int htmlLevel){
 	assert(gt.rules.initialized); // && gt.rules.internalStructureComputed);
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -1019,7 +1049,19 @@ QString StatisticsExport::exportStatisticsSubjectsTeachersHtml(QWidget* parent, 
 						Activity* act=gt.rules.activitiesList.at(tmpAct);
 						StringListPair slp;
 						slp.list1=act->studentsNames;
-						slp.list2=act->activityTagsNames;
+
+						slp.list2.clear();
+						if(printActivityTags){
+							foreach(QString at, act->activityTagsNames){
+								int id=statisticValues.hashActivityTagIDsStatistics.value(at, "0").toInt()-1;
+								assert(id>=0);
+								assert(id<gt.rules.activityTagsList.count());
+								if(gt.rules.activityTagsList[id]->printable)
+									slp.list2.append(at);
+							}
+						}
+						//slp.list2=act->activityTagsNames;
+
 						int dur=durationMap.value(slp, 0);
 						dur+=act->duration;
 						durationMap.insert(slp, dur);
@@ -1070,17 +1112,27 @@ QString StatisticsExport::exportStatisticsSubjectsTeachersHtml(QWidget* parent, 
 							}
 							if(printActivityTags){
 								for(QStringList::Iterator atn=activityTagsNames.begin(); atn!=activityTagsNames.end(); atn++){
-									switch(htmlLevel){
-										case 3 : tmpSt+=" <span class=\"activitytag\">"+protect2(*atn)+"</span>"; break;
-										case 4 : tmpSt+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\">"+protect2(*atn)+"</span></span>"; break;
-										case 5 : ;
-										case 6 : tmpSt+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\" onmouseover=\"highlight('at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"')\">"+protect2(*atn)+"</span></span>"; break;
-										default: tmpSt+=" "+protect2(*atn); break;
-									}
-									if(atn!=activityTagsNames.end()-1)
+									assert(statisticValues.hashActivityTagIDsStatistics.contains(*atn));
+									int id=statisticValues.hashActivityTagIDsStatistics.value(*atn, "0").toInt()-1;
+									assert(id>=0);
+									assert(id<statisticValues.hashActivityTagIDsStatistics.count());
+									if(gt.rules.activityTagsList[id]->printable){
+										switch(htmlLevel){
+											case 3 : tmpSt+=" <span class=\"activitytag\">"+protect2(*atn)+"</span>"; break;
+											case 4 : tmpSt+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\">"+protect2(*atn)+"</span></span>"; break;
+											case 5 : ;
+											case 6 : tmpSt+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\" onmouseover=\"highlight('at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"')\">"+protect2(*atn)+"</span></span>"; break;
+											default: tmpSt+=" "+protect2(*atn); break;
+										}
 										tmpSt+=", ";
+									}
+								}
+								if(tmpSt.endsWith(", ")){
+									tmpSt.remove(tmpSt.size()-2, 2);
 								}
 							}
+							if(tmpSt=="")
+								tmpSt=" ";
 						} else
 							tmpSt=" ";
 						tmp+=tmpSt;
@@ -1130,7 +1182,7 @@ QString StatisticsExport::exportStatisticsSubjectsTeachersHtml(QWidget* parent, 
 
 bool StatisticsExport::exportStatisticsTeachersStudents(QWidget* parent, QString saveTime, FetStatistics statisticValues, int htmlLevel){
 	assert(gt.rules.initialized); // && gt.rules.internalStructureComputed);
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -1295,7 +1347,19 @@ QString StatisticsExport::exportStatisticsTeachersStudentsHtml(QWidget* parent, 
 						Activity* act=gt.rules.activitiesList.at(tmpAct);
 						StringListPair slp;
 						slp.list1=QStringList(act->subjectName);
-						slp.list2=act->activityTagsNames;
+
+						slp.list2.clear();
+						if(printActivityTags){
+							foreach(QString at, act->activityTagsNames){
+								int id=statisticValues.hashActivityTagIDsStatistics.value(at, "0").toInt()-1;
+								assert(id>=0);
+								assert(id<gt.rules.activityTagsList.count());
+								if(gt.rules.activityTagsList[id]->printable)
+									slp.list2.append(at);
+							}
+						}
+						//slp.list2=act->activityTagsNames;
+						
 						int dur=durationMap.value(slp, 0);
 						dur+=act->duration;
 						durationMap.insert(slp, dur);
@@ -1345,17 +1409,27 @@ QString StatisticsExport::exportStatisticsTeachersStudentsHtml(QWidget* parent, 
 								}
 							if(printActivityTags){
 								for(QStringList::Iterator atn=activityTagsNames.begin(); atn!=activityTagsNames.end(); atn++){
-									switch(htmlLevel){
-										case 3 : tmpS+=" <span class=\"activitytag\">"+protect2(*atn)+"</span>"; break;
-										case 4 : tmpS+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\">"+protect2(*atn)+"</span></span>"; break;
-										case 5 : ;
-										case 6 : tmpS+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\" onmouseover=\"highlight('at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"')\">"+protect2(*atn)+"</span></span>"; break;
-										default: tmpS+=" "+protect2(*atn); break;
-									}
-									if(atn!=activityTagsNames.end()-1)
+									assert(statisticValues.hashActivityTagIDsStatistics.contains(*atn));
+									int id=statisticValues.hashActivityTagIDsStatistics.value(*atn, "0").toInt()-1;
+									assert(id>=0);
+									assert(id<statisticValues.hashActivityTagIDsStatistics.count());
+									if(gt.rules.activityTagsList[id]->printable){
+										switch(htmlLevel){
+											case 3 : tmpS+=" <span class=\"activitytag\">"+protect2(*atn)+"</span>"; break;
+											case 4 : tmpS+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\">"+protect2(*atn)+"</span></span>"; break;
+											case 5 : ;
+											case 6 : tmpS+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\" onmouseover=\"highlight('at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"')\">"+protect2(*atn)+"</span></span>"; break;
+											default: tmpS+=" "+protect2(*atn); break;
+										}
 										tmpS+=", ";
+									}
+								}
+								if(tmpS.endsWith(", ")){
+									tmpS.remove(tmpS.size()-2, 2);
 								}
 							}
+							if(tmpS=="")
+								tmpS=" ";
 						} else
 							tmpS=" ";
 
@@ -1405,7 +1479,7 @@ QString StatisticsExport::exportStatisticsTeachersStudentsHtml(QWidget* parent, 
 
 bool StatisticsExport::exportStatisticsStudentsTeachers(QWidget* parent, QString saveTime, FetStatistics statisticValues, int htmlLevel){
 	assert(gt.rules.initialized); // && gt.rules.internalStructureComputed);
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -1491,7 +1565,7 @@ QString StatisticsExport::exportStatisticsStudentsTeachersHtml(QWidget* parent, 
 	QString tmp;
 	tmp+="    <table border=\"1\">\n";	
 	tmp+="      <caption>"+protect2(gt.rules.institutionName)+"</caption>\n";
-	tmp+="      <thead>\n        <tr><td rowspan=\"2\"></td><th colspan=\""+QString::number(colspan+1)+"\">"+tr("Students -Teachers Matrix")+"</th></tr>\n";
+	tmp+="      <thead>\n        <tr><td rowspan=\"2\"></td><th colspan=\""+QString::number(colspan+1)+"\">"+tr("Students - Teachers Matrix")+"</th></tr>\n";
 	tmp+="        <tr>\n          <!-- span -->\n";
 	int currentCount=0;
 	for(int students=0; students<statisticValues.allStudentsNames.count() && currentCount<maxNames; students++){
@@ -1570,7 +1644,19 @@ QString StatisticsExport::exportStatisticsStudentsTeachersHtml(QWidget* parent, 
 						Activity* act=gt.rules.activitiesList.at(tmpAct);
 						StringListPair slp;
 						slp.list1=QStringList(act->subjectName);
-						slp.list2=act->activityTagsNames;
+
+						slp.list2.clear();
+						if(printActivityTags){
+							foreach(QString at, act->activityTagsNames){
+								int id=statisticValues.hashActivityTagIDsStatistics.value(at, "0").toInt()-1;
+								assert(id>=0);
+								assert(id<gt.rules.activityTagsList.count());
+								if(gt.rules.activityTagsList[id]->printable)
+									slp.list2.append(at);
+							}
+						}
+						//slp.list2=act->activityTagsNames;
+
 						int dur=durationMap.value(slp, 0);
 						dur+=act->duration;
 						durationMap.insert(slp, dur);
@@ -1620,17 +1706,27 @@ QString StatisticsExport::exportStatisticsStudentsTeachersHtml(QWidget* parent, 
 								}
 							if(printActivityTags){
 								for(QStringList::Iterator atn=activityTagsNames.begin(); atn!=activityTagsNames.end(); atn++){
-									switch(htmlLevel){
-										case 3 : tmpS+=" <span class=\"activitytag\">"+protect2(*atn)+"</span>"; break;
-										case 4 : tmpS+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\">"+protect2(*atn)+"</span></span>"; break;
-										case 5 : ;
-										case 6 : tmpS+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\" onmouseover=\"highlight('at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"')\">"+protect2(*atn)+"</span></span>"; break;
-										default: tmpS+=" "+protect2(*atn); break;
-									}
-									if(atn!=activityTagsNames.end()-1)
+									assert(statisticValues.hashActivityTagIDsStatistics.contains(*atn));
+									int id=statisticValues.hashActivityTagIDsStatistics.value(*atn, "0").toInt()-1;
+									assert(id>=0);
+									assert(id<statisticValues.hashActivityTagIDsStatistics.count());
+									if(gt.rules.activityTagsList[id]->printable){
+										switch(htmlLevel){
+											case 3 : tmpS+=" <span class=\"activitytag\">"+protect2(*atn)+"</span>"; break;
+											case 4 : tmpS+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\">"+protect2(*atn)+"</span></span>"; break;
+											case 5 : ;
+											case 6 : tmpS+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\" onmouseover=\"highlight('at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"')\">"+protect2(*atn)+"</span></span>"; break;
+											default: tmpS+=" "+protect2(*atn); break;
+										}
 										tmpS+=", ";
+									}
+								}
+								if(tmpS.endsWith(", ")){
+									tmpS.remove(tmpS.size()-2, 2);
 								}
 							}
+							if(tmpS=="")
+								tmpS=" ";
 						} else
 							tmpS=" ";
 						tmp+=tmpS;
@@ -1680,7 +1776,7 @@ QString StatisticsExport::exportStatisticsStudentsTeachersHtml(QWidget* parent, 
 
 bool StatisticsExport::exportStatisticsSubjectsStudents(QWidget* parent, QString saveTime, FetStatistics statisticValues, int htmlLevel){
 	assert(gt.rules.initialized); // && gt.rules.internalStructureComputed);
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -1843,7 +1939,19 @@ QString StatisticsExport::exportStatisticsSubjectsStudentsHtml(QWidget* parent, 
 						Activity* act=gt.rules.activitiesList.at(tmpAct);
 						StringListPair slp;
 						slp.list1=act->teachersNames;
-						slp.list2=act->activityTagsNames;
+
+						slp.list2.clear();
+						if(printActivityTags){
+							foreach(QString at, act->activityTagsNames){
+								int id=statisticValues.hashActivityTagIDsStatistics.value(at, "0").toInt()-1;
+								assert(id>=0);
+								assert(id<gt.rules.activityTagsList.count());
+								if(gt.rules.activityTagsList[id]->printable)
+									slp.list2.append(at);
+							}
+						}
+						//slp.list2=act->activityTagsNames;
+
 						int dur=durationMap.value(slp, 0);
 						dur+=act->duration;
 						durationMap.insert(slp, dur);
@@ -1895,17 +2003,27 @@ QString StatisticsExport::exportStatisticsSubjectsStudentsHtml(QWidget* parent, 
 							}
 							if(printActivityTags){
 								for(QStringList::Iterator atn=activityTagsNames.begin(); atn!=activityTagsNames.end(); atn++){
-									switch(htmlLevel){
-										case 3 : tmpT+=" <span class=\"activitytag\">"+protect2(*atn)+"</span>"; break;
-										case 4 : tmpT+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\">"+protect2(*atn)+"</span></span>"; break;
-										case 5 : ;
-										case 6 : tmpT+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\" onmouseover=\"highlight('at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"')\">"+protect2(*atn)+"</span></span>"; break;
-										default: tmpT+=" "+protect2(*atn); break;
-									}
-									if(atn!=activityTagsNames.end()-1)
+									assert(statisticValues.hashActivityTagIDsStatistics.contains(*atn));
+									int id=statisticValues.hashActivityTagIDsStatistics.value(*atn, "0").toInt()-1;
+									assert(id>=0);
+									assert(id<statisticValues.hashActivityTagIDsStatistics.count());
+									if(gt.rules.activityTagsList[id]->printable){
+										switch(htmlLevel){
+											case 3 : tmpT+=" <span class=\"activitytag\">"+protect2(*atn)+"</span>"; break;
+											case 4 : tmpT+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\">"+protect2(*atn)+"</span></span>"; break;
+											case 5 : ;
+											case 6 : tmpT+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\" onmouseover=\"highlight('at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"')\">"+protect2(*atn)+"</span></span>"; break;
+											default: tmpT+=" "+protect2(*atn); break;
+										}
 										tmpT+=", ";
+									}
+								}
+								if(tmpT.endsWith(", ")){
+									tmpT.remove(tmpT.size()-2, 2);
 								}
 							}
+							if(tmpT=="")
+								tmpT=" ";
 						} else
 							tmpT=" ";
 						tmp+=tmpT;
@@ -1955,7 +2073,7 @@ QString StatisticsExport::exportStatisticsSubjectsStudentsHtml(QWidget* parent, 
 
 bool StatisticsExport::exportStatisticsStudentsSubjects(QWidget* parent, QString saveTime, FetStatistics statisticValues, int htmlLevel){
 	assert(gt.rules.initialized); // && gt.rules.internalStructureComputed);
-	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because to long filenames!
+	QString s2=INPUT_FILENAME_XML.right(INPUT_FILENAME_XML.length()-INPUT_FILENAME_XML.lastIndexOf(FILE_SEP)-1);	//TODO: remove s2, because too long filenames!
 
 	if(s2.right(4)==".fet")
 		s2=s2.left(s2.length()-4);
@@ -2040,7 +2158,7 @@ QString StatisticsExport::exportStatisticsStudentsSubjectsHtml(QWidget* parent, 
 	QString tmp;
 	tmp+="    <table border=\"1\">\n";	
 	tmp+="      <caption>"+protect2(gt.rules.institutionName)+"</caption>\n";
-	tmp+="      <thead>\n        <tr><td rowspan=\"2\"></td><th colspan=\""+QString::number(colspan+1)+"\">"+tr("Students -Subjects Matrix")+"</th></tr>\n";
+	tmp+="      <thead>\n        <tr><td rowspan=\"2\"></td><th colspan=\""+QString::number(colspan+1)+"\">"+tr("Students - Subjects Matrix")+"</th></tr>\n";
 	tmp+="        <tr>\n          <!-- span -->\n";
 	int currentCount=0;
 	for(int students=0; students<statisticValues.allStudentsNames.count() && currentCount<maxNames; students++){
@@ -2119,7 +2237,19 @@ QString StatisticsExport::exportStatisticsStudentsSubjectsHtml(QWidget* parent, 
 						Activity* act=gt.rules.activitiesList.at(tmpAct);
 						StringListPair slp;
 						slp.list1=act->teachersNames;
-						slp.list2=act->activityTagsNames;
+
+						slp.list2.clear();
+						if(printActivityTags){
+							foreach(QString at, act->activityTagsNames){
+								int id=statisticValues.hashActivityTagIDsStatistics.value(at, "0").toInt()-1;
+								assert(id>=0);
+								assert(id<gt.rules.activityTagsList.count());
+								if(gt.rules.activityTagsList[id]->printable)
+									slp.list2.append(at);
+							}
+						}
+						//slp.list2=act->activityTagsNames;
+
 						int dur=durationMap.value(slp, 0);
 						dur+=act->duration;
 						durationMap.insert(slp, dur);
@@ -2171,17 +2301,27 @@ QString StatisticsExport::exportStatisticsStudentsSubjectsHtml(QWidget* parent, 
 							}
 							if(printActivityTags){
 								for(QStringList::Iterator atn=activityTagsNames.begin(); atn!=activityTagsNames.end(); atn++){
-									switch(htmlLevel){
-										case 3 : tmpT+=" <span class=\"activitytag\">"+protect2(*atn)+"</span>"; break;
-										case 4 : tmpT+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\">"+protect2(*atn)+"</span></span>"; break;
-										case 5 : ;
-										case 6 : tmpT+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\" onmouseover=\"highlight('at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"')\">"+protect2(*atn)+"</span></span>"; break;
-										default: tmpT+=" "+protect2(*atn); break;
-									}
-									if(atn!=activityTagsNames.end()-1)
+									assert(statisticValues.hashActivityTagIDsStatistics.contains(*atn));
+									int id=statisticValues.hashActivityTagIDsStatistics.value(*atn, "0").toInt()-1;
+									assert(id>=0);
+									assert(id<statisticValues.hashActivityTagIDsStatistics.count());
+									if(gt.rules.activityTagsList[id]->printable){
+										switch(htmlLevel){
+											case 3 : tmpT+=" <span class=\"activitytag\">"+protect2(*atn)+"</span>"; break;
+											case 4 : tmpT+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\">"+protect2(*atn)+"</span></span>"; break;
+											case 5 : ;
+											case 6 : tmpT+=" <span class=\"activitytag\"><span class=\"at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"\" onmouseover=\"highlight('at_"+statisticValues.hashActivityTagIDsStatistics.value(*atn)+"')\">"+protect2(*atn)+"</span></span>"; break;
+											default: tmpT+=" "+protect2(*atn); break;
+										}
 										tmpT+=", ";
+									}
+								}
+								if(tmpT.endsWith(", ")){
+									tmpT.remove(tmpT.size()-2, 2);
 								}
 							}
+							if(tmpT=="")
+								tmpT=" ";
 						} else
 							tmpT=" ";
 						tmp+=tmpT;

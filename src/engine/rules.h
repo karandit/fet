@@ -213,7 +213,8 @@ public:
 	
 	QSet<int> inactiveActivities;
 	
-	Matrix1D<QList<int> > activitiesForSubject;
+	Matrix1D<QList<int> > activitiesForSubjectList;
+	Matrix1D<QSet<int> > activitiesForSubjectSet;
 	Matrix1D<QList<int> > activitiesForActivityTagList;
 	Matrix1D<QSet<int> > activitiesForActivityTagSet;
 
@@ -735,6 +736,9 @@ public:
 	int deactivateSubject(const QString& subjectName);
 	
 	int deactivateActivityTag(const QString& activityTagName);
+	
+	void makeActivityTagPrintable(const QString& activityTagName);
+	void makeActivityTagNotPrintable(const QString& activityTagName);
 	
 	void updateActivitiesWhenRemovingStudents(const QSet<StudentsSet*>& studentsSets, bool updateConstraints);
 	void updateGroupActivitiesInInitialOrderAfterRemoval();
