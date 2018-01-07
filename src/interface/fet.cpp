@@ -234,7 +234,8 @@ void usage(QTextStream* out, const QString& error)
 		"(If you specify the --version argument, FET just prints version number on the command line prompt and in the output directory and exits.)\n"
 		"\n"
 		"You can ask the FET command line process to stop the timetable generation, by sending it the SIGTERM signal. "
-		"FET will then write the current timetable and the highest stage timetable and exit."
+		"FET will then write the current timetable and the highest stage timetable and exit. "
+		"(If you send the FET command line the SIGKILL signal it will stop immediately, without writing the timetable.)"
 	);
 	
 	cout<<qPrintable(s)<<endl;
@@ -739,9 +740,9 @@ int main(int argc, char **argv)
 
 	terminateGeneratePointer=NULL;
 	
-	students_schedule_ready=0;
-	teachers_schedule_ready=0;
-	rooms_schedule_ready=0;
+	students_schedule_ready=false;
+	teachers_schedule_ready=false;
+	rooms_schedule_ready=false;
 
 #ifndef FET_COMMAND_LINE
 	QObject::connect(&qapplication, SIGNAL(lastWindowClosed()), &qapplication, SLOT(quit()));
